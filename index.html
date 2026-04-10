@@ -3,51 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Regal Music - Neon Edition</title>
+    <title>Regal Music - Neon Sovereign</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"></script>
     
     <style>
-        :root { --accent: #1db954; --bg: #000; --panel: #121212; --text: #fff; --gray: #222; --gold: #d4af37; --red: #ff4444; --neon-g: #00ff66; --neon-r: #ff0033; }
+        :root { --accent: #1db954; --bg: #000; --panel: #121212; --text: #fff; --gray: #222; --gold: #d4af37; --red: #ff0033; --neon-g: #00ff66; --neon-r: #ff0033; --neon-y: #ffcc00; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; overflow-x: hidden; width: 100%; }
         
-        /* SIDEBAR & HEADER */
-        .sidebar { position: fixed; left: -280px; top: 0; height: 100%; width: 260px; background: var(--panel); transition: 0.3s; z-index: 4000; padding-top: 20px; box-shadow: 10px 0 40px #000; border-right: 1px solid #222; }
+        /* BAN SCREEN */
+        #ban-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
+
+        /* CUSTOM NEON MODAL (PENGGANTI PROMPT JADUL) */
+        .neon-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9000; display: none; justify-content: center; align-items: center; backdrop-filter: blur(10px); }
+        .neon-card { width: 85%; max-width: 350px; background: #111; border-radius: 25px; padding: 30px; text-align: center; border: 2px solid var(--gold); box-shadow: 0 0 20px rgba(212, 175, 55, 0.4); transform: scale(0.8); transition: 0.3s; }
+        .neon-card.active { transform: scale(1); }
+        .neon-card.error { border-color: var(--neon-r); box-shadow: 0 0 20px var(--neon-r); }
+        .neon-card.success { border-color: var(--neon-g); box-shadow: 0 0 20px var(--neon-g); }
+        .neon-card h2 { margin: 0 0 20px 0; color: var(--gold); font-size: 1.5rem; letter-spacing: 1px; }
+        .neon-card input { width: 100%; padding: 15px; background: #000; border: 1px solid #333; color: #fff; border-radius: 12px; text-align: center; font-size: 1.1rem; margin-bottom: 20px; }
+        .neon-card input:focus { border-color: var(--gold); box-shadow: 0 0 10px var(--gold); }
+
+        /* SIDEBAR */
+        .sidebar { position: fixed; left: -280px; top: 0; height: 100%; width: 260px; background: var(--panel); transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 4000; padding-top: 20px; box-shadow: 10px 0 40px #000; border-right: 1px solid #222; }
         .sidebar.active { left: 0; }
         .close-sb { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; color: var(--gold); cursor: pointer; }
-        .sidebar a { padding: 15px 25px; text-decoration: none; font-size: 1rem; color: #aaa; display: flex; align-items: center; gap: 15px; cursor: pointer; }
+        .sidebar a { padding: 15px 25px; text-decoration: none; font-size: 1rem; color: #aaa; display: flex; align-items: center; gap: 15px; cursor: pointer; border-bottom: 1px solid #1a1a1a; }
+        .sidebar a:active { background: #1a1a1a; color: var(--gold); }
+        
         header { padding: 15px 20px; display: none; align-items: center; background: #000; position: sticky; top: 0; z-index: 1000; justify-content: space-between; border-bottom: 1px solid #111; }
         .logo { font-size: 1.1rem; font-weight: 800; color: var(--gold); text-transform: uppercase; letter-spacing: 2px; }
 
-        /* NEON NOTIFICATION MODAL */
-        #regal-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; display: none; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
-        .modal-card { width: 85%; max-width: 320px; background: #111; border-radius: 25px; padding: 30px; text-align: center; transform: scale(0.7); transition: 0.3s; }
-        .modal-card.show { transform: scale(1); }
-        .modal-card.success { border: 2px solid var(--neon-g); box-shadow: 0 0 20px var(--neon-g); }
-        .modal-card.error { border: 2px solid var(--neon-r); box-shadow: 0 0 20px var(--neon-r); }
-        .modal-card i { font-size: 3.5rem; margin-bottom: 15px; }
-        .success i { color: var(--neon-g); text-shadow: 0 0 15px var(--neon-g); }
-        .error i { color: var(--neon-r); text-shadow: 0 0 15px var(--neon-r); }
-        .modal-card h2 { margin: 0 0 10px 0; font-size: 1.5rem; letter-spacing: 1px; }
-        .modal-card p { margin: 0 0 25px 0; color: #bbb; font-size: 0.9rem; line-height: 1.4; }
-
         /* PAGES */
-        .page { display: none; padding: 20px; padding-bottom: 150px; animation: fadeIn 0.4s; width: 100%; }
+        .page { display: none; padding: 20px; padding-bottom: 150px; width: 100%; animation: fadeIn 0.4s; }
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .card { background: var(--panel); padding: 25px; border-radius: 25px; border: 1px solid #333; width: 95%; max-width: 450px; margin: 0 auto 20px auto; text-align: center; }
+        .card { background: var(--panel); padding: 25px; border-radius: 25px; border: 1px solid #333; width: 100%; max-width: 450px; margin: 0 auto 20px auto; text-align: center; }
         input, select { width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 15px; border: 1px solid #333; background: #000; color: #fff; font-size: 1rem; }
         .btn { width: 100%; padding: 16px; border-radius: 15px; border: none; font-weight: 800; cursor: pointer; transition: 0.2s; font-size: 1rem; }
         .btn-gold { background: var(--gold); color: #000; }
         .btn-primary { background: var(--accent); color: #000; }
+        .btn-danger { background: var(--red); color: #fff; padding: 8px 12px; font-size: 0.8rem; border-radius: 8px; }
 
-        /* PLAYER BAR */
+        /* LISTS */
+        .search-bar { width: 100%; padding: 16px 20px; border-radius: 15px; border: 1px solid #333; background: #111; color: #fff; margin-bottom: 25px; }
+        .song-item { background: #111; padding: 12px; border-radius: 18px; margin-bottom: 12px; display: flex; align-items: center; cursor: pointer; border: 1px solid transparent; }
+        .song-img { width: 50px; height: 50px; border-radius: 10px; background: #1a1a1a; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--gold); }
+        .song-info { flex-grow: 1; margin-left: 15px; overflow: hidden; }
+        .song-title { font-weight: bold; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* MINI PLAYER */
         .mini-player { position: fixed; bottom: 0; width: 100%; background: rgba(10,10,10,0.98); backdrop-filter: blur(20px); padding: 12px 20px; border-top: 1px solid #1a1a1a; z-index: 1500; display: none; align-items: center; justify-content: space-between; }
-        .p-art-small { width: 45px; height: 45px; border-radius: 50%; background: #222; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-right: 12px; border: 1px solid #333; }
         
         #auth.page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 5000; display: none; justify-content: center; align-items: center; }
         #auth.page.active { display: flex; }
@@ -55,12 +65,31 @@
 </head>
 <body>
 
-<!-- NEON MODAL SYSTEM -->
-<div id="regal-modal">
-    <div class="modal-card" id="modal-content">
+<!-- BAN SCREEN -->
+<div id="ban-screen">
+    <i class="fas fa-user-slash" style="font-size: 5rem; color: var(--red); margin-bottom: 20px;"></i>
+    <h1 style="color: var(--red)">ACCESS DENIED</h1>
+    <p id="ban-timer" style="color: var(--gold); font-weight: bold;"></p>
+</div>
+
+<!-- CUSTOM NEON AUTHORIZATION MODAL (GANTI PROMPT) -->
+<div id="admin-auth-modal" class="neon-modal">
+    <div class="neon-card" id="auth-card-content">
+        <i class="fas fa-user-shield" style="font-size: 3rem; color: var(--gold); margin-bottom: 15px;"></i>
+        <h2>Secret Key</h2>
+        <p style="font-size: 0.8rem; color: #888; margin-bottom: 20px;">Enter Authorization Key to Access Sovereign Portal</p>
+        <input type="password" id="secret-key-input" placeholder="••••••••••••">
+        <button class="btn btn-gold" onclick="validateSecretKey()">ACCESS PORTAL</button>
+        <button class="btn" style="background:none; color:#555; margin-top:10px;" onclick="closeAuthModal()">Cancel</button>
+    </div>
+</div>
+
+<!-- NOTIFICATION MODAL -->
+<div id="regal-modal" class="neon-modal">
+    <div class="neon-card" id="modal-content">
         <i id="modal-icon" class="fas fa-check-circle"></i>
         <h2 id="modal-title">Berhasil</h2>
-        <p id="modal-msg">Pesan sukses disini.</p>
+        <p id="modal-msg"></p>
         <button class="btn btn-gold" onclick="closeRegalModal()">OK</button>
     </div>
 </div>
@@ -69,14 +98,14 @@
 <div class="sidebar" id="sidebar">
     <div class="close-sb" onclick="toggleSidebar()"><i class="fas fa-times"></i></div>
     <div style="padding: 25px; font-weight: 900; color: var(--gold); font-size: 1.3rem;">REGAL</div>
-    <a onclick="showPage('home')"><i class="fas fa-house"></i> Home</a>
+    <a onclick="showPage('home')"><i class="fas fa-house"></i> Dashboard</a>
     <a onclick="showPage('playlist')"><i class="fas fa-music"></i> Library</a>
     <a onclick="showPage('chat-page')"><i class="fas fa-comments"></i> Support</a>
     <a onclick="showPage('profile-page')"><i class="fas fa-user-circle"></i> Profile</a>
     <a id="nav-upload" onclick="showPage('upload')" style="display:none; color: var(--accent);"><i class="fas fa-upload"></i> Upload Track</a>
-    <a id="nav-upgrade" onclick="showPage('upgrade')"><i class="fas fa-crown"></i> Buy Tier</a>
-    <a id="nav-admin" onclick="secureAdminCheck()" style="display:none; color: var(--gold); font-weight: bold;"><i class="fas fa-user-shield"></i> ADMIN PANEL</a>
-    <hr style="border:0.1px solid #222; margin:20px;">
+    <a id="nav-upgrade" onclick="showPage('upgrade')"><i class="fas fa-crown"></i> Get Creator</a>
+    <a id="nav-admin" onclick="openAuthModal()" style="display:none; color: var(--gold); font-weight: bold;"><i class="fas fa-user-shield"></i> ADMIN PANEL</a>
+    <hr style="border:0.1px solid #333; margin:20px;">
     <a onclick="logout()">Logout</a>
 </div>
 
@@ -86,57 +115,83 @@
     <div id="user-display" style="font-size: 0.6rem; color: #555;"></div>
 </header>
 
+<!-- PAGES -->
 <div id="auth" class="page">
     <div class="auth-card" id="auth-box">
         <h2 style="color:var(--gold)">Sign In</h2>
         <input type="text" id="log-user" placeholder="Username">
         <input type="password" id="log-pass" placeholder="Password">
         <button class="btn btn-gold" onclick="processAuth('login')">PROCEED</button>
-        <p onclick="toggleAuth('reg')" style="color:var(--gold); font-size:0.8rem; margin-top:20px; cursor:pointer">New? Register</p>
+        <p onclick="toggleAuth('reg')" style="color:var(--gold); font-size:0.8rem; margin-top:20px; cursor:pointer">New? Create Account</p>
     </div>
 </div>
 
-<div id="home" class="page">
-    <input type="text" class="search-bar" placeholder="Search track or artist..." onkeyup="search(this.value)">
+<div id="home" class="page active">
+    <input type="text" class="search-bar" id="searchInp" placeholder="Search track or artist..." onkeyup="handleSearch()">
+    <h3 style="color:var(--gold)">Trending Now</h3>
     <div id="home-list"></div>
 </div>
 
-<div id="playlist" class="page"><h3>Global Library</h3><div id="full-list"></div></div>
+<div id="playlist" class="page">
+    <h3 style="color:var(--gold)">My Library</h3>
+    <div id="full-list"></div>
+</div>
+
+<div id="chat-page" class="page">
+    <h3 style="color:var(--gold)">Owner Support</h3>
+    <div id="chat-box" style="height:50vh; overflow-y:auto; background:#050505; border-radius:20px; padding:15px; border:1px solid #222; display:flex; flex-direction:column; gap:10px; margin-bottom:15px;"></div>
+    <div style="display:flex; gap:10px"><input type="text" id="chat-msg" style="margin:0" placeholder="Ask something..."><button class="btn btn-gold" style="width:60px" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button></div>
+</div>
+
+<div id="profile-page" class="page">
+    <div class="card">
+        <i class="fas fa-user-circle" style="font-size:4rem; color:var(--gold)"></i>
+        <h2 id="prof-name">Username</h2>
+        <p id="prof-role">Viewer</p>
+        <button class="btn btn-danger" onclick="logout()">LOGOUT</button>
+    </div>
+</div>
 
 <div id="upload" class="page">
     <div class="card">
         <h3>Publish Music</h3>
         <input type="file" id="mp3-file" accept="audio/mpeg" style="display:none" onchange="handleMp3()">
-        <label for="mp3-file" id="mp3-status" style="display:block; padding:20px; border:2px dashed #444; border-radius:15px; cursor:pointer; margin-bottom:15px;"><i class="fas fa-file-audio"></i><p>Pilih MP3</p></label>
+        <label for="mp3-file" id="mp3-status" style="display:block; padding:30px; border:2px dashed #444; border-radius:15px; cursor:pointer; margin-bottom:15px;"><i class="fas fa-file-audio" style="font-size:2rem; color:var(--gold)"></i><p>Pilih MP3</p></label>
         <input type="text" id="up-title" placeholder="Song Title">
-        <input type="text" id="up-artist" placeholder="Original Artist">
+        <input type="text" id="up-artist" placeholder="Artist Name">
         <button class="btn btn-gold" onclick="importTrack()">UPLOAD</button>
+    </div>
+</div>
+
+<div id="upgrade" class="page">
+    <div class="card">
+        <i class="fas fa-crown" style="font-size:3rem; color:var(--gold)"></i>
+        <h2>Get Creator Tier</h2>
+        <p>Buka fitur upload selamanya.</p>
+        <button class="btn btn-gold" onclick="showPage('qris-pay')">BUY VIA QRIS</button>
     </div>
 </div>
 
 <div id="qris-pay" class="page">
     <div class="card">
-        <h3>QRIS DANA</h3>
-        <img src="https://files.catbox.moe/j4l01f.jpg" style="width:100%; border-radius:15px; margin-bottom:15px; border:3px solid #fff;">
+        <h3>SCAN QRIS DANA</h3>
+        <img src="https://files.catbox.moe/j4l01f.jpg" style="width:100%; border-radius:15px; margin-bottom:15px; border:4px solid #fff;">
         <input type="file" id="up-proof" accept="image/*" style="display:none" onchange="handleProof()">
-        <label for="up-proof" id="proof-status" style="display:block; padding:10px; border:1px dashed var(--gold); border-radius:10px; margin-bottom:15px; cursor:pointer">Upload Bukti</label>
-        <button class="btn btn-primary" onclick="submitUpgrade()">KIRIM</button>
+        <label for="up-proof" id="proof-status" style="display:block; padding:15px; border:1px dashed var(--gold); cursor:pointer; margin-bottom:15px; border-radius:15px">Upload Bukti Bayar</label>
+        <button class="btn btn-primary" onclick="submitUpgrade()">DONE / KIRIM</button>
     </div>
 </div>
 
 <div id="admin-panel" class="page">
     <h2 style="color:var(--gold)">Sovereign Portal</h2>
-    <div id="admin-requests"></div>
-    <hr style="border:1px solid #222; margin:30px 0">
-    <div id="admin-tracks"></div>
-    <hr style="border:1px solid #222; margin:30px 0">
-    <div id="admin-users"></div>
+    <div id="admin-requests" class="admin-sec"><h3>Antrian Bayar</h3><div id="req-box"></div></div>
+    <div id="admin-tracks" class="admin-sec"><h3>Hapus Lagu</h3><div id="track-box"></div></div>
+    <div id="admin-users" class="admin-sec"><h3>Daftar User</h3><div id="user-box"></div></div>
 </div>
 
-<!-- PLAYER -->
 <div class="mini-player" id="mini-player">
     <div style="display:flex; align-items:center; flex-grow:1">
-        <div class="p-art-small"><i class="fas fa-music" style="color:var(--gold)"></i></div>
+        <div class="song-img"><i class="fas fa-music"></i></div>
         <div class="song-info"><div id="p-title" class="song-title">No Track</div><div id="p-artist" class="song-artist">Select music</div></div>
     </div>
     <div onclick="togglePlay()"><i class="fas fa-play" id="p-btn" style="font-size:1.5rem; color:var(--gold)"></i></div>
@@ -147,6 +202,8 @@
 <script>
 const OWNER_NAME = "King";
 const ADMIN_SECRET_KEY = "#FFHUDT6O3jVoFkhlPo7eM";
+const BAN_DURATION = 7 * 24 * 60 * 60 * 1000; 
+
 const firebaseConfig = {
   apiKey: "AIzaSyBTb_DwvrKW35f15NvzNC5VTTbubZJD5JQ",
   authDomain: "developer-9640f.firebaseapp.com",
@@ -160,68 +217,94 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 let currentUser = JSON.parse(localStorage.getItem('user_v3')) || null;
-let songs = [], mp3Data = "", proofData = "";
+let songs = [], mp3Data = "", proofData = "", strike = 0;
 const audio = document.getElementById('audio');
 
-// NEON MODAL LOGIC
-function regalAlert(title, msg, type) {
+// NEON MODAL SYSTEM
+function regalAlert(t, m, type) {
     const modal = document.getElementById('regal-modal');
+    document.getElementById('modal-title').innerText = t;
+    document.getElementById('modal-msg').innerText = m;
     const content = document.getElementById('modal-content');
-    const icon = document.getElementById('modal-icon');
-    
-    document.getElementById('modal-title').innerText = title;
-    document.getElementById('modal-msg').innerText = msg;
-    
-    content.className = "modal-card " + type; // 'success' or 'error'
-    icon.className = type === 'success' ? "fas fa-check-circle" : "fas fa-exclamation-triangle";
-    
+    content.className = "neon-card " + (type === 'success' ? 'success' : 'error');
+    document.getElementById('modal-icon').className = type === 'success' ? "fas fa-check-circle" : "fas fa-times-circle";
     modal.style.display = "flex";
-    setTimeout(() => content.classList.add('show'), 10);
+    setTimeout(() => content.classList.add('active'), 10);
 }
-
-function closeRegalModal() {
-    const content = document.getElementById('modal-content');
-    content.classList.remove('show');
+function closeRegalModal() { 
+    document.getElementById('modal-content').classList.remove('active');
     setTimeout(() => document.getElementById('regal-modal').style.display = "none", 300);
 }
 
-// Navigation
+// NAV LOGIC
 function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
-function toggleAuth(v) { 
-    const box = document.getElementById('auth-box');
-    box.innerHTML = v==='reg' ? `<h2>Register</h2><input type="text" id="reg-user" placeholder="Username"><input type="password" id="reg-pass" placeholder="Password"><button class="btn btn-gold" onclick="processAuth('register')">CREATE</button><p onclick="toggleAuth('log')" style="color:var(--gold); cursor:pointer; margin-top:20px">Back to Login</p>` : `<h2>Sign In</h2><input type="text" id="log-user" placeholder="Username"><input type="password" id="log-pass" placeholder="Password"><button class="btn btn-gold" onclick="processAuth('login')">PROCEED</button><p onclick="toggleAuth('reg')" style="color:var(--gold); cursor:pointer; margin-top:20px">New? Create Account</p>`;
-}
-
 function showPage(id) {
+    if(checkBan()) return;
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    const t = document.getElementById(id); if(t) t.classList.add('active');
+    document.getElementById(id).classList.add('active');
     const isAuth = id === 'auth' || !currentUser;
     document.getElementById('main-header').style.display = isAuth ? 'none' : 'flex';
     document.getElementById('mini-player').style.display = isAuth ? 'none' : 'flex';
     document.getElementById('sidebar').style.display = isAuth ? 'none' : 'block';
     document.getElementById('sidebar').classList.remove('active');
-    if(id==='admin-panel') loadAdmin();
+    if(id==='admin-panel') loadAdmin(); if(id==='chat-page') loadChat();
+}
+
+function checkBan() {
+    const b = localStorage.getItem('bannedUntil');
+    if(b && Date.now() < b) {
+        document.body.innerHTML = ''; document.body.appendChild(document.getElementById('ban-screen'));
+        document.getElementById('ban-screen').style.display='flex';
+        const rem = b - Date.now();
+        document.getElementById('ban-timer').innerText = `Sisa: ${Math.ceil(rem / (1000*60*60*24))} Hari`;
+        return true;
+    }
+    return false;
+}
+
+// SECRET KEY NEON MODAL
+function openAuthModal() {
+    const authExp = localStorage.getItem('adminExp');
+    if(authExp && Date.now() < authExp) { showPage('admin-panel'); return; }
+    document.getElementById('admin-auth-modal').style.display = 'flex';
+    setTimeout(() => document.getElementById('auth-card-content').classList.add('active'), 10);
+}
+function closeAuthModal() {
+    document.getElementById('auth-card-content').classList.remove('active');
+    setTimeout(() => document.getElementById('admin-auth-modal').style.display = 'none', 300);
+}
+function validateSecretKey() {
+    const k = document.getElementById('secret-key-input').value;
+    if(k === ADMIN_SECRET_KEY) {
+        localStorage.setItem('adminExp', Date.now() + (90 * 24 * 60 * 60 * 1000));
+        closeAuthModal();
+        showPage('admin-panel');
+    } else {
+        strike++; if(strike>=3) { localStorage.setItem('bannedUntil', Date.now() + 7*24*60*60*1000); location.reload(); }
+        else regalAlert("Gagal", `Kunci Salah! Strike ${strike}/3`, "error");
+    }
 }
 
 function processAuth(m) {
-    const u = document.getElementById(m==='login'?'log-user':'reg-user').value.trim();
-    const p = document.getElementById(m==='login'?'log-pass':'reg-pass').value.trim();
-    if(m==='register' && u.toLowerCase()===OWNER_NAME.toLowerCase()) return regalAlert("Gagal", "Nama King dilarang!", "error");
+    const u = document.getElementById('log-user')?.value.trim() || document.getElementById('reg-user')?.value.trim();
+    const p = document.getElementById('log-pass')?.value.trim() || document.getElementById('reg-pass')?.value.trim();
+    if(m==='register' && u.toLowerCase()===OWNER_NAME.toLowerCase()) return regalAlert("Dilarang", "Nama ini milik Raja!", "error");
     db.ref('users/'+u).once('value', (s) => {
         if(m==='register') {
-            if(s.exists()) return regalAlert("Gagal", "Username sudah ada!", "error");
-            db.ref('users/'+u).set({pass:p, role:'viewer'}).then(() => { regalAlert("Berhasil", "Akun dibuat, silakan login.", "success"); toggleAuth('log'); });
+            db.ref('users/'+u).set({pass:p, role:'viewer'}).then(() => { regalAlert("Berhasil", "Akun terdaftar!", "success"); toggleAuth('log'); });
         } else if(s.exists() && s.val().pass === p) {
             currentUser = {name:u, role:s.val().role};
             localStorage.setItem('user_v3', JSON.stringify(currentUser));
             init();
-        } else regalAlert("Gagal", "User/Password salah!", "error");
+        } else regalAlert("Gagal", "User/Pass Salah!", "error");
     });
 }
 
 function init() {
     if(!currentUser) { showPage('auth'); return; }
     document.getElementById('user-display').innerText = currentUser.name;
+    document.getElementById('prof-name').innerText = currentUser.name;
+    document.getElementById('prof-role').innerText = currentUser.role.toUpperCase();
     if(currentUser.name === OWNER_NAME) document.getElementById('nav-admin').style.display = 'block';
     if(currentUser.role === 'creator' || currentUser.name === OWNER_NAME) document.getElementById('nav-upload').style.display = 'block';
     showPage('home'); loadSongs();
@@ -233,22 +316,24 @@ function loadSongs() {
         renderList(songs, 'home-list'); renderList(songs, 'full-list');
     });
 }
-
 function renderList(data, target) {
     const b = document.getElementById(target); if(!b) return;
-    b.innerHTML = data.length === 0 ? '<p style="color:#444">Empty Library.</p>' : '';
+    b.innerHTML = data.length ? '' : '<p style="color:#444">Library is empty.</p>';
     data.forEach(s => {
         const realIdx = songs.findIndex(x => x.id === s.id);
         b.innerHTML += `<div class="song-item" onclick="play(${realIdx})"><div class="song-img"><i class="fas fa-music"></i></div><div class="song-info"><b>${s.title}</b><br><small>${s.artist}</small></div></div>`;
     });
 }
-
-function play(i) {
-    curIdx = i; const s = songs[i];
-    document.getElementById('p-title').innerText = s.title; document.getElementById('p-artist').innerText = s.artist;
-    audio.src = s.url; audio.play(); document.getElementById('p-btn').className="fas fa-pause";
+function handleSearch() {
+    const q = document.getElementById('searchInp').value.toLowerCase();
+    const f = songs.filter(s => s.title.toLowerCase().includes(q) || s.artist.toLowerCase().includes(q));
+    renderList(f, 'home-list');
 }
 
+function play(i) {
+    const s = songs[i]; document.getElementById('p-title').innerText = s.title; document.getElementById('p-artist').innerText = s.artist;
+    audio.src = s.url; audio.play(); document.getElementById('p-btn').className = "fas fa-pause";
+}
 function togglePlay() {
     if(audio.paused) { audio.play(); document.getElementById('p-btn').className="fas fa-pause"; }
     else { audio.pause(); document.getElementById('p-btn').className="fas fa-play"; }
@@ -265,41 +350,47 @@ function handleMp3() {
         const r = new FileReader(); r.onloadend = () => mp3Data = r.result; r.readAsDataURL(f);
     }
 }
-
 async function importTrack() {
-    if(!mp3Data || !document.getElementById('up-title').value) return regalAlert("Gagal", "Data belum lengkap!", "error");
+    if(!mp3Data || !document.getElementById('up-title').value) return alert("Data!");
     const id = Date.now().toString();
-    db.ref('songs/'+id).set({id, title:document.getElementById('up-title').value, artist:document.getElementById('up-artist').value, url:mp3Data, uploader:currentUser.name}).then(() => { regalAlert("Berhasil", "Lagu terbit!", "success"); showPage('home'); });
+    db.ref('songs/'+id).set({id, title:document.getElementById('up-title').value, artist:document.getElementById('up-artist').value, url:mp3Data, uploader:currentUser.name}).then(() => showPage('home'));
 }
-
+function loadChat() {
+    db.ref('messages/'+currentUser.name).on('value', (s) => {
+        const b = document.getElementById('chat-box'); b.innerHTML = '';
+        const d = s.val(); if(d) for(let k in d) b.innerHTML += `<div class="msg ${d[k].sender===currentUser.name?'me':'them'}">${d[k].text}</div>`;
+        b.scrollTop = b.scrollHeight;
+    });
+}
+function sendMessage() {
+    const m = document.getElementById('chat-msg').value; if(m) db.ref('messages/'+currentUser.name).push({sender:currentUser.name, text:m});
+    document.getElementById('chat-msg').value = '';
+}
 function loadAdmin() {
     db.ref('requests').on('value', (s) => {
-        const l = document.getElementById('admin-requests'); l.innerHTML = '<h3>Requests</h3>';
+        const l = document.getElementById('req-box'); l.innerHTML = '';
         const d = s.val(); if(d) for(let k in d) l.innerHTML += `<div class="card" style="text-align:left"><b>${d[k].user}</b><br><img src="${d[k].proof}" style="width:100%"><button class="btn btn-gold" onclick="approve('${d[k].user}')">APPROVE</button></div>`;
     });
     db.ref('songs').on('value', (s) => {
-        const l = document.getElementById('admin-global-tracks'); l.innerHTML = '<h3>Tracks</h3>';
-        const d = s.val(); if(d) for(let k in d) l.innerHTML += `<div class="song-item"><b>${d[k].title}</b><button class="btn btn-danger" onclick="db.ref('songs/'+'${d[k].id}').remove()">X</button></div>`;
+        const l = document.getElementById('track-box'); l.innerHTML = '';
+        const d = s.val(); if(d) for(let k in d) l.innerHTML += `<div class="song-item"><b>${d[k].title}</b><button class="btn-danger" onclick="db.ref('songs/'+'${d[k].id}').remove()">X</button></div>`;
     });
     db.ref('users').on('value', (s) => {
-        const l = document.getElementById('admin-users'); l.innerHTML = '<h3>Users</h3>';
-        const d = s.val(); if(d) for(let k in d) l.innerHTML += `<div class="song-item"><b>${k}</b> (${d[k].role}) <button class="btn btn-danger" onclick="db.ref('users/'+'${k}').remove()">BAN</button></div>`;
+        const l = document.getElementById('user-box'); l.innerHTML = '';
+        const d = s.val(); if(d) for(let k in d) l.innerHTML += `<div class="song-item"><b>${k}</b> (${d[k].role}) <button class="btn-danger" onclick="db.ref('users/'+'${k}').remove()">BAN</button></div>`;
     });
 }
-
-function secureAdminCheck() {
-    const k = prompt("Secret Key:");
-    if(k === ADMIN_SECRET_KEY) showPage('admin-panel');
-    else regalAlert("Gagal", "Kunci Salah!", "error");
+function toggleAuth(v) { 
+    const box = document.getElementById('auth-box');
+    box.innerHTML = v==='reg' ? `<h2>Register</h2><input type="text" id="reg-user" placeholder="Username"><input type="password" id="reg-pass" placeholder="Password"><button class="btn btn-gold" onclick="processAuth('register')">CREATE</button><p onclick="toggleAuth('log')" style="color:var(--gold); cursor:pointer; margin-top:20px">Back to Login</p>` : `<h2>Sign In</h2><input type="text" id="log-user" placeholder="Username"><input type="password" id="log-pass" placeholder="Password"><button class="btn btn-gold" onclick="processAuth('login')">PROCEED</button><p onclick="toggleAuth('reg')" style="color:var(--gold); cursor:pointer; margin-top:20px">New? Create Account</p>`;
 }
-
-function approve(u) { db.ref('users/'+u).update({role:'creator'}); db.ref('requests/'+u).remove(); regalAlert("Berhasil", u+" jadi Creator!", "success"); }
+function approve(u) { db.ref('users/'+u).update({role:'creator'}); db.ref('requests/'+u).remove(); }
 function logout() { localStorage.clear(); location.reload(); }
-function search(q) { const f = songs.filter(s => s.title.toLowerCase().includes(q.toLowerCase()) || s.artist.toLowerCase().includes(q.toLowerCase())); renderList(f, 'home-list'); }
-function handleProof() { const f = document.getElementById('up-proof').files[0]; const r = new FileReader(); r.onloadend = () => { proofData = r.result; document.getElementById('proof-status').innerText = "BUKTI OKE!"; }; if(f) r.readAsDataURL(f); }
-function submitUpgrade() { if(!proofData) return regalAlert("Gagal", "Pilih foto dulu!", "error"); db.ref('requests/'+currentUser.name).set({user:currentUser.name, proof:proofData}).then(() => regalAlert("Berhasil", "Tunggu konfirmasi owner.", "success")); }
+function handleProof() { const f = document.getElementById('up-proof').files[0]; const r = new FileReader(); r.onloadend = () => proofData = r.result; if(f) r.readAsDataURL(f); }
+function submitUpgrade() { if(proofData) db.ref('requests/'+currentUser.name).set({user:currentUser.name, proof:proofData}).then(() => regalAlert("Done!", "Tunggu owner ya.", "success")); }
 
-if(currentUser) init(); else showPage('auth');
+if(!checkBan()) { if(currentUser) init(); else showPage('auth'); }
+audio.onended = () => { if(songs.length) { curIdx = (curIdx + 1) % songs.length; play(curIdx); } };
 </script>
 </body>
 </html>
