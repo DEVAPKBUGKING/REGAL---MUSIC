@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Regal Music - Eternal Sovereign</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"></script>
+    
+    <style>
+        :root { --accent: #1db954; --bg: #000; --panel: #121212; --text: #fff; --gray: #222; --gold: #d4af37; --red: #ff4444; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; overflow-x: hidden; width: 100%; }
+        
+        /* Ban Screen */
+        #ban-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
+
+        /* Sidebar */
+        .sidebar { position: fixed; left: -280px; top: 0; height: 100%; width: 260px; background: var(--panel); transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 4000; padding-top: 20px; box-shadow: 10px 0 40px #000; border-right: 1px solid #333; }
+        .sidebar.active { left: 0; }
+        .close-sb { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; color: var(--gold); cursor: pointer; }
+        .sidebar a { padding: 15px 25px; text-decoration: none; font-size: 1rem; color: #aaa; display: flex; align-items: center; gap: 15px; cursor: pointer; }
+        .sidebar a:hover { color: var(--gold); background: #1a1a1a; }
+        
+        header { padding: 15px 20px; display: none; align-items: center; background: #000; position: sticky; top: 0; z-index: 1000; justify-content: space-between; border-bottom: 1px solid #111; }
+        .logo { font-size: 1.1rem; font-weight: 800; color: var(--gold); text-transform: uppercase; letter-spacing: 2px; }
+
+        /* Pages */
+        .page { display: none; padding: 20px; padding-bottom: 150px; animation: fadeIn 0.4s; width: 100%; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* UI Components */
+        .card { background: var(--panel); padding: 25px; border-radius: 20px; border: 1px solid #333; width: 100%; max-width: 450px; margin: 0 auto 20px auto; text-align: center; }
+        input, select { width: 100%; padding: 14px; margin-bottom: 15px; border-radius: 12px; border: 1px solid #333; background: #000; color: #fff; font-size: 1rem; }
+        .btn { width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; font-size: 1rem; }
+        .btn-gold { background: var(--gold); color: #000; }
+        .btn-danger { background: var(--red); color: #fff; font-size: 0.75rem; padding: 8px 12px; border-radius: 8px; width: auto; }
+
+        /* Song Items */
+        .song-item { background: #111; padding: 12px; border-radius: 15px; margin-bottom: 12px; display: flex; align-items: center; cursor: pointer; }
+        .song-img { width: 55px; height: 55px; border-radius: 10px; background: #1a1a1a; display: flex; align-items: center; justify-content: center; color: var(--gold); flex-shrink: 0; overflow: hidden; }
+        .song-img img { width: 100%; height: 100%; object-fit: cover; }
+        .song-info { flex-grow: 1; margin-left: 15px; overflow: hidden; }
+
+        /* Artist Scroll */
+        .artist-scroll { display: flex; gap: 15px; overflow-x: auto; padding: 10px 0; margin-bottom: 20px; scrollbar-width: none; }
+        .art-circle { flex-shrink: 0; width: 85px; text-align: center; cursor: pointer; }
+        .art-circle img { width: 75px; height: 75px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold); margin-bottom: 5px; background: #111; }
+        .art-circle span { font-size: 0.7rem; font-weight: bold; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        /* Mini Player */
+        .mini-player { position: fixed; bottom: 0; width: 100%; background: rgba(10,10,10,0.98); backdrop-filter: blur(20px); border-top: 1px solid #222; padding: 12px 20px; z-index: 1500; display: none; align-items: center; justify-content: space-between; }
+        
+        /* Admin UI */
+        .admin-sec { background: #111; padding: 15px; border-radius: 15px; margin-bottom: 20px; border-left: 4px solid var(--gold); text-align: left; }
+
+        #auth.page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 5000; display: none; justify-content: center; align-items: center; }
+        #auth.page.active { display: flex; }
+    </style>
+</head>
+<body>
+
+<div id="ban-screen">
+    <i class="fas fa-user-slash" style="font-size: 5rem; color: var(--red); margin-bottom: 20px;"></i>
+    <h1 style="color: var(--red)">ACCESS DENIED</h1>
+    <p id="ban-timer" style="color: var(--gold); font-weight: bold;"></p>
+</div>
+
+<div class="sidebar" id="sidebar">
+    <div class="close-sb" onclick="toggleSidebar()"><i class="fas fa-times"></i></div>
+    <div style="padding: 25px; font-weight: 900; color: var(--gold); font-size: 1.3rem;">REGAL</div>
+    <a onclick="showPage('home')"><i class="fas fa-house"></i> Home</a>
+    <a onclick="showPage('playlist')"><i class="fas fa-music"></i> Library</a>
+    <a onclick="showPage('chat-page')"><i class="fas fa-comments"></i> Support</a>
+    <a id="nav-upload" onclick="showPage('upload')" style="display:none; color: var(--accent);"><i class="fas fa-upload"></i> Upload</a>
+    <a id="nav-upgrade" onclick="showPage('upgrade')"><i class="fas fa-crown"></i> Buy Tier</a>
+    <a id="nav-admin" onclick="secureAdminCheck()" style="display:none; color: var(--gold); font-weight: bold;"><i class="fas fa-user-shield"></i> ADMIN PANEL</a>
+    <hr style="border:0.1px solid #333; margin:20px;">
+    <a onclick="logout()">Logout</a>
+</div>
+
+<header id="main-header">
+    <div class="menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></div>
+    <div class="logo">REGAL MUSIC</div>
+    <div id="user-display" style="font-size: 0.6rem; color: #555;"></div>
+</header>
+
+<!-- PAGES -->
+<div id="auth" class="page">
+    <div class="card" id="auth-box">
+        <h2 style="color:var(--gold)">Sign In</h2>
+        <input type="text" id="log-user" placeholder="Username">
+        <input type="password" id="log-pass" placeholder="Password">
+        <button class="btn btn-gold" onclick="processAuth('login')">CONTINUE</button>
+        <p onclick="toggleAuth('reg')" style="color:var(--gold); font-size:0.8rem; margin-top:20px; cursor:pointer">New Account</p>
+    </div>
+</div>
+
+<div id="home" class="page">
+    <input type="text" class="search-bar" id="searchInp" placeholder="Search title or artist..." onkeyup="handleSearch()">
+    <h3 style="color:var(--gold); margin-top:0">Top Artists</h3>
+    <div class="artist-scroll" id="home-artists"></div>
+    <h3 style="color:var(--gold)">New Tracks</h3>
+    <div id="home-list"></div>
+</div>
+
+<div id="playlist" class="page"><h3>Global Library</h3><div id="full-list"></div></div>
+
+<div id="chat-page" class="page">
+    <h3>Owner Support</h3>
+    <div id="chat-box" style="height:50vh; overflow-y:auto; background:#050505; border-radius:15px; padding:15px; margin-bottom:15px; border:1px solid #222; display:flex; flex-direction:column; gap:10px;"></div>
+    <div style="display:flex; gap:10px"><input type="text" id="chat-msg" style="margin:0" placeholder="Type..."><button class="btn btn-gold" style="width:60px" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button></div>
+</div>
+
+<div id="upload" class="page">
+    <div class="card">
+        <h3>Publish MP3</h3>
+        <input type="file" id="mp3-file" accept="audio/mpeg" style="display:none" onchange="handleMp3()">
+        <label for="mp3-file" id="mp3-status" style="display:block; padding:25px; border:2px dashed #444; border-radius:15px; cursor:pointer; margin-bottom:15px;"><i class="fas fa-file-audio"></i><p>Pilih MP3 (AI Detector)</p></label>
+        <input type="text" id="up-title" placeholder="Song Title">
+        <input type="text" id="up-artist" placeholder="Artist Name">
+        <button class="btn btn-gold" onclick="importTrack()">UPLOAD</button>
+    </div>
+</div>
+
+<div id="upgrade" class="page">
+    <div class="card">
+        <i class="fas fa-crown" style="font-size:3rem; color:var(--gold);"></i>
+        <h2>Creator Access</h2>
+        <button class="btn btn-gold" onclick="showPage('qris-pay')">BUY VIA QRIS (Rp 10k)</button>
+    </div>
+</div>
+
+<div id="qris-pay" class="page">
+    <div class="card">
+        <h3>QRIS DANA</h3>
+        <img src="https://files.catbox.moe/j4l01f.jpg" style="width:100%; border-radius:15px; margin-bottom:15px; border:3px solid #fff;">
+        <input type="file" id="up-proof" accept="image/*" style="display:none" onchange="handleProof()">
+        <label for="up-proof" id="proof-status" style="display:block; padding:10px; border:1px dashed var(--gold); border-radius:10px; margin-bottom:15px; cursor:pointer">Pilih Bukti Foto</label>
+        <button class="btn btn-primary" onclick="submitUpgrade()">DONE / KIRIM</button>
+    </div>
+</div>
+
+<!-- ADMIN PANEL - FIX LENGKAP -->
+<div id="admin-panel" class="page">
+    <h2 style="color:var(--gold)">Sovereign Portal</h2>
+    
+    <div class="admin-sec">
+        <h4>1. Create Artist Playlist</h4>
+        <input type="text" id="adm-art-name" placeholder="Artist Name">
+        <input type="file" id="adm-art-img" accept="image/*" style="display:none" onchange="handleArtImg()">
+        <label for="adm-art-img" id="art-img-status" style="display:block; padding:10px; border:1px dashed #555; border-radius:10px; font-size:0.8rem">Pilih Foto Artis</label>
+        <button class="btn btn-gold" onclick="saveArtist()">CREATE ARTIST</button>
+    </div>
+
+    <div class="admin-sec"><h4>2. Creator Requests</h4><div id="admin-requests"></div></div>
+    <div class="admin-sec"><h4>3. Track Manager</h4><div id="admin-tracks"></div></div>
+    <div class="admin-sec"><h4>4. User Manager</h4><div id="admin-users"></div></div>
+</div>
+
+<div id="artist-detail" class="page">
+    <div onclick="showPage('home')" style="color:var(--gold); margin-bottom:15px; cursor:pointer"><i class="fas fa-arrow-left"></i> Back</div>
+    <div style="text-align:center; margin-bottom:20px;">
+        <img id="det-art-img" src="" style="width:120px; height:120px; border-radius:50%; object-fit:cover; border:3px solid var(--gold);">
+        <h2 id="det-art-name" style="color:var(--gold); margin:10px 0"></h2>
+    </div>
+    <div id="artist-songs"></div>
+</div>
+
+<div class="mini-player" id="mini-player">
+    <div style="display:flex; align-items:center; flex-grow:1" onclick="openLyrics()">
+        <div class="song-img" id="p-art-box"><i class="fas fa-music"></i><img id="p-img" src="" style="display:none"></div>
+        <div class="song-info"><div id="p-title" class="song-title">Ready</div><div id="p-artist" class="song-artist">Select music</div></div>
+    </div>
+    <div onclick="togglePlay()"><i class="fas fa-play" id="p-btn" style="font-size:1.5rem; color:var(--gold)"></i></div>
+</div>
+
+<div id="lyric-ov" style="position:fixed; top:100%; left:0; width:100%; height:100%; background:#000; z-index:6000; transition:0.5s; padding:40px 25px; display:flex; flex-direction:column; align-items:center;">
+    <div onclick="closeLyrics()" style="font-size:2rem; color:#444; margin-bottom:20px;"><i class="fas fa-chevron-down"></i></div>
+    <div id="ov-mover" style="margin-top:40%; transition:0.5s; text-align:center;"></div>
+</div>
+
+<audio id="audio" crossorigin="anonymous"></audio>
+
+<script>
+const OWNER_NAME = "King";
+const ADMIN_SECRET_KEY = "#FFHUDT6O3jVoFkhlPo7eM";
+const firebaseConfig = {
+  apiKey: "AIzaSyBTb_DwvrKW35f15NvzNC5VTTbubZJD5JQ",
+  authDomain: "developer-9640f.firebaseapp.com",
+  databaseURL: "https://developer-9640f-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "developer-9640f",
+  storageBucket: "developer-9640f.firebasestorage.app",
+  messagingSenderId: "217471718457",
+  appId: "1:217471718457:web:e157fccbddc9ff5213a9e8"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+let currentUser = JSON.parse(localStorage.getItem('user_v3')) || null;
+let songs = [], artists = [], mp3Data = "", artImgData = "", proofData = "", strike = 0;
+const audio = document.getElementById('audio');
+
+// Navigation & Logic
+function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
+function toggleAuth(v) { document.getElementById('auth-box').innerHTML = v==='reg' ? `<h2>Register</h2><input type="text" id="reg-user" placeholder="Username"><input type="password" id="reg-pass" placeholder="Password"><button class="btn btn-gold" onclick="processAuth('register')">CREATE</button><p onclick="toggleAuth('log')" style="color:var(--gold); cursor:pointer; margin-top:20px">Back to Login</p>` : `<h2>Sign In</h2><input type="text" id="log-user" placeholder="Username"><input type="password" id="log-pass" placeholder="Password"><button class="btn btn-gold" onclick="processAuth('login')">PROCEED</button><p onclick="toggleAuth('reg')" style="color:var(--gold); cursor:pointer; margin-top:20px">New? Create Account</p>`; }
+
+function showPage(id) {
+    if(checkBan()) return;
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const t = document.getElementById(id); if(t) t.classList.add('active');
+    const isAuth = id === 'auth' || !currentUser;
+    document.getElementById('main-header').style.display = isAuth ? 'none' : 'flex';
+    document.getElementById('mini-player').style.display = isAuth ? 'none' : 'flex';
+    document.getElementById('sidebar').style.display = isAuth ? 'none' : 'block';
+    document.getElementById('sidebar').classList.remove('active');
+    if(id==='admin-panel') loadAdmin(); if(id==='chat-page') loadChat();
+}
+
+function processAuth(m) {
+    const u = document.getElementById(m==='login'?'log-user':'reg-user').value.trim();
+    const p = document.getElementById(m==='login'?'log-pass':'reg-pass').value.trim();
+    if(m==='register' && u.toLowerCase()==='king') return alert("Forbidden!");
+    db.ref('users/'+u).once('value', (s) => {
+        if(m==='register') {
+            if(s.exists()) return alert("Taken!");
+            db.ref('users/'+u).set({pass:p, role:'viewer'}).then(() => toggleAuth('log'));
+        } else if(s.exists() && s.val().pass === p) {
+            currentUser = {name:u, role:s.val().role};
+            localStorage.setItem('user_v3', JSON.stringify(currentUser));
+            init();
+        } else alert("Wrong!");
+    });
+}
+
+function init() {
+    if(!currentUser) { showPage('auth'); return; }
+    document.getElementById('user-display').innerText = currentUser.name;
+    if(currentUser.name === OWNER_NAME) document.getElementById('nav-admin').style.display = 'block';
+    if(currentUser.role === 'creator' || currentUser.name === OWNER_NAME) document.getElementById('nav-upload').style.display = 'block';
+    showPage('home'); loadData();
+}
+
+function loadData() {
+    db.ref('songs').on('value', (s) => {
+        songs = []; const d = s.val(); if(d) for(let k in d) songs.push(d[k]);
+        renderList(songs, 'home-list'); renderList(songs, 'full-list');
+    });
+    db.ref('artists').on('value', (s) => {
+        artists = []; const d = s.val(); if(d) for(let k in d) artists.push(d[k]);
+        const b = document.getElementById('home-artists'); b.innerHTML = '';
+        artists.forEach(a => b.innerHTML += `<div class="art-circle" onclick="openArtist('${a.name}')"><img src="${a.img}"><span>${a.name}</span></div>`);
+    });
+}
+
+function renderList(data, target) {
+    const b = document.getElementById(target); if(!b) return;
+    b.innerHTML = data.length === 0 ? '<p style="color:#444">Empty.</p>' : '';
+    data.forEach(s => {
+        const realIdx = songs.findIndex(x => x.id === s.id);
+        const icon = s.cover ? `<img src="${s.cover}">` : '<i class="fas fa-music"></i>';
+        b.innerHTML += `<div class="song-item" onclick="play(${realIdx})"><div class="song-img">${icon}</div><div class="song-info"><b>${s.title}</b><br><small>${s.artist}</small></div></div>`;
+    });
+}
+
+function handleSearch() {
+    const q = document.getElementById('searchInp').value.toLowerCase();
+    const f = songs.filter(s => s.title.toLowerCase().includes(q) || s.artist.toLowerCase().includes(q));
+    renderList(f, 'home-list');
+}
+
+function play(i) {
+    const s = songs[i]; document.getElementById('p-title').innerText = s.title; document.getElementById('p-artist').innerText = s.artist;
+    audio.src = s.url; audio.play(); document.getElementById('p-btn').className = "fas fa-pause";
+}
+
+function togglePlay() {
+    if(audio.paused) { audio.play(); document.getElementById('p-btn').className="fas fa-pause"; }
+    else { audio.pause(); document.getElementById('p-btn').className="fas fa-play"; }
+}
+
+function handleMp3() {
+    const f = document.getElementById('mp3-file').files[0];
+    if(f) {
+        jsmediatags.read(f, { onSuccess: (t) => {
+            document.getElementById('up-title').value = t.tags.title || "";
+            document.getElementById('up-artist').value = t.tags.artist || "";
+            document.getElementById('mp3-status').innerText = "✅ FILE OK";
+        }});
+        const r = new FileReader(); r.onloadend = () => mp3Data = r.result; r.readAsDataURL(f);
+    }
+}
+
+async function importTrack() {
+    if(!mp3Data || !document.getElementById('up-title').value) return alert("Data!");
+    db.ref('songs/'+Date.now()).set({id:Date.now(), title:document.getElementById('up-title').value, artist:document.getElementById('up-artist').value, url:mp3Data, uploader:currentUser.name}).then(() => showPage('home'));
+}
+
+function secureAdminCheck() {
+    if(localStorage.getItem('adminExp') > Date.now()) return showPage('admin-panel');
+    const k = prompt("Secret Key:");
+    if(k === ADMIN_SECRET_KEY) { localStorage.setItem('adminExp', Date.now() + 90*24*60*60*1000); showPage('admin-panel'); }
+    else { strike++; if(strike>=3) localStorage.setItem('bannedUntil', Date.now() + 7*24*60*60*1000); location.reload(); }
+}
+
+function loadAdmin() {
+    db.ref('requests').on('value', (s) => {
+        const l = document.getElementById('admin-requests'); l.innerHTML = '';
+        const d = s.val(); if(d) for(let k in d) l.innerHTML += `<div class="admin-sec"><b>${d[k].user}</b><br><img src="${d[k].proof}" style="width:100%"><button class="btn btn-gold" onclick="approve('${d[k].user}')">APPROVE</button></div>`;
+    });
+    db.ref('songs').on('value', (s) => {
+        const l = document.getElementById('admin-tracks'); l.innerHTML = '';
+        const d = s.val(); if(d) for(let k in d) l.innerHTML += `<div class="song-item"><b>${d[k].title}</b><button class="btn-danger" onclick="db.ref('songs/'+'${d[k].id}').remove()">X</button></div>`;
+    });
+    db.ref('users').on('value', (s) => {
+        const l = document.getElementById('admin-users'); l.innerHTML = '';
+        const d = s.val(); if(d) for(let k in d) l.innerHTML += `<div class="song-item"><b>${k}</b> (${d[k].role}) <button class="btn-danger" onclick="db.ref('users/'+'${k}').remove()">BAN</button></div>`;
+    });
+}
+
+function openArtist(n) {
+    const filter = songs.filter(s => s.artist === n);
+    const art = artists.find(a => a.name === n);
+    document.getElementById('det-art-name').innerText = n;
+    document.getElementById('det-art-img').src = art.img;
+    renderList(filter, 'artist-songs');
+    showPage('artist-detail');
+}
+
+function handleArtImg() { const f = document.getElementById('adm-art-img').files[0];
+    const r = new FileReader();
+    r.onloadend = () => { 
+        artImgData = r.result; 
+        document.getElementById('art-img-status').innerText = "FOTO OKE"; 
+    };
+    if(f) r.readAsDataURL(f);
+}
+
+function saveArtist() {
+    const n = document.getElementById('adm-art-name').value.trim();
+    if(n && artImgData) {
+        db.ref('artists/'+n).set({name:n, img:artImgData}).then(() => {
+            alert("Artis Berhasil Dibuat!");
+            location.reload();
+        });
+    } else {
+        alert("Isi Nama & Foto Artis!");
+    }
+}
+
+function checkBan() {
+    const b = localStorage.getItem('bannedUntil');
+    if(b && Date.now() < parseInt(b)) {
+        document.body.innerHTML = '';
+        document.body.appendChild(document.getElementById('ban-screen'));
+        document.getElementById('ban-screen').style.display='flex';
+        const remaining = parseInt(b) - Date.now();
+        const days = Math.floor(remaining / (1000 * 60 * 60 * 24));
+        document.getElementById('ban-timer').innerText = `Sisa Waktu: ${days} Hari Lagi`;
+        return true;
+    }
+    return false;
+}
+
+function approve(u) {
+    db.ref('users/'+u).update({role:'creator'});
+    db.ref('requests/'+u).remove().then(() => alert(u + " Resmi Jadi Creator!"));
+}
+
+function logout() {
+    localStorage.clear();
+    location.reload();
+}
+
+function handleProof() {
+    const f = document.getElementById('up-proof').files[0];
+    const r = new FileReader();
+    r.onloadend = () => {
+        proofData = r.result;
+        document.getElementById('proof-status').innerText = "BUKTI OKE!";
+    };
+    if(f) r.readAsDataURL(f);
+}
+
+function submitUpgrade() {
+    if(proofData) {
+        db.ref('requests/'+currentUser.name).set({
+            user: currentUser.name,
+            proof: proofData,
+            time: new Date().toLocaleString()
+        }).then(() => {
+            alert("Terkirim! Tunggu konfirmasi Owner.");
+            showPage('home');
+        });
+    } else {
+        alert("Pilih foto bukti bayar dulu!");
+    }
+}
+
+function sendMessage() {
+    const m = document.getElementById('chat-msg').value;
+    if(m) {
+        db.ref('messages/'+currentUser.name).push({
+            sender: currentUser.name,
+            text: m,
+            time: Date.now()
+        });
+        document.getElementById('chat-msg').value = '';
+    }
+}
+
+function loadChat() {
+    db.ref('messages/'+currentUser.name).on('value', (s) => {
+        const b = document.getElementById('chat-box');
+        b.innerHTML = '';
+        const d = s.val();
+        if(d) {
+            for(let k in d) {
+                b.innerHTML += `<div class="msg ${d[k].sender===currentUser.name?'me':'them'}">${d[k].text}</div>`;
+            }
+        }
+        b.scrollTop = b.scrollHeight;
+    });
+}
+
+function secureAdminCheck() {
+    const authExp = localStorage.getItem('adminExp');
+    if(authExp && Date.now() < parseInt(authExp)) {
+        showPage('admin-panel');
+        return;
+    }
+    
+    const k = prompt("SECRET KEY REQUIRED:");
+    if(k === ADMIN_SECRET_KEY) {
+        localStorage.setItem('adminExp', Date.now() + (90 * 24 * 60 * 60 * 1000));
+        showPage('admin-panel');
+    } else {
+        strike++;
+        if(strike>=3) {
+            localStorage.setItem('bannedUntil', Date.now() + 7*24*60*60*1000);
+            location.reload();
+        } else {
+            alert("Kunci Salah! Peringatan " + strike + "/3");
+        }
+    }
+}
+
+// Global initialization logic
+if(!checkBan()) {
+    if(currentUser) init(); 
+    else showPage('auth');
+}
+
+audio.onended = () => {
+    if(songs.length) {
+        curIdx = (curIdx + 1) % songs.length;
+        play(curIdx);
+    }
+};
+</script>
+</body>
+</html>
