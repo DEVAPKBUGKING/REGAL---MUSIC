@@ -7,1934 +7,472 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
     <style>
-        :root {
-            --accent: #d4af37;
-            --accent-glow: rgba(212, 175, 55, 0.3);
-            --bg: #000;
-            --panel: #121212;
-            --text: #fff;
-            --gray: #b3b3b3;
-            --red: #ff4444;
-            --green: #1db954;
-            --blue: #007bff;
-            --dark-card: #0a0a0a;
-        }
-
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            outline: none;
-        }
-
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-            height: 100vh;
-            width: 100%;
-        }
-
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
-
-        #toast-container {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 30000;
-            width: 90%;
-            max-width: 350px;
-            pointer-events: none;
-        }
-
-        .toast {
-            background: rgba(18, 18, 18, 0.97);
-            border-left: 4px solid var(--accent);
-            color: white;
-            padding: 14px 18px;
-            border-radius: 12px;
-            margin-bottom: 10px;
-            font-size: 0.82rem;
-            animation: toastIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            backdrop-filter: blur(15px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.6);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            pointer-events: auto;
-        }
-
-        .toast.error { border-left-color: var(--red); }
-        .toast.success { border-left-color: var(--green); }
-        .toast i { font-size: 1rem; }
-
-        @keyframes toastIn {
-            from { transform: translateY(-30px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        @keyframes toastOut {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(100px); opacity: 0; }
-        }
-
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.88);
-            backdrop-filter: blur(12px);
-            z-index: 20000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .modal-content {
-            background: linear-gradient(145deg, #111, #0a0a0a);
-            width: 100%;
-            max-width: 380px;
-            border-radius: 24px;
-            border: 1px solid #222;
-            padding: 35px 30px;
-            text-align: center;
-            transform: scale(0.9);
-            animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.6), 0 0 80px rgba(212,175,55,0.05);
-        }
-
-        .modal-icon {
-            width: 70px; height: 70px;
-            border-radius: 50%;
-            background: rgba(212,175,55,0.1);
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 20px;
-            font-size: 1.8rem;
-            color: var(--accent);
-        }
-
-        .modal-content h3 { margin: 0 0 8px 0; font-size: 1.15rem; color: var(--text); }
-        .modal-content p { color: var(--gray); font-size: 0.85rem; margin-bottom: 20px; line-height: 1.5; word-wrap: break-word; }
-
-        .modal-btns { display: flex; gap: 10px; margin-top: 10px; }
-        .modal-btns button {
-            flex: 1; padding: 13px; border-radius: 14px; border: none;
-            font-weight: 700; cursor: pointer; font-size: 0.85rem; transition: all 0.2s;
-        }
-
-        .btn-cancel { background: #1a1a1a; color: #aaa; border: 1px solid #333; }
-        .btn-cancel:active { transform: scale(0.95); }
-        .btn-confirm {
-            background: linear-gradient(135deg, var(--accent), #c4a030);
-            color: #000;
-            box-shadow: 0 4px 15px rgba(212,175,55,0.3);
-        }
-        .btn-confirm:active { transform: scale(0.95); }
-        .btn-danger {
-            background: linear-gradient(135deg, var(--red), #cc3333);
-            color: #fff;
-            box-shadow: 0 4px 15px rgba(255,68,68,0.3);
-        }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes popIn { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-
-        #home-loader {
-            display: flex; flex-direction: column; align-items: center;
-            justify-content: center; min-height: 40vh; text-align: center;
-        }
-
-        .spinner {
-            width: 42px; height: 42px;
-            border: 3px solid #1a1a1a;
-            border-top: 3px solid var(--accent);
-            border-radius: 50%;
-            animation: spin 0.7s linear infinite;
-        }
-
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        .sidebar {
-            position: fixed; left: -280px; top: 0;
-            height: 100%; width: 270px;
-            background: linear-gradient(180deg, #0a0a0a, #000);
-            transition: 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            z-index: 5000;
-            border-right: 1px solid #1a1a1a;
-            display: flex; flex-direction: column;
-            overflow-y: auto;
-        }
-
-        .sidebar.active { left: 0; }
-
-        .sidebar-header {
-            padding: 30px 25px 20px;
-            border-bottom: 1px solid #1a1a1a;
-        }
-
-        .sidebar-header h1 { margin: 0; color: var(--accent); font-size: 1.5rem; letter-spacing: 4px; }
-        .sidebar-header small { color: #555; font-size: 0.7rem; }
-
-        .sidebar a {
-            padding: 14px 25px;
-            text-decoration: none;
-            color: var(--gray);
-            display: flex; align-items: center; gap: 15px;
-            cursor: pointer; font-weight: 600; font-size: 0.88rem;
-            transition: all 0.2s;
-            position: relative;
-        }
-
-        .sidebar a:hover, .sidebar a.active-nav {
-            color: var(--accent);
-            background: rgba(212,175,55,0.05);
-        }
-
-        .sidebar a.active-nav::before {
-            content: '';
-            position: absolute; left: 0; top: 50%;
-            transform: translateY(-50%);
-            width: 3px; height: 60%;
-            background: var(--accent);
-            border-radius: 0 3px 3px 0;
-        }
-
-        .sidebar a i { width: 20px; text-align: center; }
-
-        .sidebar-overlay {
-            position: fixed; top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7);
-            z-index: 4999;
-            display: none;
-            backdrop-filter: blur(3px);
-        }
-
-        header {
-            padding: 15px 20px;
-            display: none; align-items: center;
-            background: rgba(0,0,0,0.95);
-            backdrop-filter: blur(10px);
-            position: sticky; top: 0; z-index: 1000;
-            justify-content: space-between;
-            border-bottom: 1px solid #111;
-        }
-
-        .header-brand { font-weight: 900; color: var(--accent); letter-spacing: 3px; font-size: 1rem; }
-        .header-user {
-            font-size: 0.7rem; color: var(--accent); font-weight: bold;
-            background: rgba(212,175,55,0.1);
-            padding: 5px 12px; border-radius: 20px;
-        }
-
-        .section-title {
-            font-size: 0.8rem; color: var(--gray);
-            text-transform: uppercase; letter-spacing: 2px;
-            margin: 20px 0 10px; font-weight: 700;
-        }
-
-        .art-scroll {
-            display: flex; gap: 18px;
-            overflow-x: auto; padding: 15px 0;
-            scrollbar-width: none;
-        }
-
-        .art-scroll::-webkit-scrollbar { display: none; }
-
-        .art-item {
-            flex-shrink: 0; text-align: center;
-            width: 80px; cursor: pointer; transition: transform 0.2s;
-        }
-
-        .art-item:active { transform: scale(0.9); }
-
-        .art-item img {
-            width: 65px; height: 65px;
-            border-radius: 50%; object-fit: cover;
-            border: 2px solid var(--accent);
-            box-shadow: 0 4px 15px rgba(212,175,55,0.2);
-            transition: 0.3s;
-        }
-
-        .art-item.active-artist img {
-            border-width: 3px;
-            box-shadow: 0 4px 20px rgba(212,175,55,0.5);
-        }
-
-        .art-item small {
-            display: block; margin-top: 6px;
-            font-size: 0.7rem; color: var(--gray);
-        }
-
-        .search-box { position: relative; margin: 10px 0 15px; }
-
-        .search-box input {
-            width: 100%;
-            padding: 14px 20px 14px 45px;
-            border-radius: 16px;
-            border: 1px solid #1a1a1a;
-            background: #0d0d0d;
-            color: #fff; font-family: inherit; font-size: 0.9rem;
-            transition: border-color 0.3s;
-        }
-
-        .search-box input:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 20px rgba(212,175,55,0.1);
-        }
-
-        .search-box i {
-            position: absolute; left: 16px; top: 50%;
-            transform: translateY(-50%); color: #555;
-        }
-
-        .song-row {
-            display: flex; align-items: center;
-            padding: 12px 14px; border-radius: 14px;
-            cursor: pointer; margin-bottom: 8px;
-            transition: all 0.2s;
-            background: var(--dark-card);
-            border: 1px solid #141414;
-        }
-
-        .song-row:active { transform: scale(0.98); background: #111; }
-        .song-row.now-playing { border-color: var(--accent); background: rgba(212,175,55,0.05); }
-
-        .song-art {
-            width: 48px; height: 48px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, #1a1a1a, #111);
-            margin-right: 12px;
-            display: flex; align-items: center; justify-content: center;
-            color: var(--accent); flex-shrink: 0; font-size: 0.9rem;
-        }
-
-        .song-info { flex-grow: 1; overflow: hidden; min-width: 0; }
-        .song-info b {
-            display: block; font-size: 0.88rem; color: white;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
-        .song-info small { color: var(--gray); font-size: 0.73rem; }
-
-        .song-actions {
-            display: flex; gap: 14px; color: var(--gray);
-            font-size: 0.95rem; margin-left: 10px; flex-shrink: 0;
-        }
-
-        .song-actions i { transition: all 0.2s; padding: 5px; }
-        .song-actions i:active { transform: scale(1.3); }
-        .song-actions i.active { color: var(--accent); }
-        .song-actions i.heart-active { color: var(--red); }
-
-        .admin-grid {
-            display: grid; grid-template-columns: 1fr 1fr;
-            gap: 12px; margin-top: 20px;
-        }
-
-        .admin-card {
-            background: linear-gradient(145deg, #111, #0a0a0a);
-            padding: 20px 10px; border-radius: 16px;
-            border: 1px solid #1a1a1a;
-            color: var(--accent); text-align: center;
-            cursor: pointer; font-weight: bold; font-size: 0.8rem;
-            transition: all 0.2s;
-        }
-
-        .admin-card:active { transform: scale(0.95); border-color: var(--accent); }
-        .admin-card i { font-size: 1.5rem; display: block; margin-bottom: 8px; }
-
-        .page {
-            display: none; padding: 20px; padding-bottom: 160px;
-            animation: pageIn 0.3s ease;
-        }
-
-        .page.active { display: block; }
-
-        @keyframes pageIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .btn {
-            padding: 13px; border-radius: 14px; border: none;
-            font-weight: 700; cursor: pointer; font-size: 0.88rem;
-            transition: all 0.2s;
-        }
-
-        .btn:active { transform: scale(0.96); }
-        .btn:disabled { opacity: 0.5; pointer-events: none; }
-
-        .btn-gold {
-            background: linear-gradient(135deg, var(--accent), #c4a030);
-            color: #000; width: 100%;
-            box-shadow: 0 4px 15px rgba(212,175,55,0.3);
-        }
-
-        .btn-dark {
-            background: #1a1a1a; color: #fff;
-            border: 1px solid #333; width: 100%;
-        }
-
-        .btn-sm {
-            padding: 8px 16px; font-size: 0.75rem; border-radius: 10px;
-        }
-
-        input, textarea, select {
-            width: 100%;
-            padding: 13px 16px; border-radius: 14px;
-            border: 1px solid #1a1a1a;
-            background: #0d0d0d; color: #fff;
-            margin-bottom: 12px; font-family: inherit; font-size: 0.88rem;
-            transition: border-color 0.3s;
-        }
-
-        input:focus, textarea:focus, select:focus { border-color: var(--accent); }
-        select option { background: #111; }
-
-        .mini-player {
-            position: fixed; bottom: 0; width: 100%;
-            background: linear-gradient(180deg, #111, #0a0a0a);
-            border-top: 1px solid #1a1a1a;
-            padding: 14px 20px; z-index: 4000;
-            display: none; align-items: center; gap: 15px;
-        }
-
-        #prog-bar-bg {
-            position: absolute; top: -3px; left: 0;
-            width: 100%; height: 3px;
-            background: #1a1a1a; cursor: pointer;
-        }
-
-        #prog-bar {
-            height: 100%;
-            background: linear-gradient(90deg, var(--accent), #e8c84a);
-            width: 0%; transition: width 0.3s linear;
-            border-radius: 0 2px 2px 0;
-        }
-
-        .player-controls { display: flex; align-items: center; gap: 18px; }
-        .player-controls i {
-            color: var(--gray); cursor: pointer;
-            font-size: 1.1rem; transition: color 0.2s;
-        }
-        .player-controls i:hover { color: white; }
-        .player-controls i.main-btn { font-size: 1.7rem; color: var(--accent); }
-
-        #chat-box {
-            height: 55vh; overflow-y: auto;
-            display: flex; flex-direction: column; gap: 8px;
-            padding: 15px; background: #060606;
-            border-radius: 14px; border: 1px solid #1a1a1a;
-        }
-
-        .msg {
-            padding: 10px 16px; border-radius: 18px;
-            max-width: 80%; font-size: 0.84rem;
-            line-height: 1.4; animation: msgIn 0.2s ease;
-        }
-
-        @keyframes msgIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .msg.me {
-            align-self: flex-end;
-            background: linear-gradient(135deg, var(--accent), #c4a030);
-            color: #000; font-weight: 600;
-            border-bottom-right-radius: 6px;
-        }
-
-        .msg.them {
-            align-self: flex-start; background: #1a1a1a;
-            border-bottom-left-radius: 6px;
-        }
-
-        .msg .msg-meta { font-size: 0.65rem; opacity: 0.6; margin-top: 4px; }
-
-        .chat-input-bar { display: flex; gap: 10px; margin-top: 15px; }
-        .chat-input-bar input { margin: 0; flex: 1; }
-        .chat-input-bar button { width: 50px; flex-shrink: 0; }
-
-        #ban-overlay {
-            position: fixed; top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: linear-gradient(180deg, #0a0000, #000);
-            z-index: 50000; display: none;
-            flex-direction: column; justify-content: center;
-            align-items: center; text-align: center; padding: 40px;
-        }
-
-        .user-item {
-            display: flex; align-items: center;
-            justify-content: space-between;
-            padding: 14px; background: var(--dark-card);
-            border: 1px solid #141414; border-radius: 14px;
-            margin-bottom: 8px;
-        }
-
-        .user-item .info { flex: 1; }
-        .user-item .info b { font-size: 0.9rem; }
-        .user-item .info small { color: var(--gray); font-size: 0.7rem; display: block; margin-top: 2px; }
-
-        .badge {
-            padding: 3px 10px; border-radius: 20px;
-            font-size: 0.65rem; font-weight: 700;
-        }
-
-        .badge-gold { background: rgba(212,175,55,0.2); color: var(--accent); }
-        .badge-red { background: rgba(255,68,68,0.2); color: var(--red); }
-        .badge-green { background: rgba(29,185,84,0.2); color: var(--green); }
-        .badge-blue { background: rgba(0,123,255,0.2); color: var(--blue); }
-
-        .tier-card {
-            text-align: center; padding: 35px 25px;
-            background: linear-gradient(145deg, #111, #0a0a0a);
-            border-radius: 24px; border: 1px solid var(--accent);
-            position: relative; overflow: hidden;
-        }
-
-        .tier-card::before {
-            content: '';
-            position: absolute; top: -50%; left: -50%;
-            width: 200%; height: 200%;
-            background: radial-gradient(circle, rgba(212,175,55,0.03) 0%, transparent 60%);
-        }
-
-        .tier-card i { font-size: 3rem; color: var(--accent); margin-bottom: 15px; position: relative; }
-        .tier-price { font-size: 2rem; font-weight: 900; color: var(--accent); margin: 20px 0; }
-        .tier-features { text-align: left; margin: 20px 0; }
-        .tier-features div { padding: 8px 0; color: var(--gray); font-size: 0.85rem; }
-        .tier-features i { color: var(--accent); margin-right: 10px; }
-
-        .empty-state { text-align: center; padding: 40px 20px; color: #333; }
-        .empty-state i { font-size: 3rem; margin-bottom: 15px; }
-        .empty-state p { font-size: 0.85rem; }
-
-        .upload-card {
-            background: linear-gradient(145deg, #111, #0a0a0a);
-            padding: 25px; border-radius: 20px;
-            border: 1px solid #1a1a1a;
-        }
-
-        .upload-drop {
-            border: 2px dashed #333; border-radius: 16px;
-            padding: 30px; text-align: center;
-            cursor: pointer; transition: all 0.3s; margin-bottom: 15px;
-        }
-
-        .upload-drop:active, .upload-drop.has-file {
-            border-color: var(--accent);
-            background: rgba(212,175,55,0.03);
-        }
-
-        .upload-drop i { font-size: 2rem; color: #444; margin-bottom: 10px; display: block; }
-        .upload-drop p { color: #555; font-size: 0.8rem; margin: 0; }
-        .upload-drop.has-file i { color: var(--accent); }
-        .upload-drop.has-file p { color: var(--accent); }
-
-        .back-btn {
-            color: var(--accent); cursor: pointer;
-            margin-bottom: 20px; display: inline-flex;
-            align-items: center; gap: 8px;
-            font-weight: 600; font-size: 0.9rem;
-        }
-
-        .back-btn:active { opacity: 0.7; }
-
-        .stat-row {
-            display: grid; grid-template-columns: repeat(3, 1fr);
-            gap: 10px; margin-bottom: 20px;
-        }
-
-        .stat-card {
-            background: var(--dark-card);
-            border: 1px solid #141414; border-radius: 14px;
-            padding: 15px 10px; text-align: center;
-        }
-
-        .stat-card .num { font-size: 1.5rem; font-weight: 900; color: var(--accent); }
-        .stat-card .label {
-            font-size: 0.65rem; color: #555;
-            text-transform: uppercase; letter-spacing: 1px; margin-top: 4px;
-        }
-
-        .chat-user-tab {
-            display: flex; align-items: center;
-            padding: 14px; background: var(--dark-card);
-            border: 1px solid #141414; border-radius: 14px;
-            margin-bottom: 8px; cursor: pointer; transition: 0.2s;
-        }
-
-        .chat-user-tab:active { transform: scale(0.98); }
-        .chat-user-tab .avatar {
-            width: 40px; height: 40px; border-radius: 50%;
-            background: #1a1a1a; display: flex; align-items: center;
-            justify-content: center; margin-right: 12px; color: var(--accent);
-        }
-
-        /* PROOF PREVIEW */
-        .proof-preview {
-            width: 100%; max-height: 200px;
-            object-fit: contain; border-radius: 12px;
-            border: 2px solid var(--accent);
-            margin: 10px 0;
-            display: none;
-        }
-
-        /* LOADING OVERLAY for buttons */
-        .btn-loading {
-            position: relative;
-            pointer-events: none;
-            opacity: 0.7;
-        }
-
-        .btn-loading::after {
-            content: '';
-            position: absolute;
-            width: 18px; height: 18px;
-            border: 2px solid transparent;
-            border-top: 2px solid currentColor;
-            border-radius: 50%;
-            animation: spin 0.6s linear infinite;
-            top: 50%; right: 15px;
-            transform: translateY(-50%);
-        }
-
-        /* STATUS BADGES */
-        .status-pending {
-            background: rgba(212,175,55,0.15);
-            color: var(--accent);
-            padding: 8px 15px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            text-align: center;
-            margin-top: 15px;
-        }
-
-        .status-approved {
-            background: rgba(29,185,84,0.15);
-            color: var(--green);
-            padding: 8px 15px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            text-align: center;
-            margin-top: 15px;
-        }
-
-        .status-rejected {
-            background: rgba(255,68,68,0.15);
-            color: var(--red);
-            padding: 8px 15px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            text-align: center;
-            margin-top: 15px;
-        }
+        :root{--accent:#d4af37;--bg:#000;--text:#fff;--gray:#b3b3b3;--red:#ff4444;--green:#1db954;--blue:#007bff;--dark:#0a0a0a}
+        *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;outline:none;margin:0;padding:0}
+        body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;height:100vh;width:100%}
+        ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:#333;border-radius:4px}
+        #toast-c{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:30000;width:90%;max-width:350px;pointer-events:none}
+        .toast{background:rgba(18,18,18,.97);border-left:4px solid var(--accent);color:#fff;padding:14px 18px;border-radius:12px;margin-bottom:10px;font-size:.82rem;animation:tIn .4s cubic-bezier(.175,.885,.32,1.275);backdrop-filter:blur(15px);box-shadow:0 8px 25px rgba(0,0,0,.6);display:flex;align-items:center;gap:10px;pointer-events:auto}
+        .toast.error{border-left-color:var(--red)}.toast.success{border-left-color:var(--green)}
+        @keyframes tIn{from{transform:translateY(-30px);opacity:0}to{transform:translateY(0);opacity:1}}
+        @keyframes tOut{from{opacity:1}to{transform:translateX(100px);opacity:0}}
+        .modal-ov{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.88);backdrop-filter:blur(12px);z-index:20000;display:none;align-items:center;justify-content:center;padding:20px}
+        .modal-box{background:linear-gradient(145deg,#111,#0a0a0a);width:100%;max-width:380px;border-radius:24px;border:1px solid #222;padding:35px 30px;text-align:center;animation:pop .35s cubic-bezier(.175,.885,.32,1.275) forwards;box-shadow:0 25px 50px rgba(0,0,0,.6)}
+        .m-icon{width:70px;height:70px;border-radius:50%;background:rgba(212,175,55,.1);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:1.8rem;color:var(--accent)}
+        .modal-box h3{margin:0 0 8px;font-size:1.15rem}.modal-box p{color:var(--gray);font-size:.85rem;margin-bottom:20px;line-height:1.5;word-wrap:break-word}
+        .m-btns{display:flex;gap:10px;margin-top:10px}.m-btns button{flex:1;padding:13px;border-radius:14px;border:none;font-weight:700;cursor:pointer;font-size:.85rem}
+        .btn-c{background:#1a1a1a;color:#aaa;border:1px solid #333}.btn-c:active{transform:scale(.95)}
+        .btn-ok{background:linear-gradient(135deg,var(--accent),#c4a030);color:#000;box-shadow:0 4px 15px rgba(212,175,55,.3)}
+        .btn-d{background:linear-gradient(135deg,var(--red),#cc3333);color:#fff}
+        @keyframes pop{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+        .spinner{width:42px;height:42px;border:3px solid #1a1a1a;border-top:3px solid var(--accent);border-radius:50%;animation:sp .7s linear infinite}
+        @keyframes sp{to{transform:rotate(360deg)}}
+        .sidebar{position:fixed;left:-280px;top:0;height:100%;width:270px;background:linear-gradient(180deg,#0a0a0a,#000);transition:left .3s cubic-bezier(.25,.46,.45,.94);z-index:5000;border-right:1px solid #1a1a1a;display:flex;flex-direction:column;overflow-y:auto}
+        .sidebar.active{left:0}.sb-hdr{padding:30px 25px 20px;border-bottom:1px solid #1a1a1a}
+        .sb-hdr h1{color:var(--accent);font-size:1.5rem;letter-spacing:4px}.sb-hdr small{color:#555;font-size:.7rem}
+        .sidebar a{padding:14px 25px;text-decoration:none;color:var(--gray);display:flex;align-items:center;gap:15px;cursor:pointer;font-weight:600;font-size:.88rem;transition:.2s;position:relative}
+        .sidebar a:hover,.sidebar a.an{color:var(--accent);background:rgba(212,175,55,.05)}
+        .sidebar a.an::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:60%;background:var(--accent);border-radius:0 3px 3px 0}
+        .sidebar a i{width:20px;text-align:center}
+        .sb-ov{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:4999;display:none;backdrop-filter:blur(3px)}
+        header{padding:15px 20px;display:none;align-items:center;background:rgba(0,0,0,.95);backdrop-filter:blur(10px);position:sticky;top:0;z-index:100;justify-content:space-between;border-bottom:1px solid #111}
+        .h-brand{font-weight:900;color:var(--accent);letter-spacing:3px;font-size:1rem}
+        .h-user{font-size:.7rem;color:var(--accent);font-weight:700;background:rgba(212,175,55,.1);padding:5px 12px;border-radius:20px}
+        .sec-t{font-size:.8rem;color:var(--gray);text-transform:uppercase;letter-spacing:2px;margin:20px 0 10px;font-weight:700}
+        .art-sc{display:flex;gap:18px;overflow-x:auto;padding:15px 0;scrollbar-width:none}.art-sc::-webkit-scrollbar{display:none}
+        .art-it{flex-shrink:0;text-align:center;width:80px;cursor:pointer;transition:.2s}.art-it:active{transform:scale(.9)}
+        .art-it img{width:65px;height:65px;border-radius:50%;object-fit:cover;border:2px solid var(--accent);box-shadow:0 4px 15px rgba(212,175,55,.2)}
+        .art-it.act img{border-width:3px;box-shadow:0 4px 20px rgba(212,175,55,.5)}.art-it small{display:block;margin-top:6px;font-size:.7rem;color:var(--gray)}
+        .s-box{position:relative;margin:10px 0 15px}.s-box input{width:100%;padding:14px 20px 14px 45px;border-radius:16px;border:1px solid #1a1a1a;background:#0d0d0d;color:#fff;font-family:inherit;font-size:.9rem;transition:.3s}
+        .s-box input:focus{border-color:var(--accent);box-shadow:0 0 20px rgba(212,175,55,.1)}.s-box i{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:#555}
+        .s-row{display:flex;align-items:center;padding:12px 14px;border-radius:14px;cursor:pointer;margin-bottom:8px;transition:.2s;background:var(--dark);border:1px solid #141414}
+        .s-row:active{transform:scale(.98);background:#111}.s-row.np{border-color:var(--accent);background:rgba(212,175,55,.05)}
+        .s-art{width:48px;height:48px;border-radius:10px;margin-right:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.9rem;overflow:hidden;background:linear-gradient(135deg,#1a1a1a,#111);color:var(--accent)}
+        .s-art img{width:100%;height:100%;object-fit:cover;border-radius:10px}
+        .s-inf{flex-grow:1;overflow:hidden;min-width:0}.s-inf b{display:block;font-size:.88rem;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .s-inf small{color:var(--gray);font-size:.73rem}.s-act{display:flex;gap:14px;color:var(--gray);font-size:.95rem;margin-left:10px;flex-shrink:0}
+        .s-act i{transition:.2s;padding:5px}.s-act i:active{transform:scale(1.3)}.s-act i.ha{color:var(--red)}
+        .page{display:none;padding:20px;padding-bottom:160px;animation:pIn .3s ease}.page.active{display:block}
+        @keyframes pIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+        .btn{padding:13px;border-radius:14px;border:none;font-weight:700;cursor:pointer;font-size:.88rem;transition:.2s}
+        .btn:active{transform:scale(.96)}.btn:disabled{opacity:.5;pointer-events:none}
+        .btn-g{background:linear-gradient(135deg,var(--accent),#c4a030);color:#000;width:100%;box-shadow:0 4px 15px rgba(212,175,55,.3)}
+        .btn-sm{padding:8px 16px;font-size:.75rem;border-radius:10px}
+        input,textarea,select{width:100%;padding:13px 16px;border-radius:14px;border:1px solid #1a1a1a;background:#0d0d0d;color:#fff;margin-bottom:12px;font-family:inherit;font-size:.88rem;transition:.3s}
+        input:focus,textarea:focus{border-color:var(--accent)}select option{background:#111}
+        .mini-p{position:fixed;bottom:0;width:100%;background:linear-gradient(180deg,#111,#0a0a0a);border-top:1px solid #1a1a1a;padding:14px 20px;z-index:4000;display:none;align-items:center;gap:15px}
+        #pbg{position:absolute;top:-3px;left:0;width:100%;height:3px;background:#1a1a1a;cursor:pointer}
+        #pb{height:100%;background:linear-gradient(90deg,var(--accent),#e8c84a);width:0%;transition:width .3s linear}
+        .p-ctrl{display:flex;align-items:center;gap:18px}.p-ctrl i{color:var(--gray);cursor:pointer;font-size:1.1rem;transition:.2s}
+        .p-ctrl i:hover{color:#fff}.p-ctrl i.mb{font-size:1.7rem;color:var(--accent)}
+        #ban-ov{position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(180deg,#0a0000,#000);z-index:50000;display:none;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:40px}
+        .u-item{display:flex;align-items:center;justify-content:space-between;padding:14px;background:var(--dark);border:1px solid #141414;border-radius:14px;margin-bottom:8px}
+        .u-item .inf{flex:1;overflow:hidden}.u-item .inf b{font-size:.9rem;display:block}.u-item .inf small{color:var(--gray);font-size:.7rem;display:block;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .badge{padding:3px 10px;border-radius:20px;font-size:.65rem;font-weight:700;flex-shrink:0;margin-left:8px}
+        .bg-gold{background:rgba(212,175,55,.2);color:var(--accent)}.bg-red{background:rgba(255,68,68,.2);color:var(--red)}
+        .bg-green{background:rgba(29,185,84,.2);color:var(--green)}.bg-blue{background:rgba(0,123,255,.2);color:var(--blue)}
+        .tier-c{text-align:center;padding:35px 25px;background:linear-gradient(145deg,#111,#0a0a0a);border-radius:24px;border:1px solid var(--accent);position:relative;overflow:hidden}
+        .tier-c::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle,rgba(212,175,55,.03) 0%,transparent 60%)}
+        .tier-c i{font-size:3rem;color:var(--accent);margin-bottom:15px;position:relative}.tier-pr{font-size:2rem;font-weight:900;color:var(--accent);margin:20px 0}
+        .tier-f{text-align:left;margin:20px 0}.tier-f div{padding:8px 0;color:var(--gray);font-size:.85rem}.tier-f i{color:var(--accent);margin-right:10px}
+        .empty{text-align:center;padding:40px 20px;color:#333}.empty i{font-size:3rem;margin-bottom:15px;display:block}.empty p{font-size:.85rem}
+        .up-card{background:linear-gradient(145deg,#111,#0a0a0a);padding:25px;border-radius:20px;border:1px solid #1a1a1a}
+        .up-drop{border:2px dashed #333;border-radius:16px;padding:30px;text-align:center;cursor:pointer;transition:.3s;margin-bottom:15px}
+        .up-drop:active,.up-drop.hf{border-color:var(--accent);background:rgba(212,175,55,.03)}
+        .up-drop i{font-size:2rem;color:#444;margin-bottom:10px;display:block}.up-drop p{color:#555;font-size:.8rem}
+        .up-drop.hf i{color:var(--accent)}.up-drop.hf p{color:var(--accent)}
+        .up-img-prev{width:100%;height:120px;border-radius:12px;border:2px dashed #333;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.3s;margin-bottom:15px;overflow:hidden;background:#0d0d0d}
+        .up-img-prev:active{border-color:var(--accent)}
+        .up-img-prev.has-img{border-style:solid;border-color:var(--accent)}
+        .up-img-prev img{width:100%;height:100%;object-fit:cover}
+        .up-img-prev i{font-size:2rem;color:#333}
+        .up-img-prev.has-img i{display:none}
+        .bk{color:var(--accent);cursor:pointer;margin-bottom:20px;display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:.9rem}.bk:active{opacity:.7}
+        .stat-r{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+        .stat-c{background:var(--dark);border:1px solid #141414;border-radius:14px;padding:15px 10px;text-align:center}
+        .stat-c .n{font-size:1.5rem;font-weight:900;color:var(--accent)}.stat-c .l{font-size:.65rem;color:#555;text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+        .proof-pv{width:100%;max-height:200px;object-fit:contain;border-radius:12px;border:2px solid var(--accent);margin:10px 0;display:none}
+        .btn-ld{position:relative;pointer-events:none;opacity:.7}
+        .btn-ld::after{content:'';position:absolute;width:18px;height:18px;border:2px solid transparent;border-top:2px solid currentColor;border-radius:50%;animation:sp .6s linear infinite;top:50%;right:15px;transform:translateY(-50%)}
+        .st-p{background:rgba(212,175,55,.15);color:var(--accent);padding:8px 15px;border-radius:12px;font-size:.8rem;text-align:center;margin-top:15px}
+        .st-a{background:rgba(29,185,84,.15);color:var(--green);padding:8px 15px;border-radius:12px;font-size:.8rem;text-align:center;margin-top:15px}
+        .st-r{background:rgba(255,68,68,.15);color:var(--red);padding:8px 15px;border-radius:12px;font-size:.8rem;text-align:center;margin-top:15px}
+        .sov-portal{text-align:center;padding:30px 20px 20px}
+        .sov-crown{font-size:3.5rem;color:var(--accent);margin-bottom:15px;filter:drop-shadow(0 0 20px rgba(212,175,55,.3))}
+        .sov-portal h2{color:var(--accent);font-size:1.6rem;letter-spacing:3px;font-weight:900;margin-bottom:5px}
+        .sov-portal p{color:#333;font-size:.78rem;letter-spacing:1px;text-transform:uppercase}
+        .adm-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}
+        .adm-card{background:linear-gradient(145deg,#111,#0a0a0a);padding:22px 12px;border-radius:18px;border:1px solid #1a1a1a;color:var(--accent);text-align:center;cursor:pointer;font-weight:700;font-size:.78rem;transition:.2s}
+        .adm-card:active{transform:scale(.95);border-color:var(--accent);box-shadow:0 0 20px rgba(212,175,55,.1)}
+        .adm-card i{font-size:1.6rem;display:block;margin-bottom:10px}
+        .au-item{display:flex;align-items:center;padding:14px 16px;background:var(--dark);border-radius:14px;margin-bottom:8px}
+        .au-av{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#c4a030);color:#000;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.1rem;flex-shrink:0;margin-right:14px}
+        .au-av.banned{background:#222!important;color:#555!important}
+        .au-av.owner{background:linear-gradient(135deg,#ff4444,#aa0000)!important;color:#fff!important}
+        .au-inf{flex:1;min-width:0;overflow:hidden}
+        .au-top{display:flex;align-items:center;gap:6px;margin-bottom:3px;flex-wrap:wrap}
+        .au-top b{font-size:.88rem;color:#fff}
+        .code-tag{font-size:.6rem;color:var(--accent);background:rgba(212,175,55,.1);padding:2px 7px;border-radius:10px;font-family:'Courier New',monospace;font-weight:700}
+        .au-sub{color:#555;font-size:.72rem;display:block}
+        .au-acts{display:flex;gap:5px;margin-top:8px}
+        .au-acts button{padding:7px 10px;border-radius:8px;border:none;font-weight:800;font-size:.62rem;cursor:pointer;transition:.2s;display:flex;align-items:center;gap:3px}
+        .au-acts button:active{transform:scale(.93)}
+        .au-ban{background:rgba(255,68,68,.12);color:var(--red)}
+        .au-up{background:rgba(29,185,84,.12);color:var(--green)}
+        .au-dn{background:rgba(0,123,255,.12);color:var(--blue)}
+        .au-unban{background:rgba(29,185,84,.12);color:var(--green)}
+        .my-code{text-align:center;padding:14px;background:rgba(212,175,55,.04);border-bottom:1px solid #111}
+        .my-code small{color:#444;font-size:.65rem;display:block;margin-bottom:3px}
+        .my-code .cn{font-family:'Courier New',monospace;font-size:1.1rem;color:var(--accent);font-weight:900;letter-spacing:3px}
+        .ct-item{display:flex;align-items:center;padding:14px 16px;cursor:pointer;transition:.15s;border-bottom:1px solid #0a0a0a}
+        .ct-item:active{background:rgba(212,175,55,.04)}
+        .ct-av{width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#c4a030);color:#000;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.2rem;flex-shrink:0;margin-right:14px}
+        .ct-av.owner{background:linear-gradient(135deg,#ff4444,#aa0000);color:#fff}
+        .ct-av.banned{background:#222!important;color:#555!important}
+        .ct-inf{flex:1;min-width:0;overflow:hidden}
+        .ct-top{display:flex;align-items:center;gap:6px;margin-bottom:3px;flex-wrap:wrap}
+        .ct-top b{font-size:.9rem;color:#fff}
+        .ct-lm{color:#444;font-size:.76rem;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .ct-time{color:#333;font-size:.65rem;flex-shrink:0;margin-left:8px;align-self:flex-start;margin-top:2px}
+
+        /* FIXED: Chat header z-index above main header */
+        .chat-hdr{display:flex;align-items:center;padding:10px 16px;background:#0a0a0a;border-bottom:1px solid #1a1a1a;position:sticky;top:0;z-index:200}
+        .dm-back{width:44px;height:44px;border-radius:50%;background:none;border:0;color:var(--accent);font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+        .dm-back:active{opacity:.6}
+        .dm-hi{flex:1}.dm-hi b{font-size:.9rem;display:block}.dm-hi small{color:#555;font-size:.68rem}
+        .dm-msgs{height:calc(100vh - 200px);overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:4px;background:#060606}
+        .dm-b{max-width:80%;padding:9px 14px;border-radius:16px;font-size:.84rem;line-height:1.45;word-wrap:break-word}
+        .dm-b.s{align-self:flex-end;background:linear-gradient(135deg,var(--accent),#c4a030);color:#000;border-bottom-right-radius:4px;font-weight:600}
+        .dm-b.r{align-self:flex-start;background:#1a1a1a;color:#fff;border-bottom-left-radius:4px}
+        .dm-b .bt{font-size:.58rem;opacity:.55;margin-top:3px;display:block;text-align:right}
+        .dm-b.s .bt{color:#000}.dm-b.r .bt{color:#aaa}
+        .dm-date{text-align:center;color:#333;font-size:.65rem;padding:8px 0}
+        .dm-inp{display:flex;gap:8px;padding:10px 14px;background:#0a0a0a;border-top:1px solid #111}
+        .dm-inp input{flex:1;margin:0;border-radius:24px;padding:11px 20px;font-size:.88rem}
+        .dm-inp button{width:46px;height:46px;border-radius:50%;border:0;background:linear-gradient(135deg,var(--accent),#c4a030);color:#000;font-size:1rem;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+        .dm-inp button:active{transform:scale(.9)}
+        .on-dot{width:9px;height:9px;border-radius:50%;background:var(--green);display:inline-block;margin-left:6px;box-shadow:0 0 6px rgba(29,185,84,.5)}
+        .off-dot{width:9px;height:9px;border-radius:50%;background:#333;display:inline-block;margin-left:6px}
     </style>
 </head>
 <body>
+<div id="toast-c"></div>
+<div id="modal" class="modal-ov"><div class="modal-box"><div class="m-icon"><i id="mi" class="fas fa-question-circle"></i></div><h3 id="mt">Konfirmasi</h3><p id="mx"></p><div id="mc"></div><div class="m-btns" id="mb"><button class="btn-c" onclick="clM()">BATAL</button><button class="btn-ok" id="mk">OKE</button></div></div></div>
+<div id="ban-ov"><i class="fas fa-ban" style="font-size:4rem;color:var(--red);margin-bottom:20px;"></i><h2 style="color:var(--red);">AKUN DIBLOKIR</h2><p id="ban-r" style="color:var(--gray);margin-top:15px;font-size:.9rem;"></p></div>
 
-<div id="toast-container"></div>
-
-<div id="regal-modal" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-icon"><i id="m-icon" class="fas fa-question-circle"></i></div>
-        <h3 id="m-title">Konfirmasi</h3>
-        <p id="m-text"></p>
-        <div id="m-custom-content"></div>
-        <div class="modal-btns" id="m-btns">
-            <button class="btn-cancel" onclick="closeModal()">BATAL</button>
-            <button class="btn-confirm" id="m-confirm">OKE</button>
-        </div>
-    </div>
-</div>
-
-<div id="ban-overlay">
-    <i class="fas fa-ban" style="font-size:4rem; color:var(--red); margin-bottom:20px;"></i>
-    <h2 style="color:var(--red);">AKUN DIBLOKIR</h2>
-    <p id="ban-reason" style="color:var(--gray); margin-top:15px; font-size:0.9rem;"></p>
-    <p style="color:#333; font-size:0.7rem; margin-top:30px;">Hubungi admin untuk banding</p>
-</div>
-
-<header id="main-header">
-    <div onclick="toggleSidebar(true)" style="cursor:pointer; padding:5px;">
-        <i class="fas fa-bars" style="font-size:1.3rem; color:white;"></i>
-    </div>
-    <div class="header-brand">REGAL MUSIC</div>
-    <div id="user-display" class="header-user"></div>
+<header id="hdr">
+    <div onclick="togSB(true)" style="cursor:pointer;padding:5px;"><i class="fas fa-bars" style="font-size:1.3rem;color:#fff;"></i></div>
+    <div class="h-brand">REGAL MUSIC</div>
+    <div id="hud" class="h-user"></div>
 </header>
 
-<div class="sidebar-overlay" onclick="toggleSidebar(false)"></div>
-<div class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-        <h1>REGAL</h1>
-        <small>Music Platform v3.0</small>
-    </div>
-    <a onclick="showPage('home')" id="nav-home"><i class="fas fa-home"></i> Home</a>
-    <a onclick="showPage('fav-page')" id="nav-fav"><i class="fas fa-heart"></i> Favorit</a>
-    <a onclick="showPage('playlist-page')" id="nav-pl"><i class="fas fa-list"></i> Playlist Saya</a>
-    <a onclick="showPage('chat-page')" id="nav-chat"><i class="fas fa-comments"></i> Support Chat</a>
-    <a onclick="showPage('upgrade-tier')" id="nav-tier"><i class="fas fa-crown"></i> Creator Tier</a>
-    <a id="nav-upload" onclick="showPage('upload')" style="display:none; color:var(--green);"><i class="fas fa-upload"></i> Upload Musik</a>
-    <a id="nav-admin" onclick="openAdminAuth()" style="display:none; color:var(--accent);"><i class="fas fa-user-shield"></i> ADMIN PANEL</a>
-
-    <div style="margin-top: auto;">
-        <a onclick="showPage('feedback-page')" style="border-top:1px solid #111; font-size:0.82rem;"><i class="fas fa-paper-plane"></i> Masukan</a>
-        <a onclick="confirmLogout()" style="color:var(--red)"><i class="fas fa-power-off"></i> Logout</a>
-    </div>
+<div class="sb-ov" id="sb-ov"></div>
+<div class="sidebar" id="sb">
+    <div class="sb-hdr"><h1>REGAL</h1><small>Music Platform v4.0</small></div>
+    <a onclick="nav('home')" id="n-home"><i class="fas fa-home"></i> Home</a>
+    <a onclick="nav('fav')" id="n-fav"><i class="fas fa-heart"></i> Favorit</a>
+    <a onclick="nav('pl')" id="n-pl"><i class="fas fa-list"></i> Playlist</a>
+    <a onclick="nav('chat-list')" id="n-ch"><i class="fas fa-comments"></i> Chat</a>
+    <a onclick="nav('tier')" id="n-ti"><i class="fas fa-crown"></i> Creator Tier</a>
+    <a id="n-up" onclick="nav('upload')" style="display:none;color:var(--green);"><i class="fas fa-upload"></i> Upload</a>
+    <a id="n-ad" onclick="nav('adm')" style="display:none;color:var(--accent);"><i class="fas fa-user-shield"></i> ADMIN</a>
+    <div style="margin-top:auto;"><a onclick="nav('fb')" style="border-top:1px solid #111;font-size:.82rem;"><i class="fas fa-paper-plane"></i> Masukan</a><a onclick="logOut()" style="color:var(--red)"><i class="fas fa-power-off"></i> Logout</a></div>
 </div>
 
-<!-- AUTH -->
-<div id="auth" class="page active">
-    <div style="max-width:350px; margin: 50px auto; text-align:center;">
-        <div style="margin-bottom:50px;">
-            <h1 style="color:var(--accent); letter-spacing:6px; font-weight:900; font-size:2.2rem; margin-bottom:5px;">REGAL</h1>
-            <p style="color:#333; font-size:0.8rem;">Premium Music Experience</p>
-        </div>
-        <div>
-            <input type="text" id="log-user" placeholder="Username" autocomplete="off">
-            <input type="password" id="log-pass" placeholder="Password">
-            <button class="btn btn-gold" onclick="processAuth()" id="auth-btn">MASUK</button>
-            <p onclick="toggleAuthMode()" id="auth-toggle" style="color:#555; font-size:0.8rem; margin-top:25px; cursor:pointer;">Belum punya akun? <span style="color:var(--accent)">Daftar</span></p>
-        </div>
+<div id="auth" class="page active"><div style="max-width:350px;margin:50px auto;text-align:center;"><div style="margin-bottom:50px;"><h1 style="color:var(--accent);letter-spacing:6px;font-weight:900;font-size:2.2rem;margin-bottom:5px;">REGAL</h1><p style="color:#333;font-size:.8rem;">Premium Music Experience</p></div><input type="text" id="l-u" placeholder="Username" autocomplete="off"><input type="password" id="l-p" placeholder="Password"><button class="btn btn-g" onclick="doAuth()" id="a-btn">MASUK</button><p onclick="togAM()" id="a-tog" style="color:#555;font-size:.8rem;margin-top:25px;cursor:pointer;">Belum punya akun? <span style="color:var(--accent)">Daftar</span></p></div></div>
+
+<div id="home" class="page"><div class="sec-t">Artis Populer</div><div class="art-sc" id="h-art"></div><div class="s-box"><i class="fas fa-search"></i><input type="text" id="s-inp" placeholder="Cari musik..." oninput="doSearch()"></div><div id="f-tag" style="display:none;margin-bottom:15px;"><span style="background:rgba(212,175,55,.1);color:var(--accent);padding:6px 14px;border-radius:20px;font-size:.75rem;display:inline-flex;align-items:center;gap:8px;"><span id="f-lbl"></span><i class="fas fa-times" onclick="clrF()" style="cursor:pointer;"></i></span></div><div id="h-ldr"><div class="spinner"></div><p style="color:#333;font-size:.75rem;margin-top:12px;">Memuat...</p></div><div id="h-list"></div></div>
+
+<div id="fav" class="page"><h2 style="color:var(--accent);margin-bottom:20px;"><i class="fas fa-heart" style="margin-right:10px;"></i>Favorit</h2><div id="f-list"></div></div>
+
+<div id="pl" class="page"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;"><h2 style="color:var(--accent);margin:0;"><i class="fas fa-list" style="margin-right:10px;"></i>Playlist</h2><button class="btn btn-g btn-sm" onclick="newPL()"><i class="fas fa-plus"></i> BARU</button></div><div id="pl-list"></div></div>
+<div id="pl-det" class="page"><div class="bk" onclick="nav('pl')"><i class="fas fa-arrow-left"></i> Kembali</div><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;"><h2 id="pl-name" style="margin:0;color:var(--accent);"></h2><button class="btn btn-sm" style="background:rgba(255,68,68,.1);color:var(--red);border:1px solid rgba(255,68,68,.2);" onclick="delPL()"><i class="fas fa-trash"></i></button></div><div id="pl-songs"></div></div>
+
+<div id="chat-list" class="page" style="padding:0;padding-bottom:0;">
+    <div class="chat-hdr" style="justify-content:space-between;">
+        <h2 style="color:var(--accent);margin:0;font-size:1.1rem;"><i class="fas fa-comments" style="margin-right:8px;"></i>Chat</h2>
+        <span class="code-tag" id="my-cd-h" style="font-size:.7rem;">#00000000</span>
     </div>
+    <div class="my-code"><small>Kode Kamu</small><div class="cn" id="my-cd-d">#00000000</div></div>
+    <div id="ct-list"></div>
 </div>
 
-<!-- HOME -->
-<div id="home" class="page">
-    <div class="section-title">Artis Populer</div>
-    <div class="art-scroll" id="home-artists"></div>
-    <div class="search-box">
-        <i class="fas fa-search"></i>
-        <input type="text" id="search-input" placeholder="Cari musik, artis..." oninput="handleSearch(this.value)">
+<div id="chat-room" class="page" style="padding:0;padding-bottom:0;">
+    <div class="chat-hdr">
+        <button class="dm-back" onclick="nav('chat-list')"><i class="fas fa-arrow-left"></i></button>
+        <div class="ct-av" id="dm-av" style="width:38px;height:38px;font-size:.85rem;margin-right:12px;">?</div>
+        <div class="dm-hi"><b id="dm-nm">---</b><small id="dm-cd">#00000000 <span id="dm-dot" class="off-dot"></span></small></div>
     </div>
-    <div id="filter-tag" style="display:none; margin-bottom:15px;">
-        <span style="background:rgba(212,175,55,0.1); color:var(--accent); padding:6px 14px; border-radius:20px; font-size:0.75rem; display:inline-flex; align-items:center; gap:8px;">
-            <span id="filter-label"></span>
-            <i class="fas fa-times" onclick="clearFilter()" style="cursor:pointer;"></i>
-        </span>
-    </div>
-    <div id="home-loader"><div class="spinner"></div><p style="color:#333; font-size:0.75rem; margin-top:12px;">Memuat musik...</p></div>
-    <div id="home-list"></div>
+    <div class="dm-msgs" id="dm-msgs"></div>
+    <div class="dm-inp"><input type="text" id="dm-inp" placeholder="Ketik pesan..." onkeypress="if(event.key==='Enter')sendDM()"><button onclick="sendDM()"><i class="fas fa-paper-plane"></i></button></div>
 </div>
 
-<!-- FAVORITES -->
-<div id="fav-page" class="page">
-    <h2 style="color:var(--accent); margin-bottom:20px;"><i class="fas fa-heart" style="margin-right:10px;"></i>Favorit Saya</h2>
-    <div id="fav-list"></div>
-</div>
-
-<!-- PLAYLISTS -->
-<div id="playlist-page" class="page">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-        <h2 style="color:var(--accent); margin:0;"><i class="fas fa-list" style="margin-right:10px;"></i>Playlist</h2>
-        <button class="btn btn-gold btn-sm" onclick="openNewPlaylistModal()"><i class="fas fa-plus"></i> BARU</button>
-    </div>
-    <div id="playlist-list"></div>
-</div>
-
-<!-- PLAYLIST DETAIL -->
-<div id="playlist-detail" class="page">
-    <div class="back-btn" onclick="showPage('playlist-page')"><i class="fas fa-arrow-left"></i> Kembali</div>
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-        <h2 id="det-playlist-name" style="margin:0; color:var(--accent);"></h2>
-        <button class="btn btn-sm" style="background:rgba(255,68,68,0.1); color:var(--red); border:1px solid rgba(255,68,68,0.2);" onclick="deleteCurrentPlaylist()"><i class="fas fa-trash"></i></button>
-    </div>
-    <div id="playlist-songs"></div>
-</div>
-
-<!-- ADMIN PANEL -->
-<div id="admin-panel" class="page">
-    <h2 style="color:var(--accent); margin-bottom:5px;"><i class="fas fa-crown" style="margin-right:10px;"></i>Sovereign Portal</h2>
-    <p style="color:#444; font-size:0.8rem; margin-bottom:10px;">Admin Control Center</p>
-    <div class="stat-row" id="admin-stats"></div>
-    <div class="admin-grid">
-        <div class="admin-card" onclick="showPage('adm-users')"><i class="fas fa-users"></i><span>All Users</span></div>
-        <div class="admin-card" onclick="showPage('adm-ban')"><i class="fas fa-user-slash"></i><span>Ban Manager</span></div>
-        <div class="admin-card" onclick="showPage('adm-chats')"><i class="fas fa-comments"></i><span>User Chats</span></div>
-        <div class="admin-card" onclick="showPage('adm-songs')"><i class="fas fa-music"></i><span>Manage Songs</span></div>
-        <div class="admin-card" onclick="showPage('adm-cc')"><i class="fas fa-id-badge"></i><span>Tier Manager</span></div>
-        <div class="admin-card" onclick="showPage('adm-req')"><i class="fas fa-wallet"></i><span>Payment Req</span></div>
-        <div class="admin-card" onclick="showPage('adm-artists')"><i class="fas fa-microphone"></i><span>Artists</span></div>
-        <div class="admin-card" onclick="showPage('adm-feedback')"><i class="fas fa-envelope"></i><span>Feedback</span></div>
+<div id="adm" class="page">
+    <div class="sov-portal"><div class="sov-crown"><i class="fas fa-crown"></i></div><h2>SOVEREIGN PORTAL</h2><p>Admin Control Center</p></div>
+    <div class="stat-r" id="a-stats"></div>
+    <div class="adm-grid">
+        <div class="adm-card" onclick="nav('a-users')"><i class="fas fa-users"></i><span>All Users</span></div>
+        <div class="adm-card" onclick="nav('a-ban')"><i class="fas fa-user-slash"></i><span>Ban Manager</span></div>
+        <div class="adm-card" onclick="nav('chat-list')"><i class="fas fa-comments"></i><span>DM Chat</span></div>
+        <div class="adm-card" onclick="nav('a-songs')"><i class="fas fa-music"></i><span>Manage Songs</span></div>
+        <div class="adm-card" onclick="nav('a-tier')"><i class="fas fa-id-badge"></i><span>Tier Manager</span></div>
+        <div class="adm-card" onclick="nav('a-req')"><i class="fas fa-wallet"></i><span>Payment Req</span></div>
+        <div class="adm-card" onclick="nav('a-art')"><i class="fas fa-microphone"></i><span>Artists</span></div>
+        <div class="adm-card" onclick="nav('a-fb')"><i class="fas fa-envelope"></i><span>Feedback</span></div>
     </div>
 </div>
 
-<!-- ADMIN SUB PAGES -->
-<div id="adm-users" class="page">
-    <div class="back-btn" onclick="showPage('admin-panel')"><i class="fas fa-arrow-left"></i> Admin Panel</div>
-    <h3 style="color:var(--accent); margin-bottom:15px;">Semua User</h3>
-    <div id="adm-user-list"></div>
-</div>
+<div id="a-users" class="page"><div class="bk" onclick="nav('adm')"><i class="fas fa-arrow-left"></i> Admin</div><h3 style="color:var(--accent);margin-bottom:15px;"><i class="fas fa-users" style="margin-right:8px;"></i>All Users</h3><div id="au-list"></div></div>
+<div id="a-ban" class="page"><div class="bk" onclick="nav('adm')"><i class="fas fa-arrow-left"></i> Admin</div><h3 style="color:var(--accent);margin-bottom:15px;"><i class="fas fa-user-slash" style="margin-right:8px;"></i>Ban Manager</h3><div id="bn-list"></div></div>
+<div id="a-songs" class="page"><div class="bk" onclick="nav('adm')"><i class="fas fa-arrow-left"></i> Admin</div><h3 style="color:var(--accent);margin-bottom:15px;"><i class="fas fa-music" style="margin-right:8px;"></i>Songs</h3><div id="as-list"></div></div>
+<div id="a-tier" class="page"><div class="bk" onclick="nav('adm')"><i class="fas fa-arrow-left"></i> Admin</div><h3 style="color:var(--accent);margin-bottom:15px;"><i class="fas fa-id-badge" style="margin-right:8px;"></i>Tier Manager</h3><div id="at-list"></div></div>
+<div id="a-req" class="page"><div class="bk" onclick="nav('adm')"><i class="fas fa-arrow-left"></i> Admin</div><h3 style="color:var(--accent);margin-bottom:15px;"><i class="fas fa-wallet" style="margin-right:8px;"></i>Payment Requests</h3><div id="ar-list"></div></div>
+<div id="a-art" class="page"><div class="bk" onclick="nav('adm')"><i class="fas fa-arrow-left"></i> Admin</div><h3 style="color:var(--accent);margin-bottom:15px;"><i class="fas fa-microphone" style="margin-right:8px;"></i>Artists</h3><div style="background:#0a0a0a;border:1px solid #141414;border-radius:16px;padding:20px;margin-bottom:20px;"><input type="text" id="ar-n" placeholder="Nama Artis"><input type="text" id="ar-i" placeholder="URL Foto"><button class="btn btn-g" onclick="saveArt()">TAMBAH</button></div><div id="aa-list"></div></div>
+<div id="a-fb" class="page"><div class="bk" onclick="nav('adm')"><i class="fas fa-arrow-left"></i> Admin</div><h3 style="color:var(--accent);margin-bottom:15px;"><i class="fas fa-envelope" style="margin-right:8px;"></i>Feedback</h3><div id="af-list"></div></div>
 
-<div id="adm-ban" class="page">
-    <div class="back-btn" onclick="showPage('admin-panel')"><i class="fas fa-arrow-left"></i> Admin Panel</div>
-    <h3 style="color:var(--accent); margin-bottom:15px;">Ban Manager</h3>
-    <div id="ban-list"></div>
-</div>
+<div id="fb" class="page"><h2 style="color:var(--accent);margin-bottom:20px;"><i class="fas fa-paper-plane" style="margin-right:10px;"></i>Feedback</h2><textarea id="fb-t" rows="5" placeholder="Tulis masukan..."></textarea><button class="btn btn-g" onclick="sendFB()">KIRIM</button></div>
 
-<div id="adm-chats" class="page">
-    <div class="back-btn" onclick="showPage('admin-panel')"><i class="fas fa-arrow-left"></i> Admin Panel</div>
-    <h3 style="color:var(--accent); margin-bottom:15px;">User Chats</h3>
-    <div id="adm-chat-list"></div>
-</div>
+<div id="tier" class="page"><div class="tier-c"><i class="fas fa-crown"></i><h2 style="margin:10px 0 5px;">CREATOR TIER</h2><p style="color:#555;font-size:.8rem;">Upload & download tanpa batas</p><div class="tier-pr">Rp 25.000</div><p style="color:#444;font-size:.75rem;margin-top:-10px;">per 2 bulan</p><div class="tier-f"><div><i class="fas fa-check-circle"></i> Upload musik</div><div><i class="fas fa-check-circle"></i> Download semua</div><div><i class="fas fa-check-circle"></i> Badge Creator</div><div><i class="fas fa-check-circle"></i> Prioritas support</div></div><button class="btn btn-g" id="up-btn" onclick="nav('qris')" style="margin-top:10px;">UPGRADE SEKARANG</button><div id="ti-info" style="margin-top:15px;"></div><div id="ti-st" style="margin-top:10px;"></div></div></div>
 
-<div id="adm-chat-detail" class="page">
-    <div class="back-btn" onclick="showPage('adm-chats')"><i class="fas fa-arrow-left"></i> Kembali</div>
-    <h3 id="adm-chat-user-title" style="color:var(--accent); margin-bottom:15px;"></h3>
-    <div id="adm-chat-box" style="height:50vh; overflow-y:auto; display:flex; flex-direction:column; gap:8px; padding:15px; background:#060606; border-radius:14px; border:1px solid #1a1a1a;"></div>
-    <div class="chat-input-bar">
-        <input type="text" id="adm-chat-msg" placeholder="Balas..." style="margin:0">
-        <button class="btn btn-gold" style="width:50px" onclick="sendAdminReply()"><i class="fas fa-paper-plane"></i></button>
-    </div>
-</div>
+<div id="qris" class="page"><div class="bk" onclick="nav('tier')"><i class="fas fa-arrow-left"></i> Kembali</div><div style="text-align:center;"><h3 style="color:var(--accent);margin-bottom:5px;">Scan QRIS</h3><p style="color:#444;font-size:.8rem;margin-bottom:20px;">Transfer Rp 25.000 lalu upload bukti</p><img src="https://files.catbox.moe/j4l01f.jpg" style="width:100%;max-width:280px;border-radius:20px;border:2px solid #222;margin-bottom:25px;"><div style="background:#0a0a0a;border:1px solid #1a1a1a;border-radius:16px;padding:20px;"><input type="file" id="up-pr" accept="image/*" onchange="hProof()" style="display:none"><div class="up-drop" id="pr-dr" onclick="document.getElementById('up-pr').click()"><i class="fas fa-cloud-upload-alt"></i><p id="pr-lb">Tap untuk pilih bukti</p></div><img id="pr-pv" class="proof-pv" alt="Preview"><div id="pr-fi" style="display:none;color:#555;font-size:.75rem;margin-bottom:15px;"></div><button class="btn btn-g" id="pr-btn" onclick="subProof()"><i class="fas fa-paper-plane" style="margin-right:8px;"></i>KIRIM BUKTI</button><div id="pr-st"></div></div></div></div>
 
-<div id="adm-songs" class="page">
-    <div class="back-btn" onclick="showPage('admin-panel')"><i class="fas fa-arrow-left"></i> Admin Panel</div>
-    <h3 style="color:var(--accent); margin-bottom:15px;">Manage Songs</h3>
-    <div id="adm-song-list"></div>
-</div>
-
-<div id="adm-cc" class="page">
-    <div class="back-btn" onclick="showPage('admin-panel')"><i class="fas fa-arrow-left"></i> Admin Panel</div>
-    <h3 style="color:var(--accent); margin-bottom:15px;">Tier Manager</h3>
-    <div id="adm-cc-list"></div>
-</div>
-
-<div id="adm-req" class="page">
-    <div class="back-btn" onclick="showPage('admin-panel')"><i class="fas fa-arrow-left"></i> Admin Panel</div>
-    <h3 style="color:var(--accent); margin-bottom:15px;">Payment Requests</h3>
-    <div id="adm-req-list"></div>
-</div>
-
-<div id="adm-artists" class="page">
-    <div class="back-btn" onclick="showPage('admin-panel')"><i class="fas fa-arrow-left"></i> Admin Panel</div>
-    <h3 style="color:var(--accent); margin-bottom:15px;">Manage Artists</h3>
-    <div style="background:#0a0a0a; border:1px solid #141414; border-radius:16px; padding:20px; margin-bottom:20px;">
-        <input type="text" id="art-name" placeholder="Nama Artis">
-        <input type="text" id="art-img" placeholder="URL Foto Artis">
-        <button class="btn btn-gold" onclick="saveArtist()">TAMBAH ARTIS</button>
-    </div>
-    <div id="adm-art-list"></div>
-</div>
-
-<div id="adm-feedback" class="page">
-    <div class="back-btn" onclick="showPage('admin-panel')"><i class="fas fa-arrow-left"></i> Admin Panel</div>
-    <h3 style="color:var(--accent); margin-bottom:15px;">User Feedback</h3>
-    <div id="adm-fb-list"></div>
-</div>
-
-<!-- CHAT -->
-<div id="chat-page" class="page">
-    <h3 style="color:var(--accent); margin-bottom:15px;"><i class="fas fa-comments" style="margin-right:8px;"></i>Support Chat</h3>
-    <div id="chat-box"></div>
-    <div class="chat-input-bar">
-        <input type="text" id="chat-msg" placeholder="Ketik pesan..." onkeypress="if(event.key==='Enter')sendMessage()">
-        <button class="btn btn-gold" style="width:50px" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
-    </div>
-</div>
-
-<!-- FEEDBACK -->
-<div id="feedback-page" class="page">
-    <h2 style="color:var(--accent); margin-bottom:20px;"><i class="fas fa-paper-plane" style="margin-right:10px;"></i>Feedback</h2>
-    <p style="color:#555; font-size:0.85rem; margin-bottom:20px;">Bantu kami menjadi lebih baik.</p>
-    <textarea id="fb-text" rows="5" placeholder="Tulis masukan anda..."></textarea>
-    <button class="btn btn-gold" onclick="sendFeedback()">KIRIM MASUKAN</button>
-</div>
-
-<!-- UPGRADE TIER -->
-<div id="upgrade-tier" class="page">
-    <div class="tier-card">
-        <i class="fas fa-crown"></i>
-        <h2 style="margin:10px 0 5px;">CREATOR TIER</h2>
-        <p style="color:#555; font-size:0.8rem;">Upload & download musik tanpa batas</p>
-        <div class="tier-price">Rp 25.000</div>
-        <p style="color:#444; font-size:0.75rem; margin-top:-10px;">per 2 bulan</p>
-        <div class="tier-features">
-            <div><i class="fas fa-check-circle"></i> Upload musik sendiri</div>
-            <div><i class="fas fa-check-circle"></i> Download semua musik</div>
-            <div><i class="fas fa-check-circle"></i> Badge Creator eksklusif</div>
-            <div><i class="fas fa-check-circle"></i> Prioritas support</div>
-        </div>
-        <button class="btn btn-gold" id="upgrade-btn" onclick="showPage('qris-pay')" style="margin-top:10px;">UPGRADE SEKARANG</button>
-        <div id="current-tier-info" style="margin-top:15px;"></div>
-        <div id="payment-status-box" style="margin-top:10px;"></div>
-    </div>
-</div>
-
-<!-- QRIS PAY - COMPLETELY REBUILT -->
-<div id="qris-pay" class="page">
-    <div class="back-btn" onclick="showPage('upgrade-tier')"><i class="fas fa-arrow-left"></i> Kembali</div>
-    <div style="text-align:center;">
-        <h3 style="color:var(--accent); margin-bottom:5px;">Scan QRIS</h3>
-        <p style="color:#444; font-size:0.8rem; margin-bottom:20px;">Transfer Rp 25.000 lalu upload bukti</p>
-
-        <img src="https://files.catbox.moe/j4l01f.jpg" style="width:100%; max-width:280px; border-radius:20px; border:2px solid #222; margin-bottom:25px;">
-
-        <div style="background:#0a0a0a; border:1px solid #1a1a1a; border-radius:16px; padding:20px;">
-            <input type="file" id="up-proof" accept="image/*" onchange="handleProof()" style="display:none">
-
-            <div class="upload-drop" id="proof-drop" onclick="document.getElementById('up-proof').click()">
-                <i class="fas fa-cloud-upload-alt"></i>
-                <p id="proof-label">Tap untuk pilih bukti transfer</p>
-            </div>
-
-            <!-- PREVIEW IMAGE -->
-            <img id="proof-preview" class="proof-preview" alt="Preview">
-
-            <!-- FILE INFO -->
-            <div id="proof-file-info" style="display:none; color:#555; font-size:0.75rem; margin-bottom:15px;"></div>
-
-            <button class="btn btn-gold" id="submit-proof-btn" onclick="submitUpgrade()">
-                <i class="fas fa-paper-plane" style="margin-right:8px;"></i>KIRIM BUKTI PEMBAYARAN
-            </button>
-
-            <!-- EXISTING REQUEST STATUS -->
-            <div id="existing-request-status"></div>
-        </div>
-    </div>
-</div>
-
-<!-- UPLOAD -->
 <div id="upload" class="page">
-    <h2 style="color:var(--accent); margin-bottom:20px;"><i class="fas fa-upload" style="margin-right:10px;"></i>Upload Musik</h2>
-    <div class="upload-card">
-        <input type="file" id="mp3-file" accept="audio/mp3,audio/*" onchange="handleMp3()" style="display:none">
-        <div class="upload-drop" id="mp3-drop" onclick="document.getElementById('mp3-file').click()">
-            <i class="fas fa-music"></i>
-            <p id="mp3-label">Tap untuk pilih file MP3</p>
-        </div>
-        <input type="text" id="up-title" placeholder="Judul Lagu">
-        <input type="text" id="up-artist" placeholder="Nama Artis">
-        <button class="btn btn-gold" onclick="importTrack()">PUBLISH MUSIK</button>
+    <h2 style="color:var(--accent);margin-bottom:20px;"><i class="fas fa-upload" style="margin-right:10px;"></i>Upload</h2>
+    <div class="up-card">
+        <div class="up-img-prev" id="img-prev" onclick="document.getElementById('img-f').click()"><i class="fas fa-image"></i><img id="img-pv" src="" alt=""></div>
+        <input type="file" id="img-f" accept="image/*" onchange="hImg()" style="display:none">
+        <p style="color:#555;font-size:.75rem;margin-bottom:12px;text-align:center;">Tap di atas untuk pilih cover lagu *</p>
+        <input type="file" id="mp3-f" accept="audio/*" onchange="hMp3()" style="display:none">
+        <div class="up-drop" id="mp3-dr" onclick="document.getElementById('mp3-f').click()"><i class="fas fa-music"></i><p id="mp3-lb">Tap untuk pilih MP3</p></div>
+        <input type="text" id="up-ti" placeholder="Judul Lagu"><input type="text" id="up-ar" placeholder="Nama Artis">
+        <button class="btn btn-g" onclick="pubTrack()">PUBLISH</button>
     </div>
 </div>
 
-<!-- MINI PLAYER -->
-<div id="mini-player" class="mini-player">
-    <div id="prog-bar-bg" onclick="seekAudio(event)"><div id="prog-bar"></div></div>
-    <div style="display:flex; align-items:center; flex-grow:1; overflow:hidden; min-width:0;">
-        <div class="song-art"><i class="fas fa-music"></i></div>
-        <div class="song-info">
-            <b id="p-title">---</b>
-            <small id="p-artist">---</small>
-        </div>
-    </div>
-    <div class="player-controls">
-        <i class="fas fa-step-backward" onclick="playPrev()"></i>
-        <i id="p-btn-icon" class="fas fa-play main-btn" onclick="togglePlay()"></i>
-        <i class="fas fa-step-forward" onclick="playNext()"></i>
-    </div>
-</div>
-
-<audio id="audio"></audio>
+<div id="mini-p" class="mini-p"><div id="pbg" onclick="seekA(event)"><div id="pb"></div></div><div style="display:flex;align-items:center;flex-grow:1;overflow:hidden;min-width:0;"><div class="s-art" id="p-art"><i class="fas fa-music"></i></div><div class="s-inf"><b id="p-ti">---</b><small id="p-ar">---</small></div></div><div class="p-ctrl"><i class="fas fa-step-backward" onclick="prev()"></i><i id="p-ic" class="fas fa-play mb" onclick="togP()"></i><i class="fas fa-step-forward" onclick="next()"></i></div></div>
+<audio id="aud"></audio>
 
 <script>
-const OWNER_NAME = "King";
-const ADMIN_SECRET_KEY = "#FFHUDT6O3jVoFkhlPo7eM";
-const MAX_PROOF_SIZE = 2 * 1024 * 1024; // 2MB max for proof image
+const OWN="King",KC="#00000001";
+const fc={apiKey:"AIzaSyBTb_DwvrKW35f15NvzNC5VTTbubZJD5JQ",authDomain:"developer-9640f.firebaseapp.com",databaseURL:"https://developer-9640f-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"developer-9640f",storageBucket:"developer-9640f.firebasestorage.app",messagingSenderId:"217471718457",appId:"1:217471718457:web:e157fccbddc9ff5213a9e8"};
+firebase.initializeApp(fc);const db=firebase.database();
+let U=JSON.parse(localStorage.getItem('uv4'))||null;
+let songs=[],favs=[],pls={},users={},codes={};
+let am='login',csi=-1,cpl=[],mp3d=null,prfd=null,caf=null,cplid=null,coverD=null;
+let myCode=null,chatU=null,chatC=null,chatL=null;
+const aud=document.getElementById('aud');
+const chatPages=new Set(['chat-list','chat-room']);
 
-const firebaseConfig = {
-    apiKey: "AIzaSyBTb_DwvrKW35f15NvzNC5VTTbubZJD5JQ",
-    authDomain: "developer-9640f.firebaseapp.com",
-    databaseURL: "https://developer-9640f-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "developer-9640f",
-    storageBucket: "developer-9640f.firebasestorage.app",
-    messagingSenderId: "217471718457",
-    appId: "1:217471718457:web:e157fccbddc9ff5213a9e8"
-};
+function toast(m,t){const c=document.getElementById('toast-c'),e=document.createElement('div');e.className='toast'+(t?' '+t:'');e.innerHTML=`<i class="fas fa-${t==='error'?'exclamation-circle':t==='success'?'check-circle':'info-circle'}"></i><span>${m}</span>`;c.appendChild(e);setTimeout(()=>{e.style.animation='tOut .3s ease forwards';setTimeout(()=>e.remove(),300)},3000)}
+function opM(t,x,i,l,f,c='',d){document.getElementById('mt').innerText=t;document.getElementById('mx').innerText=x;document.getElementById('mi').className='fas fa-'+i;const b=document.getElementById('mk');b.innerText=l;b.className=d?'btn-d':'btn-ok';b.style.flex='1';document.getElementById('mc').innerHTML=c;b.onclick=()=>{f();clM()};document.getElementById('mb').style.display='flex';document.getElementById('modal').style.display='flex'}
+function clM(){document.getElementById('modal').style.display='none'}
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-
-let currentUser = JSON.parse(localStorage.getItem('user_v3')) || null;
-let songs = [], favorites = [], playlists = {}, allUsers = {};
-let authMode = 'login', currentSongIndex = -1, currentPlaylist = [];
-let mp3Data = null, proofData = null, currentArtistFilter = null;
-let currentAdminChatUser = null, currentPlaylistId = null;
-
-const audio = document.getElementById('audio');
-
-// ─── UTILITIES ───
-function showToast(msg, type = '') {
-    const cont = document.getElementById('toast-container');
-    const t = document.createElement('div');
-    t.className = `toast ${type}`;
-    const icons = { error: 'exclamation-circle', success: 'check-circle', '': 'info-circle' };
-    t.innerHTML = `<i class="fas fa-${icons[type] || 'info-circle'}"></i><span>${msg}</span>`;
-    cont.appendChild(t);
-    setTimeout(() => { t.style.animation = 'toastOut 0.3s ease forwards'; setTimeout(() => t.remove(), 300); }, 3000);
+function togSB(open){
+    document.getElementById('sb').classList.toggle('active',open);
+    document.getElementById('sb-ov').style.display=open?'block':'none';
 }
 
-function openModal(title, text, icon, confirmLabel, onConfirm, customHTML = "", dangerBtn = false) {
-    document.getElementById('m-title').innerText = title;
-    document.getElementById('m-text').innerText = text;
-    document.getElementById('m-icon').className = `fas fa-${icon}`;
-    const confirmBtn = document.getElementById('m-confirm');
-    confirmBtn.innerText = confirmLabel;
-    confirmBtn.className = dangerBtn ? 'btn-danger' : 'btn-confirm';
-    confirmBtn.style.flex = '1';
-    document.getElementById('m-custom-content').innerHTML = customHTML;
-    confirmBtn.onclick = () => { onConfirm(); closeModal(); };
-    document.getElementById('m-btns').style.display = 'flex';
-    document.getElementById('regal-modal').style.display = 'flex';
+function nav(id){
+    if(chatL){db.ref(chatL).off();chatL=null}
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    const el=document.getElementById(id);if(el)el.classList.add('active');
+    document.querySelectorAll('.sidebar a').forEach(a=>a.classList.remove('an'));
+    const nm={home:'n-home',fav:'n-fav',pl:'n-pl','chat-list':'n-ch',tier:'n-ti'};
+    if(nm[id])document.getElementById(nm[id])?.classList.add('an');
+    if(id==='home')rFilt();
+    if(id==='fav')rFav();
+    if(id==='pl')rPL();
+    if(id==='chat-list')loadCT();
+    if(id==='a-ban')ldBan();
+    if(id==='a-songs')ldSongs();
+    if(id==='a-tier')ldTier();
+    if(id==='a-req')ldReq();
+    if(id==='a-art')ldArt();
+    if(id==='a-users')ldUsers();
+    if(id==='a-fb')ldFB();
+    if(id==='adm')ldStats();
+    if(id==='tier')upTier();
+    if(id==='qris')chkReq();
+    setTimeout(()=>togSB(false),30);
 }
 
-function closeModal() { document.getElementById('regal-modal').style.display = 'none'; }
-
-function toggleSidebar(v) {
-    document.getElementById('sidebar').classList.toggle('active', v);
-    document.querySelector('.sidebar-overlay').style.display = v ? 'block' : 'none';
-}
-
-function escHTML(str) {
-    if (!str) return '';
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-}
-
-function timeAgo(ts) {
-    const d = Date.now() - ts;
-    if (d < 60000) return 'Baru saja';
-    if (d < 3600000) return Math.floor(d / 60000) + 'm lalu';
-    if (d < 86400000) return Math.floor(d / 3600000) + 'j lalu';
-    return Math.floor(d / 86400000) + 'h lalu';
-}
-
-function formatBytes(bytes) {
-    if (bytes < 1024) return bytes + ' B';
-    if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
-    return (bytes / 1048576).toFixed(1) + ' MB';
-}
-
-function isOwner() { return currentUser && currentUser.name === OWNER_NAME; }
-function isCreator() { return currentUser && (currentUser.role === 'creator' || isOwner()); }
-
-function showPage(id) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    const el = document.getElementById(id);
-    if (el) el.classList.add('active');
-    toggleSidebar(false);
-
-    document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active-nav'));
-    const navMap = { home: 'nav-home', 'fav-page': 'nav-fav', 'playlist-page': 'nav-pl', 'chat-page': 'nav-chat', 'upgrade-tier': 'nav-tier' };
-    if (navMap[id]) document.getElementById(navMap[id])?.classList.add('active-nav');
-
-    if (id === 'home') renderFilteredSongs();
-    if (id === 'fav-page') renderFavorites();
-    if (id === 'playlist-page') renderPlaylists();
-    if (id === 'chat-page') loadChat();
-    if (id === 'adm-ban') loadAdminBan();
-    if (id === 'adm-chats') loadAdminChats();
-    if (id === 'adm-songs') loadAdminSongs();
-    if (id === 'adm-cc') loadAdminTier();
-    if (id === 'adm-req') loadAdminReq();
-    if (id === 'adm-artists') loadAdminArtists();
-    if (id === 'adm-users') loadAdminUsers();
-    if (id === 'adm-feedback') loadAdminFeedback();
-    if (id === 'admin-panel') loadAdminStats();
-    if (id === 'upgrade-tier') updateTierInfo();
-    if (id === 'qris-pay') checkExistingRequest();
-}
-
-// ─── AUTH ───
-function processAuth() {
-    const u = document.getElementById('log-user').value.trim();
-    const p = document.getElementById('log-pass').value.trim();
-    if (!u || !p) return showToast("Isi semua kolom!", "error");
-    if (u.length < 3) return showToast("Username min 3 karakter!", "error");
-
-    const btn = document.getElementById('auth-btn');
-    btn.disabled = true; btn.innerText = 'MEMPROSES...';
-
-    if (authMode === 'register') {
-        db.ref('users/' + u).once('value', s => {
-            if (s.exists()) {
-                showToast("Username sudah dipakai!", "error");
-                btn.disabled = false; btn.innerText = 'DAFTAR';
-            } else {
-                db.ref('users/' + u).set({ pass: p, role: 'viewer', joined: Date.now() }).then(() => {
-                    showToast("Berhasil daftar! Silakan login.", "success");
-                    authMode = 'login'; updateAuthUI();
-                    btn.disabled = false; btn.innerText = 'MASUK';
-                });
-            }
-        });
-    } else {
-        db.ref('users/' + u).once('value', s => {
-            btn.disabled = false; btn.innerText = 'MASUK';
-            if (s.exists() && s.val().pass === p) {
-                if (s.val().banned) {
-                    document.getElementById('ban-overlay').style.display = 'flex';
-                    document.getElementById('ban-reason').innerText = s.val().banReason || "Alasan tidak disebutkan.";
-                    return;
-                }
-                currentUser = { name: u, role: s.val().role || 'viewer' };
-                localStorage.setItem('user_v3', JSON.stringify(currentUser));
-                db.ref('users/' + u + '/lastLogin').set(Date.now());
-                location.reload();
-            } else showToast("Username atau password salah!", "error");
-        });
-    }
-}
-
-function toggleAuthMode() {
-    authMode = (authMode === 'login') ? 'register' : 'login';
-    updateAuthUI();
-}
-
-function updateAuthUI() {
-    const btn = document.getElementById('auth-btn');
-    const toggle = document.getElementById('auth-toggle');
-    if (authMode === 'register') {
-        btn.innerText = 'DAFTAR';
-        toggle.innerHTML = 'Sudah punya akun? <span style="color:var(--accent)">Login</span>';
-    } else {
-        btn.innerText = 'MASUK';
-        toggle.innerHTML = 'Belum punya akun? <span style="color:var(--accent)">Daftar</span>';
-    }
-}
-
-function confirmLogout() {
-    openModal("Logout?", "Anda yakin ingin keluar?", "power-off", "LOGOUT", () => {
-        localStorage.clear(); location.reload();
-    }, "", true);
-}
-
-// ─── INIT ───
-function init() {
-    if (!currentUser) return;
-
-    document.getElementById('auth').classList.remove('active');
-    document.getElementById('home').classList.add('active');
-    document.getElementById('main-header').style.display = 'flex';
-    document.getElementById('user-display').innerText = currentUser.name.toUpperCase();
-
-    db.ref('users/' + currentUser.name).once('value', s => {
-        if (s.exists() && s.val().banned) {
-            document.getElementById('ban-overlay').style.display = 'flex';
-            document.getElementById('ban-reason').innerText = s.val().banReason || "Alasan tidak disebutkan.";
-        }
-    });
-
-    db.ref('songs').on('value', s => {
-        songs = [];
-        s.forEach(x => { const v = x.val(); v._key = x.key; songs.push(v); });
-        document.getElementById('home-loader').style.display = 'none';
-        renderFilteredSongs();
-    });
-
-    db.ref('favorites/' + currentUser.name).on('value', s => {
-        favorites = s.val() ? Object.keys(s.val()) : [];
-        renderFilteredSongs();
-    });
-
-    db.ref('playlists/' + currentUser.name).on('value', s => {
-        playlists = s.val() || {};
-    });
-
-    db.ref('users/' + currentUser.name).on('value', s => {
-        const d = s.val(); if (!d) return;
-        currentUser.role = d.role || 'viewer';
-        localStorage.setItem('user_v3', JSON.stringify(currentUser));
-        document.getElementById('nav-upload').style.display = isCreator() ? 'flex' : 'none';
-        document.getElementById('nav-admin').style.display = isOwner() ? 'flex' : 'none';
-    });
-
-    db.ref('artists').on('value', s => {
-        const b = document.getElementById('home-artists'); b.innerHTML = '';
-        s.forEach(x => {
-            const a = x.val();
-            const isActive = currentArtistFilter === a.name;
-            b.innerHTML += `
-                <div class="art-item ${isActive ? 'active-artist' : ''}" onclick="filterByArtist('${escHTML(a.name)}')">
-                    <img src="${a.img}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23222%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2255%22 text-anchor=%22middle%22 fill=%22%23d4af37%22 font-size=%2240%22>♪</text></svg>'">
-                    <small>${escHTML(a.name)}</small>
-                </div>`;
-        });
-    });
-
-    db.ref('users').on('value', s => { allUsers = s.val() || {}; });
-}
-
-// ─── SEARCH & FILTER ───
-function handleSearch(val) {
-    currentArtistFilter = null;
-    document.getElementById('filter-tag').style.display = 'none';
-    renderFilteredSongs();
-}
-
-function filterByArtist(name) {
-    if (currentArtistFilter === name) { clearFilter(); return; }
-    currentArtistFilter = name;
-    document.getElementById('search-input').value = '';
-    document.getElementById('filter-tag').style.display = 'block';
-    document.getElementById('filter-label').innerText = 'Artis: ' + name;
-    renderFilteredSongs();
-}
-
-function clearFilter() {
-    currentArtistFilter = null;
-    document.getElementById('filter-tag').style.display = 'none';
-    renderFilteredSongs();
-}
-
-function renderFilteredSongs() {
-    let filtered = [...songs];
-    const query = document.getElementById('search-input')?.value?.toLowerCase() || '';
-    if (currentArtistFilter) filtered = filtered.filter(s => s.artist && s.artist.toLowerCase() === currentArtistFilter.toLowerCase());
-    if (query) filtered = filtered.filter(s => (s.title && s.title.toLowerCase().includes(query)) || (s.artist && s.artist.toLowerCase().includes(query)));
-    renderSongs(filtered, 'home-list');
-}
-
-function renderSongs(data, target) {
-    const b = document.getElementById(target); if (!b) return;
-    if (!data.length) { b.innerHTML = '<div class="empty-state"><i class="fas fa-music"></i><p>Tidak ada musik ditemukan</p></div>'; return; }
-    b.innerHTML = '';
-    data.forEach(s => {
-        const isF = favorites.includes(String(s.id));
-        const isPlaying = currentSongIndex >= 0 && currentPlaylist[currentSongIndex]?.id === s.id;
-        b.innerHTML += `
-            <div class="song-row ${isPlaying ? 'now-playing' : ''}" onclick="playFromList(${JSON.stringify(data.map(x => x.id)).replace(/"/g, "'")}, '${s.id}')">
-                <div class="song-art">${isPlaying ? '<i class="fas fa-volume-up" style="color:var(--accent);"></i>' : '<i class="fas fa-play"></i>'}</div>
-                <div class="song-info"><b>${escHTML(s.title || 'Untitled')}</b><small>${escHTML(s.artist || 'Unknown')}</small></div>
-                <div class="song-actions">
-                    ${isCreator() ? `<i class="fas fa-download" onclick="event.stopPropagation(); askDownload('${s.id}')"></i>` : ''}
-                    <i class="fas fa-plus" onclick="event.stopPropagation(); askPlaylist('${s.id}')"></i>
-                    <i class="${isF ? 'fas' : 'far'} fa-heart ${isF ? 'heart-active' : ''}" onclick="event.stopPropagation(); toggleFav('${s.id}')"></i>
-                </div>
-            </div>`;
-    });
-}
-
-function renderFavorites() {
-    const favSongs = songs.filter(s => favorites.includes(String(s.id)));
-    if (!favSongs.length) { document.getElementById('fav-list').innerHTML = '<div class="empty-state"><i class="fas fa-heart"></i><p>Belum ada favorit</p></div>'; return; }
-    renderSongs(favSongs, 'fav-list');
-}
-
-// ─── PLAYER ───
-function playFromList(idList, targetId) {
-    currentPlaylist = idList.map(id => songs.find(s => String(s.id) === String(id))).filter(Boolean);
-    const idx = currentPlaylist.findIndex(s => String(s.id) === String(targetId));
-    if (idx >= 0) { currentSongIndex = idx; loadAndPlay(); }
-}
-
-function loadAndPlay() {
-    const s = currentPlaylist[currentSongIndex]; if (!s) return;
-    audio.src = s.url;
-    audio.play().catch(() => {});
-    document.getElementById('p-title').innerText = s.title || 'Untitled';
-    document.getElementById('p-artist').innerText = s.artist || 'Unknown';
-    document.getElementById('mini-player').style.display = 'flex';
-    document.getElementById('p-btn-icon').className = "fas fa-pause main-btn";
-    if (s._key) db.ref('songs/' + s._key + '/plays').transaction(c => (c || 0) + 1);
-    renderFilteredSongs();
-}
-
-function togglePlay() {
-    if (audio.paused) { audio.play(); document.getElementById('p-btn-icon').className = "fas fa-pause main-btn"; }
-    else { audio.pause(); document.getElementById('p-btn-icon').className = "fas fa-play main-btn"; }
-}
-
-function playNext() {
-    if (!currentPlaylist.length) return;
-    currentSongIndex = (currentSongIndex + 1) % currentPlaylist.length;
-    loadAndPlay();
-}
-
-function playPrev() {
-    if (!currentPlaylist.length) return;
-    currentSongIndex = (currentSongIndex - 1 + currentPlaylist.length) % currentPlaylist.length;
-    loadAndPlay();
-}
-
-function seekAudio(e) {
-    const bar = document.getElementById('prog-bar-bg');
-    const rect = bar.getBoundingClientRect();
-    const pct = (e.clientX - rect.left) / rect.width;
-    if (audio.duration) audio.currentTime = pct * audio.duration;
-}
-
-audio.ontimeupdate = () => { if (audio.duration) document.getElementById('prog-bar').style.width = (audio.currentTime / audio.duration) * 100 + "%"; };
-audio.onended = () => playNext();
-
-// ─── FAV / DOWNLOAD / PLAYLIST ───
-function toggleFav(id) {
-    const r = db.ref(`favorites/${currentUser.name}/${id}`);
-    if (favorites.includes(String(id))) { r.remove(); showToast("Dihapus dari favorit"); }
-    else { r.set(true); showToast("Ditambahkan ke favorit ♥", "success"); }
-}
-
-function askDownload(id) {
-    const s = songs.find(x => String(x.id) === String(id)); if (!s) return;
-    openModal("Download Musik", `Download "${s.title}"?`, "cloud-download-alt", "DOWNLOAD", () => {
-        const a = document.createElement('a'); a.href = s.url; a.download = `${s.title} - ${s.artist}.mp3`;
-        document.body.appendChild(a); a.click(); document.body.removeChild(a);
-        showToast("Mengunduh...", "success");
-    });
-}
-
-function renderPlaylists() {
-    const b = document.getElementById('playlist-list');
-    const keys = Object.keys(playlists);
-    if (!keys.length) { b.innerHTML = '<div class="empty-state"><i class="fas fa-list"></i><p>Buat playlist pertama!</p></div>'; return; }
-    b.innerHTML = '';
-    keys.forEach(id => {
-        const p = playlists[id];
-        const count = p.songs ? Object.keys(p.songs).length : 0;
-        b.innerHTML += `
-            <div class="song-row" onclick="openPlaylistDetail('${id}')">
-                <div class="song-art"><i class="fas fa-list-ul"></i></div>
-                <div class="song-info"><b>${escHTML(p.name)}</b><small>${count} lagu</small></div>
-                <i class="fas fa-chevron-right" style="color:#333;"></i>
-            </div>`;
-    });
-}
-
-function openPlaylistDetail(id) {
-    currentPlaylistId = id;
-    const p = playlists[id]; if (!p) return;
-    document.getElementById('det-playlist-name').innerText = p.name;
-    const pIds = p.songs ? Object.keys(p.songs) : [];
-    const filtered = songs.filter(s => pIds.includes(String(s.id)));
-    showPage('playlist-detail');
-    const b = document.getElementById('playlist-songs');
-    if (!filtered.length) { b.innerHTML = '<div class="empty-state"><i class="fas fa-music"></i><p>Playlist kosong</p></div>'; return; }
-    b.innerHTML = '';
-    filtered.forEach(s => {
-        b.innerHTML += `
-            <div class="song-row" onclick="playFromList(${JSON.stringify(filtered.map(x => x.id)).replace(/"/g, "'")}, '${s.id}')">
-                <div class="song-art"><i class="fas fa-play"></i></div>
-                <div class="song-info"><b>${escHTML(s.title)}</b><small>${escHTML(s.artist)}</small></div>
-                <div class="song-actions">
-                    <i class="fas fa-minus-circle" style="color:var(--red);" onclick="event.stopPropagation(); removeFromPlaylist('${currentPlaylistId}','${s.id}')"></i>
-                </div>
-            </div>`;
-    });
-}
-
-function removeFromPlaylist(pId, sId) {
-    db.ref(`playlists/${currentUser.name}/${pId}/songs/${sId}`).remove().then(() => {
-        showToast("Dihapus dari playlist");
-        if (playlists[pId]?.songs) delete playlists[pId].songs[sId];
-        openPlaylistDetail(pId);
-    });
-}
-
-function deleteCurrentPlaylist() {
-    if (!currentPlaylistId) return;
-    openModal("Hapus Playlist?", "Playlist ini akan dihapus permanen.", "trash-alt", "HAPUS", () => {
-        db.ref(`playlists/${currentUser.name}/${currentPlaylistId}`).remove().then(() => {
-            showToast("Playlist dihapus", "success"); showPage('playlist-page');
-        });
-    }, "", true);
-}
-
-function openNewPlaylistModal() {
-    openModal("Buat Playlist", "Masukkan nama playlist:", "plus-circle", "BUAT", () => {
-        const val = document.getElementById('new-p-name')?.value?.trim();
-        if (val) db.ref('playlists/' + currentUser.name).push({ name: val, songs: {} }).then(() => showToast("Playlist dibuat!", "success"));
-        else showToast("Nama kosong!", "error");
-    }, '<input type="text" id="new-p-name" placeholder="Nama Playlist..." style="margin-top:10px;">');
-}
-
-function askPlaylist(songId) {
-    const pKeys = Object.keys(playlists);
-    if (!pKeys.length) {
-        openModal("Belum Ada Playlist", "Buat playlist dulu.", "info-circle", "BUAT", () => {
-            showPage('playlist-page'); setTimeout(openNewPlaylistModal, 300);
-        });
-        return;
-    }
-    let html = '<div style="max-height:200px; overflow-y:auto; margin-top:10px;">';
-    pKeys.forEach(k => {
-        html += `<div class="song-row" onclick="addToP('${k}', '${songId}')">
-            <div class="song-art" style="width:35px;height:35px;"><i class="fas fa-list-ul" style="font-size:0.8rem;"></i></div>
-            <div class="song-info"><b>${escHTML(playlists[k].name)}</b></div>
-        </div>`;
-    });
-    html += '</div>';
-    openModal("Tambah ke Playlist", "Pilih playlist:", "list-ul", "BATAL", closeModal, html);
-    document.getElementById('m-btns').style.display = 'none';
-}
-
-function addToP(pId, sId) {
-    db.ref(`playlists/${currentUser.name}/${pId}/songs/${sId}`).set(true).then(() => {
-        showToast("Ditambahkan!", "success"); closeModal();
-    });
-}
-
-// ─── CHAT (User) ───
-function loadChat() {
-    const box = document.getElementById('chat-box');
-    db.ref('chats/' + currentUser.name).off();
-    db.ref('chats/' + currentUser.name).on('value', s => {
-        box.innerHTML = '';
-        if (!s.exists()) { box.innerHTML = '<div class="empty-state"><i class="fas fa-comments"></i><p>Mulai percakapan</p></div>'; return; }
-        s.forEach(m => {
-            const v = m.val();
-            box.innerHTML += `<div class="msg ${v.from === currentUser.name ? 'me' : 'them'}">${escHTML(v.text)}<div class="msg-meta">${timeAgo(v.ts)}</div></div>`;
-        });
-        box.scrollTop = box.scrollHeight;
-    });
-}
-
-function sendMessage() {
-    const input = document.getElementById('chat-msg');
-    const msg = input.value.trim(); if (!msg) return;
-    db.ref('chats/' + currentUser.name).push({ from: currentUser.name, text: msg, ts: Date.now() });
-    input.value = '';
-}
-
-// ─── FEEDBACK ───
-function sendFeedback() {
-    const text = document.getElementById('fb-text').value.trim();
-    if (!text) return showToast("Tulis masukan dulu!", "error");
-    db.ref('feedback').push({ from: currentUser.name, text, ts: Date.now() }).then(() => {
-        showToast("Masukan terkirim!", "success"); document.getElementById('fb-text').value = '';
-    });
-}
-
-// ─── UPLOAD ───
-function handleMp3() {
-    const f = document.getElementById('mp3-file').files[0]; if (!f) return;
-    if (f.size > 15 * 1024 * 1024) return showToast("Max 15MB!", "error");
-    const r = new FileReader();
-    r.onloadend = () => {
-        mp3Data = r.result;
-        document.getElementById('mp3-drop').classList.add('has-file');
-        document.getElementById('mp3-label').innerText = f.name;
-    };
-    r.readAsDataURL(f);
-}
-
-function importTrack() {
-    const t = document.getElementById('up-title').value.trim();
-    if (!mp3Data) return showToast("Pilih MP3!", "error");
-    if (!t) return showToast("Isi judul!", "error");
-    const id = Date.now();
-    db.ref('songs/' + id).set({
-        id, title: t, artist: document.getElementById('up-artist').value.trim() || currentUser.name,
-        url: mp3Data, uploader: currentUser.name, uploadedAt: Date.now(), plays: 0
-    }).then(() => {
-        showToast("Musik dipublish!", "success");
-        mp3Data = null;
-        document.getElementById('up-title').value = '';
-        document.getElementById('up-artist').value = '';
-        document.getElementById('mp3-drop').classList.remove('has-file');
-        document.getElementById('mp3-label').innerText = 'Tap untuk pilih file MP3';
-        showPage('home');
-    });
-}
-
-// ════════════════════════════════════════════════════
-// ═══ FIXED: CREATOR TIER / PAYMENT SYSTEM ═════════
-// ════════════════════════════════════════════════════
-
-function compressImage(file, maxWidth, quality) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const img = new Image();
-            img.onload = function() {
-                const canvas = document.createElement('canvas');
-                let w = img.width, h = img.height;
-                if (w > maxWidth) { h = (maxWidth / w) * h; w = maxWidth; }
-                canvas.width = w; canvas.height = h;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, w, h);
-                const compressed = canvas.toDataURL('image/jpeg', quality);
-                console.log('[Compress] Original:', formatBytes(file.size), '→ Compressed:', formatBytes(compressed.length));
-                resolve(compressed);
-            };
-            img.onerror = reject;
-            img.src = e.target.result;
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-    });
-}
-
-function handleProof() {
-    const f = document.getElementById('up-proof').files[0];
-    if (!f) return;
-
-    console.log('[Proof] File selected:', f.name, formatBytes(f.size), f.type);
-
-    // Validate file type
-    if (!f.type.startsWith('image/')) {
-        showToast("Pilih file gambar (JPG/PNG)!", "error");
-        return;
-    }
-
-    // Show loading state
-    document.getElementById('proof-label').innerText = 'Memproses gambar...';
-    document.getElementById('proof-drop').classList.add('has-file');
-    document.getElementById('submit-proof-btn').disabled = true;
-
-    // Always compress to keep under Firebase limits
-    const maxWidth = f.size > 1 * 1024 * 1024 ? 600 : 800;
-    const quality = f.size > 1 * 1024 * 1024 ? 0.4 : 0.6;
-
-    compressImage(f, maxWidth, quality).then(compressed => {
-        proofData = compressed;
-
-        // Show preview
-        const preview = document.getElementById('proof-preview');
-        preview.src = compressed;
-        preview.style.display = 'block';
-
-        // Show file info
-        const info = document.getElementById('proof-file-info');
-        const compressedSize = Math.round((compressed.length * 3) / 4); // approximate base64 decoded size
-        info.innerHTML = `<i class="fas fa-check-circle" style="color:var(--green);"></i> ${f.name} — ${formatBytes(f.size)} → ${formatBytes(compressedSize)} (compressed)`;
-        info.style.display = 'block';
-
-        document.getElementById('proof-label').innerText = f.name;
-        document.getElementById('submit-proof-btn').disabled = false;
-
-        console.log('[Proof] Ready! Data length:', compressed.length);
-        showToast("Bukti siap dikirim!", "success");
-
-    }).catch(err => {
-        console.error('[Proof] Compress error:', err);
-        showToast("Gagal memproses gambar!", "error");
-        document.getElementById('proof-drop').classList.remove('has-file');
-        document.getElementById('proof-label').innerText = 'Tap untuk pilih bukti transfer';
-        document.getElementById('submit-proof-btn').disabled = false;
-        proofData = null;
-    });
-}
-
-function submitUpgrade() {
-    const btn = document.getElementById('submit-proof-btn');
-
-    // VALIDATION
-    if (!proofData) {
-        showToast("Pilih bukti transfer dulu!", "error");
-        return;
-    }
-
-    // Check data size - Firebase RTDB has ~10MB limit per node
-    const dataSizeBytes = Math.round((proofData.length * 3) / 4);
-    console.log('[Submit] Proof data size:', formatBytes(dataSizeBytes));
-
-    if (dataSizeBytes > 5 * 1024 * 1024) {
-        showToast("Gambar terlalu besar setelah kompresi! Coba foto yang lebih kecil.", "error");
-        return;
-    }
-
-    // LOADING STATE
-    btn.disabled = true;
-    btn.classList.add('btn-loading');
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:8px;"></i>MENGIRIM...';
-    showToast("Mengirim bukti pembayaran...", "");
-
-    // SEND TO FIREBASE
-    const payload = {
-        proof: proofData,
-        ts: Date.now(),
-        status: 'pending',
-        username: currentUser.name
-    };
-
-    console.log('[Submit] Sending to Firebase...');
-
-    db.ref('paymentRequests/' + currentUser.name).set(payload)
-        .then(() => {
-            console.log('[Submit] SUCCESS!');
-            showToast("Bukti berhasil terkirim! Menunggu verifikasi admin.", "success");
-
-            // Reset form
-            proofData = null;
-            document.getElementById('proof-drop').classList.remove('has-file');
-            document.getElementById('proof-label').innerText = 'Tap untuk pilih bukti transfer';
-            document.getElementById('proof-preview').style.display = 'none';
-            document.getElementById('proof-file-info').style.display = 'none';
-            document.getElementById('up-proof').value = '';
-
-            // Reset button
-            btn.disabled = false;
-            btn.classList.remove('btn-loading');
-            btn.innerHTML = '<i class="fas fa-check-circle" style="margin-right:8px;"></i>BUKTI TERKIRIM!';
-
-            // Show success status
-            document.getElementById('existing-request-status').innerHTML = `
-                <div class="status-pending" style="margin-top:15px;">
-                    <i class="fas fa-clock"></i> Bukti terkirim! Menunggu verifikasi admin...
-                </div>`;
-
-            // After 2 seconds, go back to tier page
-            setTimeout(() => {
-                showPage('upgrade-tier');
-            }, 2000);
+function esc(s){if(!s)return'';const d=document.createElement('div');d.textContent=s;return d.innerHTML}
+function tA(ts){const d=Date.now()-ts;if(d<6e4)return'Baru saja';if(d<36e5)return Math.floor(d/6e4)+'m';if(d<864e5)return Math.floor(d/36e5)+'j';return Math.floor(d/864e5)+'h'}
+function isOn(n){const u=users[n];return u&&(Date.now()-u.lastLogin)<120000}
+function isOw(){return U&&U.name===OWN}
+function isCr(){return U&&(U.role==='creator'||isOw())}
+function nxtCode(cb){db.ref('userCodes').once('value',s=>{let mx=1;s.forEach(x=>{const n=parseInt(x.val().code.replace('#',''));if(n>mx)mx=n});cb('#'+String(mx+1).padStart(8,'0'))})}
+function ensCode(cb){db.ref('userCodes/'+U.name).once('value',s=>{if(s.exists()){myCode=s.val().code;cb()}else if(U.name===OWN){myCode=KC;db.ref('userCodes/'+OWN).set({code:KC});cb()}else{nxtCode(c=>{myCode=c;db.ref('userCodes/'+U.name).set({code:c});cb()})}})}
+function cPath(a,b){const x=a.replace('#',''),y=b.replace('#','');return x<y?x+'_'+y:y+'_'+x}
+
+function doAuth(){
+    const u=document.getElementById('l-u').value.trim(),p=document.getElementById('l-p').value.trim();
+    if(!u||!p)return toast("Isi semua!","error");if(u.length<3)return toast("Min 3 karakter!","error");
+    const btn=document.getElementById('a-btn');btn.disabled=true;btn.innerText='MEMPROSES...';
+    if(am==='register'){
+        db.ref('users/'+u).once('value',s=>{
+            if(s.exists()){toast("Username dipakai!","error");btn.disabled=false;btn.innerText='DAFTAR'}
+            else{nxtCode(code=>{db.ref('userCodes/'+u).set({code});db.ref('users/'+u).set({pass:p,role:'viewer',joined:Date.now(),code}).then(()=>{toast("Berhasil daftar!","success");am='login';upAUI();btn.disabled=false;btn.innerText='MASUK'})})}
         })
-        .catch(err => {
-            console.error('[Submit] FIREBASE ERROR:', err);
-            console.error('[Submit] Error code:', err.code);
-            console.error('[Submit] Error message:', err.message);
+    }else{
+        db.ref('users/'+u).once('value',s=>{
+            btn.disabled=false;btn.innerText='MASUK';
+            if(s.exists()&&s.val().pass===p){
+                if(s.val().banned){document.getElementById('ban-ov').style.display='flex';document.getElementById('ban-r').innerText=s.val().banReason||"-";return}
+                U={name:u,role:s.val().role||'viewer'};localStorage.setItem('uv4',JSON.stringify(U));
+                db.ref('users/'+u+'/lastLogin').set(Date.now());location.reload()
+            }else toast("Username atau password salah!","error")
+        })
+    }
+}
+function togAM(){am=am==='login'?'register':'login';upAUI()}
+function upAUI(){const b=document.getElementById('a-btn'),t=document.getElementById('a-tog');if(am==='register'){b.innerText='DAFTAR';t.innerHTML='Sudah punya akun? <span style="color:var(--accent)">Login</span>'}else{b.innerText='MASUK';t.innerHTML='Belum punya akun? <span style="color:var(--accent)">Daftar</span>'}}
+function logOut(){opM("Logout?","Yakin keluar?","power-off","LOGOUT",()=>{localStorage.clear();location.reload()},"",true)}
 
-            let errorMsg = "Gagal mengirim bukti! ";
-
-            if (err.message && err.message.includes('PERMISSION_DENIED')) {
-                errorMsg += "Akses ditolak oleh database.";
-            } else if (err.message && err.message.includes('size')) {
-                errorMsg += "Data terlalu besar. Coba foto yang lebih kecil.";
-            } else if (err.message && err.message.includes('network')) {
-                errorMsg += "Periksa koneksi internet.";
-            } else {
-                errorMsg += err.message || "Coba lagi.";
-            }
-
-            showToast(errorMsg, "error");
-
-            // Reset button
-            btn.disabled = false;
-            btn.classList.remove('btn-loading');
-            btn.innerHTML = '<i class="fas fa-paper-plane" style="margin-right:8px;"></i>KIRIM BUKTI PEMBAYARAN';
-        });
+function init(){
+    if(!U)return;
+    document.getElementById('auth').classList.remove('active');document.getElementById('home').classList.add('active');
+    document.getElementById('hdr').style.display='flex';document.getElementById('hud').innerText=U.name.toUpperCase();
+    db.ref('users/'+U.name).once('value',s=>{if(s.exists()&&s.val().banned){document.getElementById('ban-ov').style.display='flex';document.getElementById('ban-r').innerText=s.val().banReason||"-"}});
+    ensCode(()=>{document.getElementById('my-cd-d').innerText=myCode;document.getElementById('my-cd-h').innerText=myCode});
+    db.ref('songs').on('value',s=>{songs=[];s.forEach(x=>{const v=x.val();v._k=x.key;songs.push(v)});document.getElementById('h-ldr').style.display='none';rFilt()});
+    db.ref('favorites/'+U.name).on('value',s=>{favs=s.val()?Object.keys(s.val()):[];rFilt()});
+    db.ref('playlists/'+U.name).on('value',s=>{pls=s.val()||{}});
+    db.ref('users/'+U.name).on('value',s=>{const d=s.val();if(!d)return;U.role=d.role||'viewer';localStorage.setItem('uv4',JSON.stringify(U));document.getElementById('n-up').style.display=isCr()?'flex':'none';document.getElementById('n-ad').style.display=isOw()?'flex':'none'});
+    db.ref('artists').on('value',s=>{const b=document.getElementById('h-art');b.innerHTML='';s.forEach(x=>{const a=x.val();b.innerHTML+=`<div class="art-it ${caf===a.name?'act':''}" onclick="fArt('${esc(a.name)}')"><img src="${a.img}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23222%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2255%22 text-anchor=%22middle%22 fill=%22%23d4af37%22 font-size=%2240%22>♪</text></svg>'"><small>${esc(a.name)}</small></div>`})});
+    db.ref('users').on('value',s=>{users=s.val()||{}});
+    db.ref('userCodes').on('value',s=>{codes=s.val()||{};if(codes[U.name])myCode=codes[U.name].code});
 }
 
-function checkExistingRequest() {
-    const statusBox = document.getElementById('existing-request-status');
+function doSearch(){caf=null;document.getElementById('f-tag').style.display='none';rFilt()}
+function fArt(n){if(caf===n){clrF();return}caf=n;document.getElementById('s-inp').value='';document.getElementById('f-tag').style.display='block';document.getElementById('f-lbl').innerText='Artis: '+n;rFilt()}
+function clrF(){caf=null;document.getElementById('f-tag').style.display='none';rFilt()}
+function rFilt(){let f=[...songs];const q=document.getElementById('s-inp')?.value?.toLowerCase()||'';if(caf)f=f.filter(s=>s.artist&&s.artist.toLowerCase()===caf.toLowerCase());if(q)f=f.filter(s=>(s.title&&s.title.toLowerCase().includes(q))||(s.artist&&s.artist.toLowerCase().includes(q)));rSongs(f,'h-list')}
+function sArtH(s){if(s&&s.cover)return`<img src="${s.cover}" onerror="this.remove()">`;return'<i class="fas fa-music"></i>'}
+function rSongs(data,tgt){const b=document.getElementById(tgt);if(!b)return;if(!data.length){b.innerHTML='<div class="empty"><i class="fas fa-music"></i><p>Tidak ada musik</p></div>';return}b.innerHTML='';data.forEach(s=>{const isF=favs.includes(String(s.id)),isP=csi>=0&&cpl[csi]?.id===s.id;b.innerHTML+=`<div class="s-row ${isP?'np':''}" onclick="pFL(${JSON.stringify(data.map(x=>x.id)).replace(/"/g,"'")},'${s.id}')"><div class="s-art">${isP?'<i class="fas fa-volume-up" style="color:var(--accent);"></i>':sArtH(s)}</div><div class="s-inf"><b>${esc(s.title||'Untitled')}</b><small>${esc(s.artist||'Unknown')}</small></div><div class="s-act">${isCr()?`<i class="fas fa-download" onclick="event.stopPropagation();askDL('${s.id}')"></i>`:''}<i class="fas fa-plus" onclick="event.stopPropagation();askAdd('${s.id}')"></i><i class="${isF?'fas':'far'} fa-heart ${isF?'ha':''}" onclick="event.stopPropagation();togFav('${s.id}')"></i></div></div>`})}
+function rFav(){const f=songs.filter(s=>favs.includes(String(s.id)));if(!f.length){document.getElementById('f-list').innerHTML='<div class="empty"><i class="fas fa-heart"></i><p>Kosong</p></div>';return}rSongs(f,'f-list')}
+function updPA(s){const el=document.getElementById('p-art');if(s&&s.cover)el.innerHTML=`<img src="${s.cover}" onerror="this.remove()">`;else el.innerHTML='<i class="fas fa-music"></i>'}
+function pFL(ids,tid){cpl=ids.map(id=>songs.find(s=>String(s.id)===String(id))).filter(Boolean);const i=cpl.findIndex(s=>String(s.id)===String(tid));if(i>=0){csi=i;ldP()}}
+function ldP(){const s=cpl[csi];if(!s)return;aud.src=s.url;aud.play().catch(()=>{});document.getElementById('p-ti').innerText=s.title||'---';document.getElementById('p-ar').innerText=s.artist||'---';updPA(s);document.getElementById('mini-p').style.display='flex';document.getElementById('p-ic').className="fas fa-pause mb";if(s._k)db.ref('songs/'+s._k+'/plays').transaction(c=>(c||0)+1);rFilt()}
+function togP(){if(aud.paused){aud.play();document.getElementById('p-ic').className="fas fa-pause mb"}else{aud.pause();document.getElementById('p-ic').className="fas fa-play mb"}}
+function next(){if(!cpl.length)return;csi=(csi+1)%cpl.length;ldP()}
+function prev(){if(!cpl.length)return;csi=(csi-1+cpl.length)%cpl.length;ldP()}
+function seekA(e){const r=document.getElementById('pbg').getBoundingClientRect();if(aud.duration)aud.currentTime=((e.clientX-r.left)/r.width)*aud.duration}
+aud.ontimeupdate=()=>{if(aud.duration)document.getElementById('pb').style.width=(aud.currentTime/aud.duration)*100+"%"};aud.onended=next;
+function togFav(id){const r=db.ref(`favorites/${U.name}/${id}`);if(favs.includes(String(id))){r.remove();toast("Dihapus")}else{r.set(true);toast("Ditambahkan ♥","success")}}
+function askDL(id){const s=songs.find(x=>String(x.id)===String(id));if(!s)return;opM("Download",s.title,"cloud-download-alt","DOWNLOAD",()=>{const a=document.createElement('a');a.href=s.url;a.download=s.title+'.mp3';document.body.appendChild(a);a.click();a.remove();toast("Mengunduh...","success")})}
+function rPL(){const b=document.getElementById('pl-list'),ks=Object.keys(pls);if(!ks.length){b.innerHTML='<div class="empty"><i class="fas fa-list"></i><p>Buat playlist!</p></div>';return}b.innerHTML='';ks.forEach(id=>{const p=pls[id],cnt=p.songs?Object.keys(p.songs).length:0;b.innerHTML+=`<div class="s-row" onclick="opPL('${id}')"><div class="s-art"><i class="fas fa-list-ul"></i></div><div class="s-inf"><b>${esc(p.name)}</b><small>${cnt} lagu</small></div><i class="fas fa-chevron-right" style="color:#333;"></i></div>`})}
+function opPL(id){cplid=id;const p=pls[id];if(!p)return;document.getElementById('pl-name').innerText=p.name;const pids=p.songs?Object.keys(p.songs):[],fl=songs.filter(s=>pids.includes(String(s.id)));nav('pl-det');const b=document.getElementById('pl-songs');if(!fl.length){b.innerHTML='<div class="empty"><i class="fas fa-music"></i><p>Kosong</p></div>';return}b.innerHTML='';fl.forEach(s=>{b.innerHTML+=`<div class="s-row" onclick="pFL(${JSON.stringify(fl.map(x=>x.id)).replace(/"/g,"'")},'${s.id}')"><div class="s-art">${sArtH(s)}</div><div class="s-inf"><b>${esc(s.title)}</b><small>${esc(s.artist)}</small></div><div class="s-act"><i class="fas fa-minus-circle" style="color:var(--red);" onclick="event.stopPropagation();rmPL('${cplid}','${s.id}')"></i></div></div>`})}
+function rmPL(p,s){db.ref(`playlists/${U.name}/${p}/songs/${s}`).remove().then(()=>{toast("Dihapus");if(pls[p]?.songs)delete pls[p].songs[s];opPL(p)})}
+function delPL(){if(!cplid)return;opM("Hapus Playlist?","Permanen.","trash-alt","HAPUS",()=>{db.ref(`playlists/${U.name}/${cplid}`).remove().then(()=>{toast("Dihapus","success");nav('pl')})},"",true)}
+function newPL(){opM("Buat Playlist","Nama:","plus-circle","BUAT",()=>{const v=document.getElementById('np-n')?.value?.trim();if(v)db.ref('playlists/'+U.name).push({name:v,songs:{}}).then(()=>toast("Dibuat!","success"));else toast("Kosong!","error")},'<input type="text" id="np-n" placeholder="Nama..." style="margin-top:10px;">')}
+function askAdd(sid){const ks=Object.keys(pls);if(!ks.length){opM("Belum Ada","Buat dulu.","info-circle","BUAT",()=>{nav('pl');setTimeout(newPL,300)});return}let h='<div style="max-height:200px;overflow-y:auto;margin-top:10px;">';ks.forEach(k=>{h+=`<div class="s-row" onclick="addPL('${k}','${sid}')"><div class="s-art" style="width:35px;height:35px;"><i class="fas fa-list-ul" style="font-size:.8rem;"></i></div><div class="s-inf"><b>${esc(pls[k].name)}</b></div></div>`});h+='</div>';opM("Tambah ke","Pilih:","list-ul","TUTUP",clM,h);document.getElementById('mb').style.display='none'}
+function addPL(p,s){db.ref(`playlists/${U.name}/${p}/songs/${s}`).set(true).then(()=>{toast("Ditambahkan!","success");clM()})}
 
-    db.ref('paymentRequests/' + currentUser.name).once('value', s => {
-        if (!s.exists()) {
-            statusBox.innerHTML = '';
-            return;
+function hImg(){const f=document.getElementById('img-f').files[0];if(!f)return;if(!f.type.startsWith('image/'))return toast("Pilih gambar!","error");const r=new FileReader();r.onloadend=()=>{coverD=r.result;document.getElementById('img-pv').src=coverD;document.getElementById('img-prev').classList.add('has-img')};r.readAsDataURL(f)}
+function hMp3(){const f=document.getElementById('mp3-f').files[0];if(!f)return;if(f.size>15*1048576)return toast("Max 15MB!","error");const r=new FileReader();r.onloadend=()=>{mp3d=r.result;document.getElementById('mp3-dr').classList.add('hf');document.getElementById('mp3-lb').innerText=f.name};r.readAsDataURL(f)}
+function pubTrack(){const t=document.getElementById('up-ti').value.trim();if(!coverD)return toast("Pilih cover lagu dulu!","error");if(!mp3d)return toast("Pilih MP3!","error");if(!t)return toast("Isi judul!","error");const id=Date.now();db.ref('songs/'+id).set({id,title:t,artist:document.getElementById('up-ar').value.trim()||U.name,url:mp3d,cover:coverD,uploader:U.name,uploadedAt:Date.now(),plays:0}).then(()=>{toast("Dipublish!","success");mp3d=null;coverD=null;document.getElementById('up-ti').value='';document.getElementById('up-ar').value='';document.getElementById('mp3-dr').classList.remove('hf');document.getElementById('mp3-lb').innerText='Tap untuk pilih MP3';document.getElementById('img-pv').src='';document.getElementById('img-prev').classList.remove('has-img');nav('home')})}
+
+function cmpImg(f,mw,q){return new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>{const img=new Image();img.onload=()=>{const c=document.createElement('canvas');let w=img.width,h=img.height;if(w>mw){h=(mw/w)*h;w=mw}c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);res(c.toDataURL('image/jpeg',q))};img.onerror=rej;img.src=e.target.result};r.onerror=rej;r.readAsDataURL(f)})}
+function hProof(){const f=document.getElementById('up-pr').files[0];if(!f)return;if(!f.type.startsWith('image/'))return toast("Pilih gambar!","error");document.getElementById('pr-lb').innerText='Memproses...';document.getElementById('pr-dr').classList.add('hf');document.getElementById('pr-btn').disabled=true;cmpImg(f,f.size>1048576?600:800,f.size>1048576?.4:.6).then(c=>{prfd=c;document.getElementById('pr-pv').src=c;document.getElementById('pr-pv').style.display='block';document.getElementById('pr-fi').innerHTML=`<i class="fas fa-check-circle" style="color:var(--green);"></i> ${f.name}`;document.getElementById('pr-fi').style.display='block';document.getElementById('pr-lb').innerText=f.name;document.getElementById('pr-btn').disabled=false;toast("Siap!","success")}).catch(()=>{toast("Gagal!","error");document.getElementById('pr-dr').classList.remove('hf');document.getElementById('pr-lb').innerText='Tap untuk pilih bukti';document.getElementById('pr-btn').disabled=false;prfd=null})}
+function subProof(){const btn=document.getElementById('pr-btn');if(!prfd)return toast("Pilih bukti!","error");const sz=Math.round((prfd.length*3)/4);if(sz>5*1048576)return toast("Terlalu besar!","error");btn.disabled=true;btn.classList.add('btn-ld');btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> MENGIRIM...';db.ref('paymentRequests/'+U.name).set({proof:prfd,ts:Date.now(),status:'pending',username:U.name}).then(()=>{toast("Terkirim!","success");prfd=null;document.getElementById('pr-dr').classList.remove('hf');document.getElementById('pr-lb').innerText='Tap untuk pilih bukti';document.getElementById('pr-pv').style.display='none';document.getElementById('pr-fi').style.display='none';document.getElementById('up-pr').value='';btn.disabled=false;btn.classList.remove('btn-ld');btn.innerHTML='<i class="fas fa-check-circle" style="margin-right:8px;"></i>TERKIRIM!';setTimeout(()=>nav('tier'),2000)}).catch(e=>{toast("Gagal: "+e.message,"error");btn.disabled=false;btn.classList.remove('btn-ld');btn.innerHTML='<i class="fas fa-paper-plane" style="margin-right:8px;"></i>KIRIM BUKTI'})}
+function chkReq(){const b=document.getElementById('pr-st');db.ref('paymentRequests/'+U.name).once('value',s=>{if(!s.exists()){b.innerHTML='';return}const r=s.val(),st=r.status||'pending';if(st==='pending')b.innerHTML=`<div class="st-p"><i class="fas fa-clock"></i> Terkirim (${tA(r.ts)})</div><button class="btn btn-sm" style="background:rgba(255,68,68,.1);color:var(--red);margin-top:10px;width:100%;" onclick="canReq()"><i class="fas fa-times"></i> Batalkan</button>`;else if(st==='approved')b.innerHTML='<div class="st-a"><i class="fas fa-check-circle"></i> DISETUJUI!</div>';else if(st==='rejected')b.innerHTML=`<div class="st-r"><i class="fas fa-times-circle"></i> DITOLAK</div><button class="btn btn-sm" style="background:rgba(255,68,68,.1);color:var(--red);margin-top:10px;width:100%;" onclick="canReq()"><i class="fas fa-redo"></i> Ulang</button>`})}
+function canReq(){opM("Batalkan?","","undo","BATALKAN",()=>{db.ref('paymentRequests/'+U.name).remove().then(()=>{toast("Dibatalkan.","");document.getElementById('pr-st').innerHTML='';const b=document.getElementById('pr-btn');b.disabled=false;b.classList.remove('btn-ld');b.innerHTML='<i class="fas fa-paper-plane" style="margin-right:8px;"></i>KIRIM BUKTI'})},"",true)}
+function upTier(){const el=document.getElementById('ti-info'),sb=document.getElementById('ti-st'),ub=document.getElementById('up-btn');if(isCr()){el.innerHTML='<span class="badge bg-gold" style="font-size:.8rem;padding:6px 15px;">✓ Creator Active</span>';ub.innerText='SUDAH AKTIF';ub.disabled=true;ub.style.opacity='.5';sb.innerHTML=''}else{el.innerHTML='<p style="color:#444;font-size:.75rem;">Tier: Viewer</p>';ub.innerText='UPGRADE SEKARANG';ub.disabled=false;ub.style.opacity='1';db.ref('paymentRequests/'+U.name).once('value',s=>{if(!s.exists()){sb.innerHTML='';return}const r=s.val();if(r.status==='pending')sb.innerHTML='<div class="st-p"><i class="fas fa-clock"></i> Menunggu...</div>';else if(r.status==='rejected')sb.innerHTML='<div class="st-r"><i class="fas fa-times-circle"></i> Ditolak</div>'})}}
+
+function loadCT(){
+    const c=document.getElementById('ct-list');c.innerHTML='';
+    if(!myCode){c.innerHTML='<div class="empty"><div class="spinner"></div></div>';return}
+    if(isOw()){
+        let h='';
+        for(let n in users){
+            if(n===OWN)continue;
+            const u=users[n],cd=u.code||codes[n]?.code||'...',bn=u.banned,cr=u.role==='creator';
+            h+=`<div class="ct-item" onclick="opDM('${n}','${cd}')"><div class="ct-av ${bn?'banned':''}">${n.charAt(0).toUpperCase()}</div><div class="ct-inf"><div class="ct-top"><b>${esc(n)}</b><span class="code-tag">${cd}</span>${bn?'<span class="badge bg-red" style="font-size:.55rem;">BANNED</span>':''}${cr?'<span class="badge bg-gold" style="font-size:.55rem;">CREATOR</span>':''}</div><span class="ct-lm" id="lm-${cd.replace('#','')}">Tap untuk chat</span></div><span class="ct-time" id="lt-${cd.replace('#','')}"></span></div>`
         }
-
-        const req = s.val();
-        const status = req.status || 'pending';
-
-        if (status === 'pending') {
-            statusBox.innerHTML = `
-                <div class="status-pending">
-                    <i class="fas fa-clock"></i> Bukti sudah terkirim (${timeAgo(req.ts)})<br>
-                    <small>Menunggu verifikasi admin...</small>
-                </div>
-                <button class="btn btn-sm" style="background:rgba(255,68,68,0.1); color:var(--red); margin-top:10px; width:100%;"
-                    onclick="cancelRequest()">
-                    <i class="fas fa-times"></i> Batalkan & Kirim Ulang
-                </button>`;
-        } else if (status === 'approved') {
-            statusBox.innerHTML = `
-                <div class="status-approved">
-                    <i class="fas fa-check-circle"></i> Pembayaran DISETUJUI!<br>
-                    <small>Anda sekarang Creator!</small>
-                </div>`;
-        } else if (status === 'rejected') {
-            statusBox.innerHTML = `
-                <div class="status-rejected">
-                    <i class="fas fa-times-circle"></i> Pembayaran DITOLAK<br>
-                    <small>Silakan kirim ulang bukti yang valid</small>
-                </div>
-                <button class="btn btn-sm" style="background:rgba(255,68,68,0.1); color:var(--red); margin-top:10px; width:100%;"
-                    onclick="cancelRequest()">
-                    <i class="fas fa-redo"></i> Kirim Ulang
-                </button>`;
+        c.innerHTML=h;
+        for(let n in users){
+            if(n===OWN)continue;
+            const cd=users[n]?.code||codes[n]?.code;if(!cd||cd==='...')continue;
+            db.ref('dm/'+cPath(KC,cd)+'/messages').limitToLast(1).once('value',s=>{
+                const lm=document.getElementById('lm-'+cd.replace('#','')),lt=document.getElementById('lt-'+cd.replace('#',''));
+                if(s.exists())s.forEach(m=>{const v=m.val();if(lm)lm.innerText=(v.fn===OWN?'Kamu: ':'')+v.tx;if(lt)lt.innerText=tA(v.ts)})
+            })
         }
-    });
-}
-
-function cancelRequest() {
-    openModal("Batalkan Request?", "Anda bisa mengirim bukti baru setelah ini.", "undo", "BATALKAN", () => {
-        db.ref('paymentRequests/' + currentUser.name).remove().then(() => {
-            showToast("Request dibatalkan. Kirim bukti baru.", "");
-            document.getElementById('existing-request-status').innerHTML = '';
-
-            // Reset everything
-            const btn = document.getElementById('submit-proof-btn');
-            btn.disabled = false;
-            btn.classList.remove('btn-loading');
-            btn.innerHTML = '<i class="fas fa-paper-plane" style="margin-right:8px;"></i>KIRIM BUKTI PEMBAYARAN';
-        });
-    }, "", true);
-}
-
-function updateTierInfo() {
-    const el = document.getElementById('current-tier-info');
-    const statusBox = document.getElementById('payment-status-box');
-    const upgradeBtn = document.getElementById('upgrade-btn');
-
-    if (isCreator()) {
-        el.innerHTML = '<span class="badge badge-gold" style="font-size:0.8rem; padding:6px 15px;">✓ Creator Active</span>';
-        upgradeBtn.innerText = 'SUDAH AKTIF';
-        upgradeBtn.disabled = true;
-        upgradeBtn.style.opacity = '0.5';
-        statusBox.innerHTML = '';
-    } else {
-        el.innerHTML = '<p style="color:#444; font-size:0.75rem;">Tier saat ini: Viewer (Free)</p>';
-        upgradeBtn.innerText = 'UPGRADE SEKARANG';
-        upgradeBtn.disabled = false;
-        upgradeBtn.style.opacity = '1';
-
-        // Check if there's a pending request
-        db.ref('paymentRequests/' + currentUser.name).once('value', s => {
-            if (!s.exists()) { statusBox.innerHTML = ''; return; }
-            const req = s.val();
-            if (req.status === 'pending') {
-                statusBox.innerHTML = `<div class="status-pending"><i class="fas fa-clock"></i> Menunggu verifikasi admin...</div>`;
-            } else if (req.status === 'rejected') {
-                statusBox.innerHTML = `<div class="status-rejected"><i class="fas fa-times-circle"></i> Ditolak. Kirim ulang bukti.</div>`;
-            }
-        });
+    }else{
+        c.innerHTML=`<div class="ct-item" onclick="opDM('${OWN}','${KC}')"><div class="ct-av owner">K</div><div class="ct-inf"><div class="ct-top"><b>${OWN}</b><span class="code-tag">${KC}</span><span class="badge bg-gold" style="font-size:.55rem;">OWNER</span></div><span class="ct-lm" id="lm-00000001">Tap untuk chat</span></div><span class="ct-time" id="lt-00000001"></span></div>`;
+        db.ref('dm/'+cPath(myCode,KC)+'/messages').limitToLast(1).once('value',s=>{
+            if(s.exists())s.forEach(m=>{const v=m.val();const lm=document.getElementById('lm-00000001'),lt=document.getElementById('lt-00000001');if(lm)lm.innerText=(v.fn===U.name?'Kamu: ':'')+v.tx;if(lt)lt.innerText=tA(v.ts)})
+        })
     }
 }
 
-// ─── ADMIN FUNCTIONS ───
-function openAdminAuth() {
-    openModal("Admin Access", "Masukkan kode admin:", "user-shield", "UNLOCK", () => {
-        const k = document.getElementById('adm-key')?.value;
-        if (k === ADMIN_SECRET_KEY) { showToast("Akses diberikan!", "success"); showPage('admin-panel'); }
-        else showToast("Kode salah!", "error");
-    }, '<input type="password" id="adm-key" placeholder="Kode Admin..." style="margin-top:10px;">');
+function opDM(uname,ucode){
+    if(!myCode)return;
+    if(users[U.name]?.banned)return toast("Kamu dibanned!","error");
+    chatU=uname;chatC=ucode;
+    const av=document.getElementById('dm-av');av.className='ct-av';
+    if(uname===OWN)av.classList.add('owner');
+    if(users[uname]?.banned)av.classList.add('banned');
+    av.innerText=uname.charAt(0).toUpperCase();
+    document.getElementById('dm-nm').innerText=uname;
+    document.getElementById('dm-cd').innerHTML=ucode+' <span class="'+(isOn(uname)?'on-dot':'off-dot')+'"></span>';
+    document.getElementById('dm-msgs').innerHTML='';
+    nav('chat-room');
+    const path=cPath(myCode,ucode);
+    if(chatL)db.ref(chatL).off();
+    chatL='dm/'+path+'/messages';
+    db.ref(chatL).on('value',s=>{
+        const box=document.getElementById('dm-msgs');box.innerHTML='';
+        if(!s.exists()){box.innerHTML='<div class="empty" style="padding:60px 20px;"><i class="fas fa-lock" style="color:#222;"></i><p style="color:#222;font-size:.8rem;">Ketik pesan untuk mulai chat</p></div>';return}
+        let ld='';
+        s.forEach(m=>{
+            const v=m.val(),d=new Date(v.ts).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'});
+            if(d!==ld){ld=d;box.innerHTML+=`<div class="dm-date">— ${d} —</div>`}
+            box.innerHTML+=`<div class="dm-b ${v.fr===myCode?'s':'r'}">${esc(v.tx)}<span class="bt">${new Date(v.ts).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})}</span></div>`
+        });
+        box.scrollTop=box.scrollHeight;
+    });
+    db.ref('dm/'+path+'/messages').limitToLast(1).on('value',s=>{
+        if(s.exists())s.forEach(m=>{const v=m.val();const lm=document.getElementById('lm-'+ucode.replace('#','')),lt=document.getElementById('lt-'+ucode.replace('#',''));if(lm)lm.innerText=(v.fn===U.name?'Kamu: ':'')+v.tx;if(lt)lt.innerText=tA(v.ts)})
+    })
 }
 
-function loadAdminStats() {
-    const stats = document.getElementById('admin-stats');
-    stats.innerHTML = `
-        <div class="stat-card"><div class="num">${Object.keys(allUsers).length}</div><div class="label">Users</div></div>
-        <div class="stat-card"><div class="num">${songs.length}</div><div class="label">Songs</div></div>
-        <div class="stat-card"><div class="num">${Object.values(allUsers).filter(u => u.role === 'creator').length}</div><div class="label">Creators</div></div>`;
+function sendDM(){
+    const inp=document.getElementById('dm-inp'),txt=inp.value.trim();
+    if(!txt||!myCode||!chatC)return;
+    if(users[U.name]?.banned)return toast("Kamu dibanned!","error");
+    db.ref('dm/'+cPath(myCode,chatC)+'/messages').push({fr:myCode,fn:U.name,tx:txt,ts:Date.now()});
+    inp.value='';
 }
 
-function loadAdminUsers() {
-    const b = document.getElementById('adm-user-list'); b.innerHTML = '';
-    for (let name in allUsers) {
-        const u = allUsers[name];
-        const badge = u.role === 'creator' ? '<span class="badge badge-gold">Creator</span>' : u.banned ? '<span class="badge badge-red">Banned</span>' : '<span class="badge badge-blue">Viewer</span>';
-        b.innerHTML += `<div class="user-item"><div class="info"><b>${escHTML(name)}</b><small>${u.lastLogin ? timeAgo(u.lastLogin) : 'Never'}</small></div>${badge}</div>`;
+function ldStats(){document.getElementById('a-stats').innerHTML=`<div class="stat-c"><div class="n">${Object.keys(users).length}</div><div class="l">USERS</div></div><div class="stat-c"><div class="n">${songs.length}</div><div class="l">SONGS</div></div><div class="stat-c"><div class="n">${Object.values(users).filter(u=>u.role==='creator').length}</div><div class="l">CREATORS</div></div>`}
+function ldUsers(){
+    const b=document.getElementById('au-list');b.innerHTML='';
+    for(let n in users){
+        const u=users[n],cd=u.code||codes[n]?.code||'...',bn=u.banned,cr=u.role==='creator',ow=n===OWN;
+        b.innerHTML+=`<div class="au-item" style="${ow?'opacity:.5;':''}"><div class="au-av ${ow?'owner':bn?'banned':''}">${n.charAt(0).toUpperCase()}</div><div class="au-inf"><div class="au-top"><b>${esc(n)}</b><span class="code-tag">${cd}</span>${ow?'<span class="badge bg-gold" style="font-size:.55rem;">OWNER</span>':''}${cr?'<span class="badge bg-gold" style="font-size:.55rem;">CREATOR</span>':''}${bn?'<span class="badge bg-red" style="font-size:.55rem;">BANNED</span>':''}</div><span class="au-sub">${isOn(n)?'🟢 Online':'⚫ Offline'} · ${u.lastLogin?tA(u.lastLogin):'Never'}</span>${!ow?`<div class="au-acts">${bn?`<button class="au-unban" onclick="unbanU('${n}')"><i class="fas fa-unlock"></i> UNBAN</button>`:`<button class="au-ban" onclick="banU('${n}')"><i class="fas fa-ban"></i> BAN</button>`}${!cr?`<button class="au-up" onclick="tierUp('${n}')"><i class="fas fa-arrow-up"></i> CREATOR</button>`:`<button class="au-dn" onclick="tierDn('${n}')"><i class="fas fa-arrow-down"></i> VIEWER</button>`}</div>`:''}</div></div>`
     }
 }
+function banU(n){opM("Ban "+n+"?","User diblokir permanen.","user-slash","BAN",()=>{const r=document.getElementById('br-i')?.value||'Melanggar aturan';db.ref('users/'+n).update({banned:true,banReason:r}).then(()=>{toast(n+" diban!","success");ldUsers();ldBan()})},'<input type="text" id="br-i" placeholder="Alasan ban..." style="margin-top:10px;">',true)}
+function unbanU(n){opM("Unban "+n+"?","","user-check","UNBAN",()=>{db.ref('users/'+n).update({banned:false,banReason:null}).then(()=>{toast(n+" diunban!","success");ldUsers();ldBan()})})}
+function tierUp(n){opM("Upgrade Creator?",n+" jadi Creator.","crown","UPGRADE",()=>{db.ref('users/'+n+'/role').set('creator').then(()=>{toast(n+" → Creator!","success");ldUsers();ldTier()})})}
+function tierDn(n){opM("Downgrade Viewer?",n+" turun jadi Viewer.","arrow-down","DOWNGRADE",()=>{db.ref('users/'+n+'/role').set('viewer').then(()=>{toast(n+" → Viewer","success");ldUsers();ldTier()})},"",true)}
+function ldBan(){const b=document.getElementById('bn-list');b.innerHTML='';for(let n in users){if(n===OWN)continue;const u=users[n];b.innerHTML+=`<div class="u-item"><div class="inf"><b>${esc(n)}</b><small>${u.banned?'🔴 '+(u.banReason||'-'):'🟢 Active'}</small></div><button class="btn btn-sm" style="background:${u.banned?'rgba(29,185,84,.2);color:var(--green)':'rgba(255,68,68,.2);color:var(--red)'};" onclick="${u.banned?`unbanU('${n}')`:`banU('${n}')`}">${u.banned?'UNBAN':'BAN'}</button></div>`}}
+function ldSongs(){const b=document.getElementById('as-list');b.innerHTML='';if(!songs.length){b.innerHTML='<div class="empty"><p>Kosong</p></div>';return}songs.forEach(s=>{b.innerHTML+=`<div class="u-item"><div class="inf" style="display:flex;align-items:center;gap:10px;"><div style="width:40px;height:40px;border-radius:8px;overflow:hidden;flex-shrink:0;background:#111;">${s.cover?`<img src="${s.cover}" style="width:100%;height:100%;object-fit:cover;">`:'<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#333;"><i class="fas fa-music"></i></div>'}</div><div><b>${esc(s.title)}</b><small>${esc(s.artist)} · ${s.plays||0} plays</small></div></div></div><button class="btn btn-sm" style="background:rgba(255,68,68,.2);color:var(--red);" onclick="delS('${s._k}')"><i class="fas fa-trash"></i></button></div>`})}
+function delS(k){opM("Hapus Lagu?","","trash-alt","HAPUS",()=>{db.ref('songs/'+k).remove().then(()=>{toast("Dihapus!","success");ldSongs()})},"",true)}
+function ldTier(){const b=document.getElementById('at-list');b.innerHTML='';for(let n in users){if(n===OWN)continue;const cr=users[n].role==='creator';b.innerHTML+=`<div class="u-item"><div class="inf"><b>${esc(n)}</b><small>${cr?'⭐ Creator':'👤 Viewer'}</small></div><button class="btn btn-sm" style="background:${cr?'rgba(255,68,68,.2);color:var(--red)':'rgba(212,175,55,.2);color:var(--accent)'};" onclick="${cr?`tierDn('${n}')`:`tierUp('${n}')`}">${cr?'REVOKE':'GRANT'}</button></div>`}}
+function ldReq(){const b=document.getElementById('ar-list');db.ref('paymentRequests').once('value',s=>{b.innerHTML='';if(!s.exists()){b.innerHTML='<div class="empty"><i class="fas fa-wallet"></i><p>Kosong</p></div>';return}s.forEach(r=>{const n=r.key,v=r.val();b.innerHTML+=`<div class="u-item" style="flex-direction:column;align-items:stretch;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;"><div><b>${esc(n)}</b><br><small style="color:#555;">${tA(v.ts)}</small></div><span class="badge ${v.status==='approved'?'bg-green':v.status==='rejected'?'bg-red':'bg-gold'}">${(v.status||'PENDING').toUpperCase()}</span></div>${v.proof?`<img src="${v.proof}" style="width:100%;max-height:200px;object-fit:contain;border-radius:10px;margin-bottom:10px;cursor:pointer;background:#111;" onclick="window.open(this.src)">`:'<p style="color:var(--red);font-size:.75rem;">⚠ Tidak ada bukti</p>'}${v.status!=='approved'?`<div style="display:flex;gap:8px;"><button class="btn btn-sm" style="flex:1;background:rgba(29,185,84,.2);color:var(--green);" onclick="apPay('${n}')">✓ APPROVE</button><button class="btn btn-sm" style="flex:1;background:rgba(255,68,68,.2);color:var(--red);" onclick="rjPay('${n}')">✗ REJECT</button></div>`:''}</div>`})})}
+function apPay(n){opM("Approve?",n,"check-circle","APPROVE",()=>{db.ref('paymentRequests/'+n+'/status').set('approved');db.ref('users/'+n+'/role').set('creator');db.ref('users/'+n+'/tierExpiry').set(Date.now()+60*24*36e5);toast(n+" → Creator!","success");ldReq()})}
+function rjPay(n){opM("Reject?",n,"times-circle","REJECT",()=>{db.ref('paymentRequests/'+n+'/status').set('rejected');toast("Ditolak","");ldReq()},"",true)}
+function ldArt(){const b=document.getElementById('aa-list');db.ref('artists').once('value',s=>{b.innerHTML='';s.forEach(a=>{const v=a.val();b.innerHTML+=`<div class="u-item"><div style="display:flex;align-items:center;gap:12px;"><img src="${v.img}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;" onerror="this.style.display='none'"><b>${esc(v.name)}</b></div><button class="btn btn-sm" style="background:rgba(255,68,68,.2);color:var(--red);" onclick="delArt('${a.key}')"><i class="fas fa-trash"></i></button></div>`})})}
+function saveArt(){const n=document.getElementById('ar-n').value.trim(),i=document.getElementById('ar-i').value.trim();if(!n||!i)return toast("Isi semua!","error");db.ref('artists').push({name:n,img:i}).then(()=>{toast("Ditambahkan!","success");document.getElementById('ar-n').value='';document.getElementById('ar-i').value='';ldArt()})}
+function delArt(k){opM("Hapus Artis?","","trash-alt","HAPUS",()=>{db.ref('artists/'+k).remove().then(()=>{toast("Dihapus!","success");ldArt()})},"",true)}
+function ldFB(){const b=document.getElementById('af-list');db.ref('feedback').once('value',s=>{b.innerHTML='';if(!s.exists()){b.innerHTML='<div class="empty"><i class="fas fa-envelope"></i><p>Kosong</p></div>';return}const items=[];s.forEach(f=>items.push({key:f.key,...f.val()}));items.reverse().forEach(f=>{b.innerHTML+=`<div class="u-item" style="flex-direction:column;align-items:stretch;"><div style="display:flex;justify-content:space-between;margin-bottom:8px;"><b style="color:var(--accent);">${esc(f.from)}</b><small style="color:#444;">${tA(f.ts)}</small></div><p style="color:var(--gray);font-size:.85rem;">${esc(f.text)}</p><button class="btn btn-sm" style="background:rgba(255,68,68,.1);color:var(--red);margin-top:10px;width:fit-content;" onclick="db.ref('feedback/${f.key}').remove().then(()=>{toast('Dihapus');ldFB()})"><i class="fas fa-trash"></i></button></div>`})})}
+function sendFB(){const t=document.getElementById('fb-t').value.trim();if(!t)return toast("Tulis dulu!","error");db.ref('feedback').push({from:U.name,text:t,ts:Date.now()}).then(()=>{toast("Terkirim!","success");document.getElementById('fb-t').value=''})}
 
-function loadAdminBan() {
-    const b = document.getElementById('ban-list'); b.innerHTML = '';
-    for (let name in allUsers) {
-        if (name === OWNER_NAME) continue;
-        const u = allUsers[name];
-        b.innerHTML += `
-            <div class="user-item">
-                <div class="info"><b>${escHTML(name)}</b><small>${u.banned ? '🔴 ' + (u.banReason || '-') : '🟢 Active'}</small></div>
-                <button class="btn btn-sm" style="background:${u.banned ? 'rgba(29,185,84,0.2); color:var(--green)' : 'rgba(255,68,68,0.2); color:var(--red)'};"
-                    onclick="${u.banned ? `unbanUser('${name}')` : `banUserPrompt('${name}')`}">${u.banned ? 'UNBAN' : 'BAN'}</button>
-            </div>`;
-    }
-}
-
-function banUserPrompt(name) {
-    openModal("Ban " + name + "?", "User akan diblokir.", "user-slash", "BAN", () => {
-        const reason = document.getElementById('ban-reason-input')?.value || 'Melanggar aturan';
-        db.ref('users/' + name).update({ banned: true, banReason: reason }).then(() => { showToast(name + " diban!", "success"); loadAdminBan(); });
-    }, '<input type="text" id="ban-reason-input" placeholder="Alasan ban..." style="margin-top:10px;">', true);
-}
-
-function unbanUser(name) {
-    openModal("Unban " + name + "?", "User bisa akses lagi.", "user-check", "UNBAN", () => {
-        db.ref('users/' + name).update({ banned: false, banReason: null }).then(() => { showToast(name + " diunban!", "success"); loadAdminBan(); });
-    });
-}
-
-function loadAdminChats() {
-    const b = document.getElementById('adm-chat-list');
-    db.ref('chats').once('value', s => {
-        b.innerHTML = '';
-        if (!s.exists()) { b.innerHTML = '<div class="empty-state"><i class="fas fa-comments"></i><p>Tidak ada chat</p></div>'; return; }
-        s.forEach(uc => {
-            let lastMsg = '', lastTs = 0;
-            uc.forEach(m => { lastMsg = m.val().text; lastTs = m.val().ts; });
-            b.innerHTML += `
-                <div class="chat-user-tab" onclick="openAdminChat('${uc.key}')">
-                    <div class="avatar"><i class="fas fa-user"></i></div>
-                    <div class="song-info"><b>${escHTML(uc.key)}</b><small>${escHTML(lastMsg.substring(0, 40))}</small></div>
-                    <small style="color:#444; font-size:0.65rem;">${timeAgo(lastTs)}</small>
-                </div>`;
-        });
-    });
-}
-
-function openAdminChat(userName) {
-    currentAdminChatUser = userName;
-    document.getElementById('adm-chat-user-title').innerText = 'Chat: ' + userName;
-    showPage('adm-chat-detail');
-    const box = document.getElementById('adm-chat-box');
-    db.ref('chats/' + userName).off();
-    db.ref('chats/' + userName).on('value', s => {
-        box.innerHTML = '';
-        s.forEach(m => {
-            const v = m.val();
-            box.innerHTML += `<div class="msg ${v.from === OWNER_NAME ? 'me' : 'them'}">${escHTML(v.text)}<div class="msg-meta">${timeAgo(v.ts)}</div></div>`;
-        });
-        box.scrollTop = box.scrollHeight;
-    });
-}
-
-function sendAdminReply() {
-    if (!currentAdminChatUser) return;
-    const input = document.getElementById('adm-chat-msg');
-    const msg = input.value.trim(); if (!msg) return;
-    db.ref('chats/' + currentAdminChatUser).push({ from: OWNER_NAME, text: msg, ts: Date.now() });
-    input.value = '';
-}
-
-function loadAdminSongs() {
-    const b = document.getElementById('adm-song-list'); b.innerHTML = '';
-    songs.forEach(s => {
-        b.innerHTML += `
-            <div class="user-item">
-                <div class="info"><b>${escHTML(s.title)}</b><small>${escHTML(s.artist)} · ${s.plays || 0} plays</small></div>
-                <button class="btn btn-sm" style="background:rgba(255,68,68,0.2); color:var(--red);"
-                    onclick="deleteSong('${s._key}', '${escHTML(s.title)}')"><i class="fas fa-trash"></i></button>
-            </div>`;
-    });
-    if (!songs.length) b.innerHTML = '<div class="empty-state"><p>Tidak ada lagu</p></div>';
-}
-
-function deleteSong(key, title) {
-    openModal("Hapus Lagu?", `"${title}" akan dihapus.`, "trash-alt", "HAPUS", () => {
-        db.ref('songs/' + key).remove().then(() => { showToast("Lagu dihapus!", "success"); loadAdminSongs(); });
-    }, "", true);
-}
-
-function loadAdminTier() {
-    const b = document.getElementById('adm-cc-list'); b.innerHTML = '';
-    for (let name in allUsers) {
-        if (name === OWNER_NAME) continue;
-        const isCr = allUsers[name].role === 'creator';
-        b.innerHTML += `
-            <div class="user-item">
-                <div class="info"><b>${escHTML(name)}</b><small>${isCr ? '⭐ Creator' : '👤 Viewer'}</small></div>
-                <button class="btn btn-sm" style="background:${isCr ? 'rgba(255,68,68,0.2); color:var(--red)' : 'rgba(212,175,55,0.2); color:var(--accent)'};"
-                    onclick="toggleTier('${name}', ${isCr})">${isCr ? 'REVOKE' : 'GRANT'}</button>
-            </div>`;
-    }
-}
-
-function toggleTier(name, isCr) {
-    openModal(`${isCr ? 'Revoke' : 'Grant'} Creator?`, `${isCr ? 'Mencabut' : 'Memberikan'} Creator untuk ${name}.`, "id-badge",
-        isCr ? "REVOKE" : "GRANT", () => {
-            db.ref('users/' + name + '/role').set(isCr ? 'viewer' : 'creator').then(() => {
-                showToast(`${name} → ${isCr ? 'Viewer' : 'Creator'}!`, "success"); loadAdminTier();
-            });
-        }, "", isCr);
-}
-
-function loadAdminReq() {
-    const b = document.getElementById('adm-req-list');
-    db.ref('paymentRequests').once('value', s => {
-        b.innerHTML = '';
-        if (!s.exists()) { b.innerHTML = '<div class="empty-state"><i class="fas fa-wallet"></i><p>Tidak ada request</p></div>'; return; }
-        s.forEach(r => {
-            const name = r.key, v = r.val();
-            b.innerHTML += `
-                <div class="user-item" style="flex-direction:column; align-items:stretch;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                        <div><b>${escHTML(name)}</b><br><small style="color:#555;">${timeAgo(v.ts)}</small></div>
-                        <span class="badge ${v.status === 'approved' ? 'badge-green' : v.status === 'rejected' ? 'badge-red' : 'badge-gold'}">${(v.status || 'PENDING').toUpperCase()}</span>
-                    </div>
-                    ${v.proof ? `<img src="${v.proof}" style="width:100%; max-height:200px; object-fit:contain; border-radius:10px; margin-bottom:10px; cursor:pointer; background:#111;" onclick="window.open(this.src)">` : '<p style="color:var(--red); font-size:0.75rem;">⚠ Tidak ada bukti gambar</p>'}
-                    ${v.status !== 'approved' ? `
-                    <div style="display:flex; gap:8px;">
-                        <button class="btn btn-sm" style="flex:1; background:rgba(29,185,84,0.2); color:var(--green);" onclick="approvePayment('${name}')">✓ APPROVE</button>
-                        <button class="btn btn-sm" style="flex:1; background:rgba(255,68,68,0.2); color:var(--red);" onclick="rejectPayment('${name}')">✗ REJECT</button>
-                    </div>` : ''}
-                </div>`;
-        });
-    });
-}
-
-function approvePayment(name) {
-    openModal("Approve?", `Setujui & berikan Creator ke ${name}?`, "check-circle", "APPROVE", () => {
-        db.ref('paymentRequests/' + name + '/status').set('approved');
-        db.ref('users/' + name + '/role').set('creator');
-        db.ref('users/' + name + '/tierExpiry').set(Date.now() + 60 * 24 * 60 * 60 * 1000);
-        showToast(name + " → Creator!", "success"); loadAdminReq();
-    });
-}
-
-function rejectPayment(name) {
-    openModal("Reject?", `Tolak pembayaran ${name}?`, "times-circle", "REJECT", () => {
-        db.ref('paymentRequests/' + name + '/status').set('rejected');
-        showToast("Ditolak", ""); loadAdminReq();
-    }, "", true);
-}
-
-function loadAdminArtists() {
-    const b = document.getElementById('adm-art-list');
-    db.ref('artists').once('value', s => {
-        b.innerHTML = '';
-        s.forEach(a => {
-            const v = a.val();
-            b.innerHTML += `
-                <div class="user-item">
-                    <div style="display:flex; align-items:center; gap:12px;">
-                        <img src="${v.img}" style="width:40px; height:40px; border-radius:50%; object-fit:cover;" onerror="this.style.display='none'">
-                        <b>${escHTML(v.name)}</b>
-                    </div>
-                    <button class="btn btn-sm" style="background:rgba(255,68,68,0.2); color:var(--red);"
-                        onclick="deleteArtist('${a.key}')"><i class="fas fa-trash"></i></button>
-                </div>`;
-        });
-    });
-}
-
-function saveArtist() {
-    const name = document.getElementById('art-name').value.trim();
-    const img = document.getElementById('art-img').value.trim();
-    if (!name || !img) return showToast("Isi semua data!", "error");
-    db.ref('artists').push({ name, img }).then(() => {
-        showToast("Artis ditambahkan!", "success");
-        document.getElementById('art-name').value = '';
-        document.getElementById('art-img').value = '';
-        loadAdminArtists();
-    });
-}
-
-function deleteArtist(key) {
-    openModal("Hapus Artis?", "Artis akan dihapus.", "trash-alt", "HAPUS", () => {
-        db.ref('artists/' + key).remove().then(() => { showToast("Dihapus!", "success"); loadAdminArtists(); });
-    }, "", true);
-}
-
-function loadAdminFeedback() {
-    const b = document.getElementById('adm-fb-list');
-    db.ref('feedback').once('value', s => {
-        b.innerHTML = '';
-        if (!s.exists()) { b.innerHTML = '<div class="empty-state"><i class="fas fa-envelope"></i><p>Tidak ada feedback</p></div>'; return; }
-        const items = []; s.forEach(f => items.push({ key: f.key, ...f.val() }));
-        items.reverse().forEach(f => {
-            b.innerHTML += `
-                <div class="user-item" style="flex-direction:column; align-items:stretch;">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-                        <b style="color:var(--accent);">${escHTML(f.from)}</b>
-                        <small style="color:#444;">${timeAgo(f.ts)}</small>
-                    </div>
-                    <p style="color:var(--gray); font-size:0.85rem; margin:0;">${escHTML(f.text)}</p>
-                    <button class="btn btn-sm" style="background:rgba(255,68,68,0.1); color:var(--red); margin-top:10px; width:fit-content;"
-                        onclick="db.ref('feedback/${f.key}').remove().then(()=>{showToast('Dihapus');loadAdminFeedback();})"><i class="fas fa-trash"></i></button>
-                </div>`;
-        });
-    });
-}
-
-document.addEventListener('keydown', e => {
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-    if (e.code === 'Space') { e.preventDefault(); togglePlay(); }
-    if (e.code === 'ArrowRight') playNext();
-    if (e.code === 'ArrowLeft') playPrev();
-});
-
+document.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;if(e.code==='Space'){e.preventDefault();togP()}if(e.code==='ArrowRight')next();if(e.code==='ArrowLeft')prev()});
 init();
 </script>
 </body>
