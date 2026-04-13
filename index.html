@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Regal Music Sovereign v15.0</title>
+    <title>Regal Music Sovereign v16.0</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -21,650 +21,111 @@
             --green: #1db954;
             --border: rgba(255, 255, 255, 0.1);
         }
-
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            outline: none;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            overflow: hidden;
-            height: 100vh;
-        }
-
-        .bg-app {
-            position: fixed;
-            inset: 0;
-            background: linear-gradient(160deg, #050a0f 0%, #0a1f2f 100%);
-            z-index: -1;
-        }
-
-        .bg-app::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: url('https://images.unsplash.com/photo-1514525253344-f814d074e015?q=80&w=1974&auto=format&fit=crop') no-repeat center center/cover;
-            opacity: 0.1;
-            filter: blur(50px);
-        }
-
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; margin: 0; padding: 0; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); overflow: hidden; height: 100vh; }
+        .bg-app { position: fixed; inset: 0; background: linear-gradient(160deg, #050a0f 0%, #0a1f2f 100%); z-index: -1; }
+        .bg-app::before { content: ''; position: absolute; inset: 0; background: url('https://images.unsplash.com/photo-1514525253344-f814d074e015?q=80&w=1974&auto=format&fit=crop') no-repeat center center/cover; opacity: 0.1; filter: blur(50px); }
         ::-webkit-scrollbar { display: none; }
-
-        .page {
-            display: none;
-            position: absolute;
-            inset: 0;
-            padding: 20px 20px 160px;
-            overflow-y: auto;
-        }
-
+        .page { display: none; position: absolute; inset: 0; padding: 20px 20px 160px; overflow-y: auto; }
         .page.active { display: block; animation: spotifyFade 0.4s ease; }
-
-        @keyframes spotifyFade {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        #loader-ov {
-            position: fixed;
-            inset: 0;
-            background: var(--bg);
-            z-index: 99999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            gap: 20px;
-            transition: opacity 0.5s;
-        }
-
-        .loader-spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            border-top-color: var(--accent);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
+        @keyframes spotifyFade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        #loader-ov { position: fixed; inset: 0; background: var(--bg); z-index: 99999; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 20px; transition: opacity 0.5s; }
+        .loader-spinner { width: 50px; height: 50px; border: 4px solid rgba(255,255,255,0.1); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-
         .greet-box { margin-top: 40px; margin-bottom: 20px; }
-
-        .greet-box h1 {
-            font-size: 1.8rem;
-            font-weight: 800;
-            background: linear-gradient(to right, #fff, var(--gray));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .greet-box h1 { font-size: 1.8rem; font-weight: 800; background: linear-gradient(to right, #fff, var(--gray)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        input[type="text"], input[type="password"], input[type="url"], input[type="number"], textarea, select {
+            width: 100%; padding: 15px 20px; background: rgba(255,255,255,0.08); border: 1px solid var(--border); border-radius: 12px; color: var(--text); font-family: inherit; font-size: 0.9rem; margin-bottom: 12px; transition: border 0.3s;
         }
-
-        input[type="text"],
-        input[type="password"],
-        input[type="file"],
-        input[type="url"],
-        input[type="number"],
-        textarea,
-        select {
-            width: 100%;
-            padding: 15px 20px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            color: var(--text);
-            font-family: inherit;
-            font-size: 0.9rem;
-            margin-bottom: 12px;
-            transition: border 0.3s;
-        }
-
         input::placeholder, textarea::placeholder { color: var(--gray); }
         input:focus, textarea:focus, select:focus { border-color: var(--accent); }
         textarea { min-height: 100px; resize: vertical; }
         select { appearance: none; cursor: pointer; }
-
-        .search-pill {
-            width: 100%;
-            padding: 16px 20px 16px 55px;
-            background: #fff;
-            border: none;
-            border-radius: 50px;
-            color: #000;
-            font-weight: 700;
-            font-size: 0.9rem;
-            margin-top: 10px;
-        }
-
+        .search-pill { width: 100%; padding: 16px 20px 16px 55px; background: #fff; border: none; border-radius: 50px; color: #000; font-weight: 700; font-size: 0.9rem; margin-top: 10px; }
         .search-pill:focus { border-color: transparent; }
         .search-wrap { position: relative; margin-bottom: 25px; }
-
-        .search-wrap i {
-            position: absolute;
-            left: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #555;
-            z-index: 10;
-            font-size: 1.2rem;
-        }
-
-        .bottom-nav-scroll {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            height: 75px;
-            background: rgba(0, 0, 0, 0.95);
-            border-top: 1px solid var(--border);
-            z-index: 10000;
-            display: flex;
-            align-items: center;
-            overflow-x: auto;
-            padding: 0 10px;
-            backdrop-filter: blur(20px);
-        }
-
-        .nav-item {
-            min-width: 75px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: var(--gray);
-            cursor: pointer;
-            transition: color 0.2s;
-            position: relative;
-        }
-
+        .search-wrap i { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: #555; z-index: 10; font-size: 1.2rem; }
+        .bottom-nav-scroll { position: fixed; bottom: 0; width: 100%; height: 75px; background: rgba(0,0,0,0.95); border-top: 1px solid var(--border); z-index: 10000; display: flex; align-items: center; overflow-x: auto; padding: 0 10px; backdrop-filter: blur(20px); }
+        .nav-item { min-width: 75px; display: flex; flex-direction: column; align-items: center; color: var(--gray); cursor: pointer; transition: color 0.2s; position: relative; }
         .nav-item.active { color: #fff; }
         .nav-item i { font-size: 1.2rem; margin-bottom: 5px; }
         .nav-item span { font-size: 0.6rem; font-weight: 700; }
-
-        .nav-badge {
-            position: absolute;
-            top: 2px;
-            right: 15px;
-            width: 10px;
-            height: 10px;
-            background: var(--red);
-            border-radius: 50%;
-            display: none;
-        }
-
-        .chat-footer {
-            position: fixed;
-            bottom: 75px;
-            width: 100%;
-            left: 0;
-            padding: 12px 15px;
-            background: rgba(0, 0, 0, 0.98);
-            display: flex;
-            gap: 10px;
-            border-top: 1px solid var(--border);
-            z-index: 9500;
-        }
-
-        .chat-footer input {
-            flex: 1;
-            margin-bottom: 0;
-            border-radius: 20px;
-            padding: 12px 18px;
-        }
-
+        .nav-badge { position: absolute; top: 2px; right: 15px; width: 10px; height: 10px; background: var(--red); border-radius: 50%; display: none; }
+        .chat-footer { position: fixed; bottom: 75px; width: 100%; left: 0; padding: 12px 15px; background: rgba(0,0,0,0.98); display: flex; gap: 10px; border-top: 1px solid var(--border); z-index: 9500; }
+        .chat-footer input { flex: 1; margin-bottom: 0; border-radius: 20px; padding: 12px 18px; }
         body.player-active .chat-footer { bottom: 160px; }
-
-        .chat-bubble {
-            max-width: 80%;
-            padding: 10px 15px;
-            border-radius: 18px;
-            font-size: 0.85rem;
-            line-height: 1.4;
-            word-wrap: break-word;
-        }
-
-        .chat-bubble.mine {
-            align-self: flex-end;
-            background: var(--green);
-            color: #000;
-            border-bottom-right-radius: 4px;
-        }
-
-        .chat-bubble.other {
-            align-self: flex-start;
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text);
-            border-bottom-left-radius: 4px;
-        }
-
-        .chat-bubble .chat-name {
-            font-size: 0.65rem;
-            font-weight: 800;
-            color: var(--accent);
-            margin-bottom: 3px;
-        }
-
+        .chat-bubble { max-width: 80%; padding: 10px 15px; border-radius: 18px; font-size: 0.85rem; line-height: 1.4; word-wrap: break-word; }
+        .chat-bubble.mine { align-self: flex-end; background: var(--green); color: #000; border-bottom-right-radius: 4px; }
+        .chat-bubble.other { align-self: flex-start; background: rgba(255,255,255,0.1); color: var(--text); border-bottom-left-radius: 4px; }
+        .chat-bubble .chat-name { font-size: 0.65rem; font-weight: 800; color: var(--accent); margin-bottom: 3px; }
         .chat-bubble.mine .chat-name { color: #064e26; }
-
-        .chat-bubble .chat-time {
-            font-size: 0.55rem;
-            opacity: 0.6;
-            margin-top: 4px;
-            text-align: right;
-        }
-
-        .adm-header-stats {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            background: var(--card);
-            padding: 15px 5px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            text-align: center;
-        }
-
+        .chat-bubble .chat-time { font-size: 0.55rem; opacity: 0.6; margin-top: 4px; text-align: right; }
+        .adm-header-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 30px; }
+        .stat-card { background: var(--card); padding: 15px 5px; border-radius: 12px; border: 1px solid var(--border); text-align: center; }
         .stat-card b { color: var(--accent); font-size: 1rem; }
         .stat-card p { font-size: 0.5rem; font-weight: 800; color: var(--gray); }
-
-        .btn-gold {
-            background: var(--accent);
-            color: #000;
-            padding: 15px;
-            border-radius: 30px;
-            border: none;
-            font-weight: 800;
-            width: 100%;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: transform 0.2s, opacity 0.2s;
-        }
-
+        .btn-gold { background: var(--accent); color: #000; padding: 15px; border-radius: 30px; border: none; font-weight: 800; width: 100%; cursor: pointer; font-size: 0.9rem; transition: transform 0.2s, opacity 0.2s; }
         .btn-gold:active { transform: scale(0.97); opacity: 0.9; }
-
-        #modal-ov {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.9);
-            z-index: 50000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .m-box {
-            background: #121212;
-            padding: 30px;
-            border-radius: 25px;
-            width: 100%;
-            max-width: 350px;
-            text-align: center;
-            border: 1px solid var(--border);
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-
-        .player-bar {
-            position: fixed;
-            bottom: 80px;
-            left: 8px;
-            right: 8px;
-            background: rgba(20, 30, 40, 0.98);
-            border-radius: 12px;
-            padding: 10px 14px;
-            display: none;
-            align-items: center;
-            gap: 12px;
-            z-index: 9000;
-            border: 1px solid var(--border);
-            backdrop-filter: blur(20px);
-        }
-
-        .player-bar img {
-            width: 42px;
-            height: 42px;
-            border-radius: 6px;
-            object-fit: cover;
-            flex-shrink: 0;
-        }
-
-        .p-ctrls {
-            display: flex;
-            align-items: center;
-            gap: 18px;
-            flex-shrink: 0;
-        }
-
-        .p-ctrls i {
-            font-size: 1.1rem;
-            cursor: pointer;
-            color: #fff;
-            transition: color 0.2s;
-        }
-
+        #modal-ov { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 50000; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .m-box { background: #121212; padding: 30px; border-radius: 25px; width: 100%; max-width: 350px; text-align: center; border: 1px solid var(--border); max-height: 80vh; overflow-y: auto; }
+        .player-bar { position: fixed; bottom: 80px; left: 8px; right: 8px; background: rgba(20,30,40,0.98); border-radius: 12px; padding: 10px 14px; display: none; align-items: center; gap: 12px; z-index: 9000; border: 1px solid var(--border); backdrop-filter: blur(20px); }
+        .player-bar img { width: 42px; height: 42px; border-radius: 6px; object-fit: cover; flex-shrink: 0; }
+        .p-ctrls { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+        .p-ctrls i { font-size: 1.1rem; cursor: pointer; color: #fff; transition: color 0.2s; }
         .p-ctrls i:active { color: var(--accent); }
         .p-ctrls .fa-heart { color: var(--red); }
-
-        .track-row {
-            display: flex;
-            align-items: center;
-            padding: 12px;
-            background: var(--card);
-            border-radius: 12px;
-            margin-bottom: 10px;
-            border: 1px solid var(--border);
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .track-row:active { background: rgba(255, 255, 255, 0.05); }
-
-        .track-row img {
-            width: 45px;
-            height: 45px;
-            border-radius: 5px;
-            margin-right: 15px;
-            object-fit: cover;
-            flex-shrink: 0;
-        }
-
-        .badge-fixed {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            z-index: 5;
-        }
-
-        .badge-dev {
-            background: var(--red);
-            color: var(--accent);
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-weight: 900;
-            border: 1px solid var(--accent);
-            font-size: 10px;
-        }
-
-        .badge-e {
-            background: var(--elite);
-            color: #000;
-            padding: 5px 8px;
-            border-radius: 50%;
-            font-size: 10px;
-        }
-
-        .badge-c {
-            background: var(--green);
-            color: #000;
-            padding: 5px 8px;
-            border-radius: 50%;
-            font-size: 10px;
-        }
-
-        .contact-item {
-            display: flex;
-            align-items: center;
-            padding: 15px;
-            background: var(--card);
-            border-radius: 12px;
-            margin-bottom: 10px;
-            border: 1px solid var(--border);
-            cursor: pointer;
-            gap: 15px;
-            position: relative;
-        }
-
-        .contact-item:active { background: rgba(255, 255, 255, 0.05); }
-
-        .contact-avatar {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: var(--accent);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            color: #000;
-            font-size: 1.1rem;
-            flex-shrink: 0;
-            overflow: hidden;
-        }
-
-        .contact-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .unsaved-badge {
-            background: var(--red);
-            color: #fff;
-            font-size: 0.55rem;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-weight: 800;
-            margin-left: 8px;
-        }
-
-        .unread-dot {
-            width: 12px;
-            height: 12px;
-            background: var(--red);
-            border-radius: 50%;
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        .upload-section {
-            background: var(--card);
-            padding: 25px;
-            border-radius: 20px;
-            border: 1px solid var(--border);
-            margin-top: 20px;
-        }
-
-        .upload-section label {
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: var(--gray);
-            margin-bottom: 5px;
-            display: block;
-        }
-
-        .file-input-wrap {
-            width: 100%;
-            padding: 15px 20px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 2px dashed var(--border);
-            border-radius: 12px;
-            color: var(--gray);
-            font-size: 0.85rem;
-            margin-bottom: 12px;
-            text-align: center;
-            cursor: pointer;
-            transition: border 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-
+        .p-ctrls .fa-plus-circle { color: var(--green); }
+        .track-row { display: flex; align-items: center; padding: 12px; background: var(--card); border-radius: 12px; margin-bottom: 10px; border: 1px solid var(--border); cursor: pointer; transition: background 0.2s; }
+        .track-row:active { background: rgba(255,255,255,0.05); }
+        .track-row img { width: 45px; height: 45px; border-radius: 5px; margin-right: 15px; object-fit: cover; flex-shrink: 0; }
+        .badge-fixed { position: absolute; top: -5px; right: -5px; z-index: 5; }
+        .badge-dev { background: var(--red); color: var(--accent); padding: 4px 10px; border-radius: 6px; font-weight: 900; border: 1px solid var(--accent); font-size: 10px; }
+        .badge-e { background: var(--elite); color: #000; padding: 5px 8px; border-radius: 50%; font-size: 10px; }
+        .badge-c { background: var(--green); color: #000; padding: 5px 8px; border-radius: 50%; font-size: 10px; }
+        .badge-a { background: #ff6600; color: #000; padding: 5px 8px; border-radius: 50%; font-size: 10px; }
+        .contact-item { display: flex; align-items: center; padding: 15px; background: var(--card); border-radius: 12px; margin-bottom: 10px; border: 1px solid var(--border); cursor: pointer; gap: 15px; position: relative; }
+        .contact-item:active { background: rgba(255,255,255,0.05); }
+        .contact-avatar { width: 45px; height: 45px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 800; color: #000; font-size: 1.1rem; flex-shrink: 0; overflow: hidden; }
+        .contact-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .unsaved-badge { background: var(--red); color: #fff; font-size: 0.55rem; padding: 2px 8px; border-radius: 10px; font-weight: 800; margin-left: 8px; }
+        .unread-dot { width: 12px; height: 12px; background: var(--red); border-radius: 50%; position: absolute; right: 15px; top: 50%; transform: translateY(-50%); }
+        .upload-section { background: var(--card); padding: 25px; border-radius: 20px; border: 1px solid var(--border); margin-top: 20px; }
+        .upload-section label { font-size: 0.75rem; font-weight: 700; color: var(--gray); margin-bottom: 5px; display: block; }
+        .file-input-wrap { width: 100%; padding: 15px 20px; background: rgba(255,255,255,0.08); border: 2px dashed var(--border); border-radius: 12px; color: var(--gray); font-size: 0.85rem; margin-bottom: 12px; text-align: center; cursor: pointer; transition: border 0.3s; position: relative; overflow: hidden; }
         .file-input-wrap:hover { border-color: var(--accent); }
-
-        .file-input-wrap input[type="file"] {
-            position: absolute;
-            inset: 0;
-            opacity: 0;
-            cursor: pointer;
-            padding: 0;
-            margin: 0;
-        }
-
-        .file-input-wrap .file-label {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-        }
-
+        .file-input-wrap input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; padding: 0; margin: 0; }
+        .file-input-wrap .file-label { display: flex; flex-direction: column; align-items: center; gap: 5px; }
         .file-input-wrap .file-label i { font-size: 1.5rem; color: var(--accent); }
         .file-input-wrap .file-name { color: var(--green); font-weight: 700; font-size: 0.75rem; margin-top: 5px; }
-
-        .premium-card {
-            background: var(--card);
-            padding: 25px;
-            border-radius: 20px;
-            margin-top: 20px;
-        }
-
+        .premium-card { background: var(--card); padding: 25px; border-radius: 20px; margin-top: 20px; }
         .premium-card ul { list-style: none; margin: 15px 0; }
-
-        .premium-card ul li {
-            padding: 6px 0;
-            font-size: 0.85rem;
-            color: var(--gray);
-        }
-
-        .premium-card ul li i {
-            color: var(--green);
-            margin-right: 8px;
-        }
-
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .back-btn {
-            cursor: pointer;
-            padding: 10px 0;
-            margin-bottom: 15px;
-            font-size: 0.9rem;
-            color: var(--gray);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
+        .premium-card ul li { padding: 6px 0; font-size: 0.85rem; color: var(--gray); }
+        .premium-card ul li i { color: var(--green); margin-right: 8px; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .back-btn { cursor: pointer; padding: 10px 0; margin-bottom: 15px; font-size: 0.9rem; color: var(--gray); display: flex; align-items: center; gap: 8px; }
         .back-btn:hover { color: #fff; }
-
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--gray);
-        }
-
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--gray); }
         .empty-state i { font-size: 3rem; margin-bottom: 15px; opacity: 0.3; }
         .empty-state p { font-size: 0.85rem; }
-
-        .recent-search-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .recent-search-header h3 {
-            font-size: 0.9rem;
-            font-weight: 700;
-        }
-
-        .recent-search-header span {
-            color: var(--accent);
-            font-size: 0.75rem;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        .ban-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.97);
-            z-index: 999999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            gap: 20px;
-        }
-
+        .recent-search-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .recent-search-header h3 { font-size: 0.9rem; font-weight: 700; }
+        .recent-search-header span { color: var(--accent); font-size: 0.75rem; font-weight: 700; cursor: pointer; }
+        .ban-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.97); z-index: 999999; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 20px; }
         .ban-overlay i { font-size: 4rem; color: var(--red); }
         .ban-overlay h2 { color: var(--red); }
         .ban-overlay p { color: var(--gray); text-align: center; padding: 0 30px; }
-
-        .profile-view-page {
-            text-align: center;
-            padding-top: 40px;
-        }
-
-        .profile-view-avatar {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            margin: 0 auto 20px;
-            background: var(--accent);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-            font-weight: 800;
-            color: #000;
-            overflow: hidden;
-            border: 4px solid #1a1a1a;
-        }
-
-        .profile-view-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .profile-info-card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 20px;
-            margin-top: 20px;
-            text-align: left;
-        }
-
-        .profile-info-card .info-row {
-            padding: 10px 0;
-            border-bottom: 1px solid var(--border);
-        }
-
+        .profile-view-page { text-align: center; padding-top: 40px; }
+        .profile-view-avatar { width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 20px; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: 800; color: #000; overflow: hidden; border: 4px solid #1a1a1a; }
+        .profile-view-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .profile-info-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-top: 20px; text-align: left; }
+        .profile-info-card .info-row { padding: 10px 0; border-bottom: 1px solid var(--border); }
         .profile-info-card .info-row:last-child { border-bottom: none; }
         .profile-info-card .info-row small { color: var(--gray); font-size: 0.7rem; }
         .profile-info-card .info-row b { display: block; margin-top: 3px; font-size: 0.9rem; }
-
-        .upload-progress-bar {
-            width: 100%;
-            height: 6px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 3px;
-            margin: 10px 0;
-            overflow: hidden;
-            display: none;
-        }
-
-        .upload-progress-bar .fill {
-            height: 100%;
-            background: var(--accent);
-            border-radius: 3px;
-            transition: width 0.3s;
-            width: 0%;
-        }
+        .upload-progress-bar { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; margin: 10px 0; overflow: hidden; display: none; }
+        .upload-progress-bar .fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width 0.3s; width: 0%; }
+        .toast-msg { position: fixed; top: 40px; left: 50%; transform: translateX(-50%); background: var(--green); color: #000; padding: 12px 25px; border-radius: 30px; font-weight: 800; font-size: 0.8rem; z-index: 999999; animation: toastIn 0.3s ease; pointer-events: none; }
+        @keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(-20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
     </style>
 </head>
 <body>
@@ -687,7 +148,6 @@
     </div>
 </div>
 
-<!-- BAN OVERLAY -->
 <div id="ban-overlay" class="ban-overlay" style="display:none;">
     <i class="fas fa-ban"></i>
     <h2>AKUN DI-BANNED</h2>
@@ -695,7 +155,6 @@
     <button onclick="logOut()" style="padding:15px 40px; background:var(--red); color:#fff; border:none; border-radius:15px; font-weight:800; cursor:pointer; margin-top:10px;">KELUAR</button>
 </div>
 
-<!-- BOTTOM NAV -->
 <div class="bottom-nav-scroll" id="bot-nav" style="display:none;">
     <div class="nav-item active" onclick="nav('home', this)"><i class="fas fa-house"></i><span>Beranda</span></div>
     <div class="nav-item" onclick="nav('search-page', this)"><i class="fas fa-search"></i><span>Cari</span></div>
@@ -755,24 +214,15 @@
     <div class="back-btn" onclick="nav('home')"><i class="fas fa-arrow-left"></i> Kembali</div>
     <h1 style="font-weight:800; margin-bottom:20px;"><i class="fas fa-heart" style="color:var(--red);"></i> Favorit</h1>
     <div id="fav-list"></div>
-    <div id="fav-empty" class="empty-state">
-        <i class="far fa-heart"></i>
-        <p>Belum ada lagu favorit</p>
-    </div>
+    <div id="fav-empty" class="empty-state"><i class="far fa-heart"></i><p>Belum ada lagu favorit</p></div>
 </div>
 
 <!-- PLAYLIST DETAIL -->
 <div id="pl-detail" class="page">
     <div class="back-btn" onclick="nav('home')"><i class="fas fa-arrow-left"></i> Kembali</div>
-    <div class="section-header">
-        <h1 style="font-weight:800;"><i class="fas fa-list" style="color:var(--green);"></i> Playlist</h1>
-        <i class="fas fa-plus-circle" onclick="addToPlaylistModal()" style="font-size:1.8rem; color:var(--green); cursor:pointer;"></i>
-    </div>
+    <h1 style="font-weight:800; margin-bottom:20px;"><i class="fas fa-list" style="color:var(--green);"></i> Playlist</h1>
     <div id="pl-list"></div>
-    <div id="pl-empty" class="empty-state">
-        <i class="fas fa-list"></i>
-        <p>Playlist kosong. Tambahkan lagu!</p>
-    </div>
+    <div id="pl-empty" class="empty-state"><i class="fas fa-list"></i><p>Playlist kosong. Tekan + di player untuk menambah lagu!</p></div>
 </div>
 
 <!-- PESAN / DM LIST -->
@@ -782,10 +232,7 @@
         <i class="fas fa-plus-circle" onclick="addContactModal()" style="font-size:2rem; color:var(--green); cursor:pointer;"></i>
     </div>
     <div id="ct-list"></div>
-    <div id="ct-empty" class="empty-state">
-        <i class="fas fa-comment-dots"></i>
-        <p>Belum ada percakapan. Tap + untuk mulai chat</p>
-    </div>
+    <div id="ct-empty" class="empty-state"><i class="fas fa-comment-dots"></i><p>Belum ada percakapan. Tap + untuk mulai chat</p></div>
 </div>
 
 <!-- CHAT ROOM (DM) -->
@@ -794,8 +241,7 @@
         <i class="fas fa-arrow-left" onclick="closeChatRoom()" style="cursor:pointer; font-size:1.1rem;"></i>
         <div class="contact-avatar" id="cr-avatar" onclick="viewUserProfile(currentDMUser)" style="width:35px; height:35px; font-size:0.9rem; cursor:pointer;"></div>
         <div onclick="viewUserProfile(currentDMUser)" style="cursor:pointer;">
-            <b id="cr-name">Chat</b>
-            <br><small id="cr-sub" style="color:var(--gray); font-size:0.65rem;"></small>
+            <b id="cr-name">Chat</b><br><small id="cr-sub" style="color:var(--gray); font-size:0.65rem;"></small>
         </div>
     </div>
     <div id="cr-msgs" style="height:calc(100vh - 210px); overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:10px;"></div>
@@ -870,7 +316,49 @@
     <div style="text-align:center;">
         <h2 id="q-title">Pembayaran</h2>
         <p id="q-price" style="font-size:1.5rem; font-weight:800; color:var(--accent); margin:10px 0;"></p>
-        <img src="https://novellum-filestore-mcp.s3.us-east-2.amazonaws.com/atxp:atxp_acct_28RefC1yi2fRT45f7ubvZ/c98776c7-6cc8-4f0c-9d08-37faffa3b2be.png" style="width:100%; max-width:280px; border-radius:20px; border:2px solid #222; margin:20px 0;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjgwIiBoZWlnaHQ9IjI4MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjgwIiBoZWlnaHQ9IjI4MCIgZmlsbD0iIzFhMWExYSIvPjx0ZXh0IHg9IjE0MCIgeT0iMTMwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZDRhZjM3IiBmb250LXNpemU9IjIwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtd2VpZ2h0PSJib2xkIj5RUklTPC90ZXh0Pjx0ZXh0IHg9IjE0MCIgeT0iMTYwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOTk5IiBmb250LXNpemU9IjEyIiBmb250LWZhbWlseT0iQXJpYWwiPlNjYW4gdG8gUGF5PC90ZXh0Pjwvc3ZnPg=='">
+        <div id="qris-img-container" style="margin:20px auto; width:100%; max-width:280px;">
+            <svg viewBox="0 0 280 280" xmlns="http://www.w3.org/2000/svg" style="width:100%; border-radius:20px; border:2px solid #222;">
+                <rect width="280" height="280" fill="#ffffff"/>
+                <rect x="20" y="20" width="80" height="80" rx="8" fill="none" stroke="#000" stroke-width="6"/>
+                <rect x="35" y="35" width="50" height="50" rx="4" fill="#000"/>
+                <rect x="180" y="20" width="80" height="80" rx="8" fill="none" stroke="#000" stroke-width="6"/>
+                <rect x="195" y="35" width="50" height="50" rx="4" fill="#000"/>
+                <rect x="20" y="180" width="80" height="80" rx="8" fill="none" stroke="#000" stroke-width="6"/>
+                <rect x="35" y="195" width="50" height="50" rx="4" fill="#000"/>
+                <rect x="120" y="20" width="12" height="12" fill="#000"/>
+                <rect x="120" y="44" width="12" height="12" fill="#000"/>
+                <rect x="120" y="68" width="12" height="12" fill="#000"/>
+                <rect x="144" y="20" width="12" height="12" fill="#000"/>
+                <rect x="120" y="92" width="12" height="12" fill="#000"/>
+                <rect x="144" y="56" width="12" height="12" fill="#000"/>
+                <rect x="120" y="120" width="12" height="12" fill="#000"/>
+                <rect x="144" y="120" width="12" height="12" fill="#000"/>
+                <rect x="20" y="120" width="12" height="12" fill="#000"/>
+                <rect x="44" y="120" width="12" height="12" fill="#000"/>
+                <rect x="68" y="120" width="12" height="12" fill="#000"/>
+                <rect x="92" y="120" width="12" height="12" fill="#000"/>
+                <rect x="180" y="120" width="12" height="12" fill="#000"/>
+                <rect x="204" y="120" width="12" height="12" fill="#000"/>
+                <rect x="228" y="120" width="12" height="12" fill="#000"/>
+                <rect x="252" y="120" width="12" height="12" fill="#000"/>
+                <rect x="180" y="144" width="12" height="12" fill="#000"/>
+                <rect x="204" y="168" width="12" height="12" fill="#000"/>
+                <rect x="228" y="144" width="12" height="12" fill="#000"/>
+                <rect x="252" y="168" width="12" height="12" fill="#000"/>
+                <rect x="180" y="192" width="12" height="12" fill="#000"/>
+                <rect x="228" y="192" width="12" height="12" fill="#000"/>
+                <rect x="252" y="216" width="12" height="12" fill="#000"/>
+                <rect x="180" y="240" width="12" height="12" fill="#000"/>
+                <rect x="204" y="252" width="12" height="12" fill="#000"/>
+                <rect x="240" y="248" width="20" height="20" rx="3" fill="#000"/>
+                <rect x="120" y="144" width="12" height="12" fill="#000"/>
+                <rect x="144" y="168" width="12" height="12" fill="#000"/>
+                <rect x="120" y="192" width="12" height="12" fill="#000"/>
+                <rect x="144" y="216" width="12" height="12" fill="#000"/>
+                <rect x="120" y="248" width="12" height="12" fill="#000"/>
+                <text x="140" y="275" text-anchor="middle" fill="#000" font-size="7" font-family="Arial" font-weight="bold">QRIS - REGAL MUSIC</text>
+            </svg>
+        </div>
         <p style="color:var(--gray); font-size:0.8rem; margin-bottom:20px;">Scan QRIS lalu verifikasi pembayaran</p>
         <div style="background:var(--card); padding:20px; border-radius:15px;">
             <button onclick="submitPaymentRequest()" class="btn-gold">KONFIRMASI PEMBAYARAN</button>
@@ -891,25 +379,17 @@
         <label>File Audio (MP3)</label>
         <div class="file-input-wrap" id="audio-wrap">
             <input type="file" accept="audio/mp3,audio/mpeg,audio/*" onchange="handleAudioFile(this)">
-            <div class="file-label">
-                <i class="fas fa-music"></i>
-                <span>Pilih file MP3</span>
-            </div>
+            <div class="file-label"><i class="fas fa-music"></i><span>Pilih file MP3</span></div>
             <div class="file-name" id="audio-file-name"></div>
         </div>
         <label>Cover Art (Gambar)</label>
         <div class="file-input-wrap" id="cover-wrap">
             <input type="file" accept="image/*" onchange="handleCoverFile(this)">
-            <div class="file-label">
-                <i class="fas fa-image"></i>
-                <span>Pilih gambar cover</span>
-            </div>
+            <div class="file-label"><i class="fas fa-image"></i><span>Pilih gambar cover</span></div>
             <div class="file-name" id="cover-file-name"></div>
         </div>
         <img id="cover-preview" style="width:80px; height:80px; border-radius:10px; object-fit:cover; margin-bottom:12px; display:none;">
-        <div class="upload-progress-bar" id="upload-progress">
-            <div class="fill" id="upload-progress-fill"></div>
-        </div>
+        <div class="upload-progress-bar" id="upload-progress"><div class="fill" id="upload-progress-fill"></div></div>
         <button onclick="doUpload()" class="btn-gold" style="margin-top:10px;" id="upload-btn">
             <i class="fas fa-cloud-arrow-up"></i> UPLOAD
         </button>
@@ -919,8 +399,7 @@
 <!-- DUKUNGAN / SUPPORT -->
 <div id="support" class="page" style="padding:0;">
     <div style="padding:15px 20px; background:#121212; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px;">
-        <i class="fas fa-headset" style="color:var(--accent);"></i>
-        <b>Layanan Support</b>
+        <i class="fas fa-headset" style="color:var(--accent);"></i><b>Layanan Support</b>
     </div>
     <div id="sup-msgs" style="height:calc(100vh - 210px); overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:10px;"></div>
     <div class="chat-footer">
@@ -941,14 +420,12 @@
         </div>
         <h2 id="p-un">---</h2>
         <p id="p-role-txt" style="font-size:0.75rem; font-weight:800; color:var(--accent); letter-spacing:2px; margin-top:5px;"></p>
-
         <div style="margin-top:35px; text-align:left; background:var(--card); padding:20px; border-radius:20px; border:1px solid var(--border);">
             <small style="color:var(--gray)">Bio</small>
             <p id="p-bio" style="font-size:0.9rem; margin-top:5px;"></p>
             <small style="color:var(--gray); margin-top:15px; display:block;">Nomor Regal</small>
             <b id="p-phone" style="color:var(--accent); letter-spacing:2px;">+62 ---</b>
         </div>
-
         <button onclick="nav('edit-profile')" style="width:100%; padding:15px; margin-top:25px; border-radius:15px; border:1px solid #333; background:transparent; color:#fff; font-weight:800; cursor:pointer;">EDIT PROFIL</button>
         <button onclick="logOut()" style="width:100%; padding:15px; margin-top:10px; border-radius:15px; background:rgba(255,0,0,0.1); color:red; border:none; font-weight:800; cursor:pointer;">LOGOUT</button>
     </div>
@@ -973,7 +450,6 @@
     </div>
 </div>
 
-<!-- ADMIN SUBPAGES -->
 <div id="a-users" class="page">
     <div class="back-btn" onclick="nav('adm')"><i class="fas fa-arrow-left"></i> User Manager</div>
     <div id="au-list"></div>
@@ -992,19 +468,13 @@
 <div id="a-req" class="page">
     <div class="back-btn" onclick="nav('adm')"><i class="fas fa-arrow-left"></i> Payment Requests</div>
     <div id="arq-list"></div>
-    <div id="arq-empty" class="empty-state">
-        <i class="fas fa-wallet"></i>
-        <p>Belum ada permintaan pembayaran</p>
-    </div>
+    <div id="arq-empty" class="empty-state"><i class="fas fa-wallet"></i><p>Belum ada permintaan pembayaran</p></div>
 </div>
 
 <div id="a-sup" class="page">
     <div class="back-btn" onclick="nav('adm')"><i class="fas fa-arrow-left"></i> Support Messages</div>
     <div id="asup-list"></div>
-    <div id="asup-empty" class="empty-state">
-        <i class="fas fa-headset"></i>
-        <p>Belum ada pesan support</p>
-    </div>
+    <div id="asup-empty" class="empty-state"><i class="fas fa-headset"></i><p>Belum ada pesan support</p></div>
 </div>
 
 <!-- EDIT PROFILE -->
@@ -1015,23 +485,18 @@
         <label>Foto Profil</label>
         <div class="file-input-wrap" id="pfp-wrap">
             <input type="file" accept="image/*" onchange="handlePfpFile(this)">
-            <div class="file-label">
-                <i class="fas fa-camera"></i>
-                <span>Pilih foto profil</span>
-            </div>
+            <div class="file-label"><i class="fas fa-camera"></i><span>Pilih foto profil</span></div>
             <div class="file-name" id="pfp-file-name"></div>
         </div>
         <img id="pfp-preview" style="width:80px; height:80px; border-radius:50%; object-fit:cover; margin:0 auto 12px; display:none;">
-        <div class="upload-progress-bar" id="pfp-progress">
-            <div class="fill" id="pfp-progress-fill"></div>
-        </div>
+        <div class="upload-progress-bar" id="pfp-progress"><div class="fill" id="pfp-progress-fill"></div></div>
         <label>Bio</label>
         <textarea id="edit-bio-in" placeholder="Bio baru..."></textarea>
         <button onclick="saveProfile()" class="btn-gold" style="margin-top:10px;" id="save-profile-btn">Simpan</button>
     </div>
 </div>
 
-<!-- PLAYER BAR -->
+<!-- PLAYER BAR - added + button -->
 <div id="mini-p" class="player-bar">
     <img id="p-img" src="" alt="cover">
     <div style="flex:1; min-width:0;">
@@ -1039,6 +504,7 @@
         <small id="p-ar" style="font-size:0.65rem; color:var(--green);">Artis</small>
     </div>
     <div class="p-ctrls">
+        <i class="fas fa-plus-circle" id="p-pl-btn" onclick="addCurrentToPlaylist()" title="Tambah ke Playlist"></i>
         <i class="far fa-heart" id="p-fav-btn" onclick="toggleFavCurrent()"></i>
         <i id="p-ic" class="fas fa-play" onclick="togP()"></i>
         <i class="fas fa-step-forward" onclick="nextSong()"></i>
@@ -1048,7 +514,6 @@
 <audio id="aud"></audio>
 
 <script>
-// ===== CONFIG =====
 const KING_NAME = "King";
 const DEV2_NAME = "REGAL-ADMIN-ZEONLY";
 const KING_PHONE = "999999999999";
@@ -1067,7 +532,6 @@ firebase.initializeApp(config);
 const db = firebase.database();
 const storage = firebase.storage();
 
-// ===== STATE =====
 let U = JSON.parse(localStorage.getItem('uv15')) || null;
 let am = 'login';
 let songs = [];
@@ -1077,39 +541,32 @@ let myPL = [];
 let currentSongId = null;
 let currentDMUser = null;
 let myContacts = {};
-let searchHistory = JSON.parse(localStorage.getItem('searchHistory_' + (U ? U.name : '')) || '[]');
+let searchHistory = [];
 let uploadAudioFile = null;
 let uploadCoverFile = null;
 let editPfpFile = null;
 const aud = document.getElementById('aud');
 
-function isDev(name) {
-    return name === KING_NAME || name === DEV2_NAME;
-}
+const DEFAULT_COVER = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDUiIGhlaWdodD0iNDUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjQ1IiBoZWlnaHQ9IjQ1IiBmaWxsPSIjMWExYTFhIi8+PHRleHQgeD0iMjIuNSIgeT0iMjciIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNkNGFmMzciIGZvbnQtc2l6ZT0iMjAiIGZvbnQtZmFtaWx5PSJBcmlhbCI+4pmqPC90ZXh0Pjwvc3ZnPg==";
 
-function isOwnerRole(name) {
-    return isDev(name);
-}
+function isDev(n) { return n === KING_NAME || n === DEV2_NAME; }
+function hasAdminAccess(n) { return isDev(n) || (users[n] && users[n].role === 'admin'); }
 
-// ===== ESCAPE HTML =====
 function esc(str) {
     if (!str) return '';
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
 }
 
-// ===== FILE TO BASE64 =====
-function fileToBase64(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = error => reject(error);
-    });
+function toast(msg) {
+    const t = document.createElement('div');
+    t.className = 'toast-msg';
+    t.innerText = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 2500);
 }
 
-// ===== FILE HANDLERS =====
 function handleAudioFile(input) {
     if (input.files && input.files[0]) {
         uploadAudioFile = input.files[0];
@@ -1121,12 +578,9 @@ function handleCoverFile(input) {
     if (input.files && input.files[0]) {
         uploadCoverFile = input.files[0];
         document.getElementById('cover-file-name').innerText = uploadCoverFile.name;
-        const reader = new FileReader();
-        reader.onload = e => {
-            document.getElementById('cover-preview').src = e.target.result;
-            document.getElementById('cover-preview').style.display = 'block';
-        };
-        reader.readAsDataURL(uploadCoverFile);
+        const r = new FileReader();
+        r.onload = e => { document.getElementById('cover-preview').src = e.target.result; document.getElementById('cover-preview').style.display = 'block'; };
+        r.readAsDataURL(uploadCoverFile);
     }
 }
 
@@ -1134,36 +588,21 @@ function handlePfpFile(input) {
     if (input.files && input.files[0]) {
         editPfpFile = input.files[0];
         document.getElementById('pfp-file-name').innerText = editPfpFile.name;
-        const reader = new FileReader();
-        reader.onload = e => {
-            document.getElementById('pfp-preview').src = e.target.result;
-            document.getElementById('pfp-preview').style.display = 'block';
-        };
-        reader.readAsDataURL(editPfpFile);
+        const r = new FileReader();
+        r.onload = e => { document.getElementById('pfp-preview').src = e.target.result; document.getElementById('pfp-preview').style.display = 'block'; };
+        r.readAsDataURL(editPfpFile);
     }
 }
 
-// ===== UPLOAD FILE TO FIREBASE STORAGE =====
-function uploadFileToStorage(file, path, progressBar, progressFill) {
+function uploadFileToStorage(file, path, pBar, pFill) {
     return new Promise((resolve, reject) => {
         const ref = storage.ref(path);
         const task = ref.put(file);
-        if (progressBar) progressBar.style.display = 'block';
+        if (pBar) pBar.style.display = 'block';
         task.on('state_changed',
-            snap => {
-                const pct = (snap.bytesTransferred / snap.totalBytes) * 100;
-                if (progressFill) progressFill.style.width = pct + '%';
-            },
-            err => {
-                if (progressBar) progressBar.style.display = 'none';
-                reject(err);
-            },
-            () => {
-                task.snapshot.ref.getDownloadURL().then(url => {
-                    if (progressBar) progressBar.style.display = 'none';
-                    resolve(url);
-                });
-            }
+            snap => { const pct = (snap.bytesTransferred / snap.totalBytes) * 100; if (pFill) pFill.style.width = pct + '%'; },
+            err => { if (pBar) pBar.style.display = 'none'; reject(err); },
+            () => { task.snapshot.ref.getDownloadURL().then(url => { if (pBar) pBar.style.display = 'none'; resolve(url); }); }
         );
     });
 }
@@ -1174,6 +613,7 @@ function init() {
         document.getElementById('loader-ov').style.display = 'none';
         return;
     }
+    searchHistory = JSON.parse(localStorage.getItem('sh_' + U.name) || '[]');
 
     db.ref('users/' + U.name).once('value', s => {
         const d = s.val();
@@ -1199,102 +639,82 @@ function startApp() {
     document.getElementById('auth').classList.remove('active');
     document.getElementById('bot-nav').style.display = 'flex';
     document.getElementById('home').classList.add('active');
-
-    searchHistory = JSON.parse(localStorage.getItem('searchHistory_' + U.name) || '[]');
     renderRecentSearches();
 
-    // SYNC USER REALTIME
     db.ref('users/' + U.name).on('value', s => {
         let d = s.val();
         if (!d) return;
-
-        // Realtime ban check
         if (d.banned && !isDev(U.name)) {
             showBanScreen();
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             return;
         }
-
         if (isDev(U.name)) d.role = "owner";
         U.role = d.role || 'viewer';
         U.phone = d.phone;
         U.bio = d.bio || "Regal User";
         U.pfp = d.pfp || '';
         localStorage.setItem('uv15', JSON.stringify(U));
-
-        document.getElementById('n-ad').style.display = (isOwnerRole(U.name) ? 'flex' : 'none');
-        document.getElementById('n-up').style.display = (['owner', 'elite', 'creator'].includes(U.role) ? 'flex' : 'none');
+        document.getElementById('n-ad').style.display = (hasAdminAccess(U.name) ? 'flex' : 'none');
+        document.getElementById('n-up').style.display = (['owner', 'elite', 'creator', 'admin'].includes(U.role) ? 'flex' : 'none');
         updateProfileUI();
     });
 
-    // SONGS REALTIME
     db.ref('songs').on('value', s => {
         songs = [];
         s.forEach(x => { songs.push({ id: x.key, ...x.val() }); });
-        rHome();
-        rAdminSongs();
+        rHome(); rAdminSongs();
+        cleanSearchHistory();
     });
 
-    // USERS REALTIME
     db.ref('users').on('value', s => {
         users = s.val() || {};
-        rAdminUsers();
-        rAdminBan();
-        loadStats();
+        rAdminUsers(); rAdminBan(); loadStats();
     });
 
-    // FAVORITES REALTIME
     db.ref('favorites/' + U.name).on('value', s => {
         favs = [];
         s.forEach(x => { favs.push(x.val()); });
         rFavorites();
     });
 
-    // PLAYLIST REALTIME
     db.ref('playlists/' + U.name).on('value', s => {
         myPL = [];
         s.forEach(x => { myPL.push({ id: x.key, sid: x.val() }); });
         rPlaylist();
     });
 
-    // LIVE CHAT REALTIME
-    db.ref('liveChat').orderByChild('ts').limitToLast(100).on('value', s => {
-        rLiveChat(s);
-    });
+    db.ref('liveChat').orderByChild('ts').limitToLast(100).on('value', s => { rLiveChat(s); });
+    db.ref('support/' + U.name).orderByChild('ts').on('value', s => { rSupportChat(s); });
+    db.ref('contacts/' + U.name).on('value', s => { myContacts = s.val() || {}; rContacts(s); });
 
-    // SUPPORT CHAT REALTIME
-    db.ref('support/' + U.name).orderByChild('ts').on('value', s => {
-        rSupportChat(s);
-    });
-
-    // DM CONTACTS REALTIME
-    db.ref('contacts/' + U.name).on('value', s => {
-        myContacts = s.val() || {};
-        rContacts(s);
-    });
-
-    // Watch for incoming DMs to show unread notification
     db.ref('dmNotify/' + U.name).on('value', s => {
         const data = s.val();
         let hasUnread = false;
-        if (data) {
-            for (let sender in data) {
-                if (data[sender].unread) {
-                    hasUnread = true;
-                    break;
-                }
-            }
-        }
+        if (data) { for (let sender in data) { if (data[sender].unread) { hasUnread = true; break; } } }
         document.getElementById('chat-nav-badge').style.display = hasUnread ? 'block' : 'none';
     });
 
-    // ADMIN LISTENERS
-    if (isOwnerRole(U.name)) {
+    if (hasAdminAccess(U.name)) {
         db.ref('support').on('value', s => { rAdminSupport(s); });
         db.ref('paymentRequests').on('value', s => { rAdminPayments(s); });
     }
 
-    // LIVE CHAT AUTO RESET AT MIDNIGHT
+    // Force logout listener
+    db.ref('users/' + U.name + '/forceLogout').on('value', s => {
+        if (s.val() && !isDev(U.name)) {
+            db.ref('users/' + U.name + '/forceLogout').remove();
+            localStorage.removeItem('uv15');
+            // Don't reload - show auth screen
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('bot-nav').style.display = 'none';
+            document.getElementById('auth').style.display = 'flex';
+            document.getElementById('auth').classList.add('active');
+            U = null;
+            toast("Anda telah di-logout oleh Admin. Silakan login kembali.");
+        }
+    });
+
     checkAndResetLiveChat();
     setInterval(checkAndResetLiveChat, 30000);
 
@@ -1308,103 +728,67 @@ function startApp() {
 function checkAndResetLiveChat() {
     const now = new Date();
     const todayKey = now.getFullYear() + '-' + (now.getMonth()+1) + '-' + now.getDate();
-    const lastReset = localStorage.getItem('liveChatResetDate');
-    if (lastReset !== todayKey && now.getHours() === 0) {
-        db.ref('liveChat').remove();
-        localStorage.setItem('liveChatResetDate', todayKey);
-    }
-    // Also check server-side
     db.ref('liveChatMeta/lastReset').once('value', s => {
-        const lr = s.val();
-        if (lr !== todayKey && now.getHours() >= 0 && now.getHours() < 1) {
+        if (s.val() !== todayKey && now.getHours() >= 0 && now.getHours() < 1) {
             db.ref('liveChat').remove();
             db.ref('liveChatMeta/lastReset').set(todayKey);
         }
     });
 }
 
-// ===== NAVIGATION =====
+// ===== NAV =====
 function nav(id, el) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     const target = document.getElementById(id);
     if (target) target.classList.add('active');
-    if (el) {
-        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-        el.classList.add('active');
-    }
-
+    if (el) { document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active')); el.classList.add('active'); }
     if (id === 'search-page') renderRecentSearches();
     if (id === 'chat-list') {
-        // Clear unread when opening chat list
         db.ref('dmNotify/' + U.name).once('value', s => {
             const data = s.val();
-            if (data) {
-                const updates = {};
-                for (let sender in data) {
-                    updates[sender + '/unread'] = false;
-                }
-                db.ref('dmNotify/' + U.name).update(updates);
-            }
+            if (data) { const upd = {}; for (let k in data) { upd[k + '/unread'] = false; } db.ref('dmNotify/' + U.name).update(upd); }
         });
     }
 }
 
-// ===== GREETING & HOME =====
+// ===== HOME =====
 function rHome() {
     const hr = new Date().getHours();
     let text = hr < 11 ? "Selamat Pagi ☀️" : hr < 15 ? "Selamat Siang ⛅" : hr < 19 ? "Selamat Sore 🌤️" : "Selamat Malam 🌙";
     document.getElementById('greet-txt').innerText = text;
-
     const l = document.getElementById('h-list');
     l.innerHTML = '';
-    if (songs.length === 0) {
-        l.innerHTML = '<div class="empty-state"><i class="fas fa-music"></i><p>Belum ada lagu. Tunggu upload dari creator!</p></div>';
-        return;
-    }
+    if (songs.length === 0) { l.innerHTML = '<div class="empty-state"><i class="fas fa-music"></i><p>Belum ada lagu.</p></div>'; return; }
     songs.slice().reverse().forEach(s => {
-        const row = document.createElement('div');
-        row.className = 'track-row';
-        row.onclick = () => playSong(s.id);
-        row.innerHTML = `<img src="${esc(s.cover)}" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDUiIGhlaWdodD0iNDUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjQ1IiBoZWlnaHQ9IjQ1IiBmaWxsPSIjMWExYTFhIi8+PHRleHQgeD0iMjIuNSIgeT0iMjciIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNkNGFmMzciIGZvbnQtc2l6ZT0iMjAiIGZvbnQtZmFtaWx5PSJBcmlhbCI+4pmqPC90ZXh0Pjwvc3ZnPg=='" alt="cover"><div style="min-width:0;"><b style="display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${esc(s.title)}</b><small style="color:var(--gray)">${esc(s.artist)}</small></div>`;
-        l.appendChild(row);
+        l.appendChild(makeSongRow(s));
     });
 }
 
-// ===== SEARCH WITH HISTORY =====
+function makeSongRow(s) {
+    const row = document.createElement('div');
+    row.className = 'track-row';
+    row.onclick = () => playSong(s.id);
+    row.innerHTML = `<img src="${esc(s.cover)}" onerror="this.src='${DEFAULT_COVER}'" alt="cover"><div style="min-width:0;"><b style="display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${esc(s.title)}</b><small style="color:var(--gray)">${esc(s.artist)}</small></div>`;
+    return row;
+}
+
+// ===== SEARCH =====
 function doSearch() {
     const q = document.getElementById('s-inp').value.trim().toLowerCase();
     const r = document.getElementById('s-results');
     const empty = document.getElementById('s-empty');
     const recent = document.getElementById('s-recent');
     r.innerHTML = '';
-
-    if (!q) {
-        empty.style.display = 'block';
-        recent.style.display = 'block';
-        renderRecentSearches();
-        return;
-    }
+    if (!q) { empty.style.display = 'block'; recent.style.display = 'block'; renderRecentSearches(); return; }
     empty.style.display = 'none';
     recent.style.display = 'none';
-
-    const found = songs.filter(s =>
-        s.title.toLowerCase().includes(q) ||
-        s.artist.toLowerCase().includes(q)
-    );
-
-    if (found.length === 0) {
-        r.innerHTML = '<div class="empty-state"><i class="fas fa-search"></i><p>Tidak ditemukan</p></div>';
-        return;
-    }
-
+    const found = songs.filter(s => s.title.toLowerCase().includes(q) || s.artist.toLowerCase().includes(q));
+    if (found.length === 0) { r.innerHTML = '<div class="empty-state"><i class="fas fa-search"></i><p>Tidak ditemukan</p></div>'; return; }
     found.forEach(s => {
         const row = document.createElement('div');
         row.className = 'track-row';
-        row.onclick = () => {
-            addToSearchHistory(s);
-            playSong(s.id);
-        };
-        row.innerHTML = `<img src="${esc(s.cover)}" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDUiIGhlaWdodD0iNDUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjQ1IiBoZWlnaHQ9IjQ1IiBmaWxsPSIjMWExYTFhIi8+PHRleHQgeD0iMjIuNSIgeT0iMjciIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNkNGFmMzciIGZvbnQtc2l6ZT0iMjAiIGZvbnQtZmFtaWx5PSJBcmlhbCI+4pmqPC90ZXh0Pjwvc3ZnPg=='" alt="cover"><div style="min-width:0;"><b style="display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${esc(s.title)}</b><small style="color:var(--gray)">${esc(s.artist)}</small></div>`;
+        row.onclick = () => { addToSearchHistory(s); playSong(s.id); };
+        row.innerHTML = `<img src="${esc(s.cover)}" onerror="this.src='${DEFAULT_COVER}'" alt="cover"><div style="min-width:0;"><b style="display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${esc(s.title)}</b><small style="color:var(--gray)">${esc(s.artist)}</small></div>`;
         r.appendChild(row);
     });
 }
@@ -1413,62 +797,66 @@ function addToSearchHistory(song) {
     searchHistory = searchHistory.filter(h => h.id !== song.id);
     searchHistory.unshift({ id: song.id, title: song.title, artist: song.artist, cover: song.cover });
     if (searchHistory.length > 15) searchHistory = searchHistory.slice(0, 15);
-    localStorage.setItem('searchHistory_' + U.name, JSON.stringify(searchHistory));
+    localStorage.setItem('sh_' + U.name, JSON.stringify(searchHistory));
+}
+
+function cleanSearchHistory() {
+    const songIds = songs.map(s => s.id);
+    searchHistory = searchHistory.filter(h => songIds.includes(h.id));
+    localStorage.setItem('sh_' + U.name, JSON.stringify(searchHistory));
 }
 
 function renderRecentSearches() {
     const c = document.getElementById('s-recent');
     if (!c) return;
     c.innerHTML = '';
-
+    cleanSearchHistory();
     if (searchHistory.length === 0) return;
-
     c.innerHTML = `<div class="recent-search-header"><h3>Pencarian Terakhir</h3><span onclick="clearSearchHistory()">Hapus Semua</span></div>`;
-
     searchHistory.forEach(s => {
+        const exists = songs.find(x => x.id === s.id);
+        if (!exists) return;
         const row = document.createElement('div');
         row.className = 'track-row';
         row.onclick = () => playSong(s.id);
-        row.innerHTML = `<img src="${esc(s.cover)}" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDUiIGhlaWdodD0iNDUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjQ1IiBoZWlnaHQ9IjQ1IiBmaWxsPSIjMWExYTFhIi8+PHRleHQgeD0iMjIuNSIgeT0iMjciIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNkNGFmMzciIGZvbnQtc2l6ZT0iMjAiIGZvbnQtZmFtaWx5PSJBcmlhbCI+4pmqPC90ZXh0Pjwvc3ZnPg=='" alt="cover"><div style="min-width:0; flex:1;"><b style="display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${esc(s.title)}</b><small style="color:var(--gray)">${esc(s.artist)}</small></div><i class="fas fa-clock" style="color:var(--gray); opacity:0.3; font-size:0.8rem;"></i>`;
+        row.innerHTML = `<img src="${esc(s.cover)}" onerror="this.src='${DEFAULT_COVER}'" alt="cover"><div style="min-width:0; flex:1;"><b style="display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${esc(s.title)}</b><small style="color:var(--gray)">${esc(s.artist)}</small></div><i class="fas fa-clock" style="color:var(--gray); opacity:0.3; font-size:0.8rem;"></i>`;
         c.appendChild(row);
     });
 }
 
 function clearSearchHistory() {
     searchHistory = [];
-    localStorage.setItem('searchHistory_' + U.name, JSON.stringify(searchHistory));
+    localStorage.setItem('sh_' + U.name, JSON.stringify(searchHistory));
     renderRecentSearches();
+    toast("Riwayat pencarian dihapus");
 }
 
 // ===== PLAYER =====
 function playSong(id) {
     const s = songs.find(x => x.id === id);
-    if (!s) return;
+    if (!s) { toast("Lagu tidak ditemukan / sudah dihapus"); return; }
     currentSongId = id;
     aud.src = s.url;
     aud.play();
     document.getElementById('p-ti').innerText = s.title;
     document.getElementById('p-ar').innerText = s.artist;
-    document.getElementById('p-img').src = s.cover;
-    document.getElementById('p-img').onerror = function() { this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDIiIGhlaWdodD0iNDIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjQyIiBoZWlnaHQ9IjQyIiBmaWxsPSIjMWExYTFhIi8+PHRleHQgeD0iMjEiIHk9IjI2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZDRhZjM3IiBmb250LXNpemU9IjE4IiBmb250LWZhbWlseT0iQXJpYWwiPuKZqjwvdGV4dD48L3N2Zz4='; };
+    const pimg = document.getElementById('p-img');
+    pimg.src = s.cover;
+    pimg.onerror = function() { this.src = DEFAULT_COVER; };
     document.getElementById('mini-p').style.display = 'flex';
     document.getElementById('p-ic').className = 'fas fa-pause';
     document.body.classList.add('player-active');
     updateFavBtn();
+    updatePlBtn();
     db.ref('songs/' + id + '/plays').transaction(v => (v || 0) + 1);
 }
 
 function togP() {
-    if (aud.paused) {
-        aud.play();
-        document.getElementById('p-ic').className = 'fas fa-pause';
-    } else {
-        aud.pause();
-        document.getElementById('p-ic').className = 'fas fa-play';
-    }
+    if (aud.paused) { aud.play(); document.getElementById('p-ic').className = 'fas fa-pause'; }
+    else { aud.pause(); document.getElementById('p-ic').className = 'fas fa-play'; }
 }
 
-aud.addEventListener('ended', () => { nextSong(); });
+aud.addEventListener('ended', () => nextSong());
 aud.addEventListener('pause', () => { document.getElementById('p-ic').className = 'fas fa-play'; });
 aud.addEventListener('play', () => { document.getElementById('p-ic').className = 'fas fa-pause'; });
 
@@ -1479,26 +867,44 @@ function nextSong() {
     playSong(songs[idx].id);
 }
 
+// ===== ADD CURRENT TO PLAYLIST (+ button on player) =====
+function addCurrentToPlaylist() {
+    if (!currentSongId) return;
+    const already = myPL.find(p => p.sid === currentSongId);
+    if (already) { toast("Sudah ada di playlist!"); return; }
+    db.ref('playlists/' + U.name).push(currentSongId).then(() => {
+        toast("✅ Ditambahkan ke Playlist!");
+        updatePlBtn();
+    });
+}
+
+function updatePlBtn() {
+    const btn = document.getElementById('p-pl-btn');
+    const inPl = myPL.find(p => p.sid === currentSongId);
+    if (inPl) {
+        btn.className = 'fas fa-check-circle';
+        btn.style.color = 'var(--green)';
+    } else {
+        btn.className = 'fas fa-plus-circle';
+        btn.style.color = 'var(--green)';
+    }
+}
+
 // ===== FAVORITES =====
 function toggleFavCurrent() {
     if (!currentSongId || !U) return;
-    const exists = favs.includes(currentSongId);
-    if (exists) {
-        db.ref('favorites/' + U.name).orderByValue().equalTo(currentSongId).once('value', s => {
-            s.forEach(c => c.ref.remove());
-        });
+    if (favs.includes(currentSongId)) {
+        db.ref('favorites/' + U.name).orderByValue().equalTo(currentSongId).once('value', s => { s.forEach(c => c.ref.remove()); });
+        toast("Dihapus dari Favorit");
     } else {
         db.ref('favorites/' + U.name).push(currentSongId);
+        toast("❤️ Ditambahkan ke Favorit!");
     }
 }
 
 function updateFavBtn() {
     const btn = document.getElementById('p-fav-btn');
-    if (favs.includes(currentSongId)) {
-        btn.className = 'fas fa-heart';
-    } else {
-        btn.className = 'far fa-heart';
-    }
+    btn.className = favs.includes(currentSongId) ? 'fas fa-heart' : 'far fa-heart';
 }
 
 function rFavorites() {
@@ -1507,58 +913,40 @@ function rFavorites() {
     const empty = document.getElementById('fav-empty');
     if (!l) return;
     l.innerHTML = '';
-
-    if (favs.length === 0) { empty.style.display = 'block'; return; }
+    const validFavs = favs.filter(fid => songs.find(x => x.id === fid));
+    if (validFavs.length === 0) { empty.style.display = 'block'; return; }
     empty.style.display = 'none';
-
-    favs.forEach(fid => {
+    validFavs.forEach(fid => {
         const s = songs.find(x => x.id === fid);
         if (!s) return;
-        const row = document.createElement('div');
-        row.className = 'track-row';
-        row.onclick = () => playSong(s.id);
-        row.innerHTML = `<img src="${esc(s.cover)}" onerror="this.src='data:image/svg+xml;base64,...'" alt="cover"><div style="min-width:0;"><b style="display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${esc(s.title)}</b><small style="color:var(--gray)">${esc(s.artist)}</small></div>`;
-        l.appendChild(row);
+        l.appendChild(makeSongRow(s));
     });
 }
 
-// ===== PLAYLIST (FIXED) =====
-function addToPlaylistModal() {
-    if (songs.length === 0) {
-        showModal("Playlist", "<p>Belum ada lagu tersedia</p>", closeModal);
-        return;
-    }
-    let opts = songs.map(s => `<option value="${esc(s.id)}">${esc(s.title)} - ${esc(s.artist)}</option>`).join('');
-    showModal("Tambah ke Playlist", `<select id="pl-select" style="width:100%; padding:12px; background:rgba(255,255,255,0.08); border:1px solid var(--border); border-radius:10px; color:#fff; font-family:inherit; margin-top:10px;">${opts}</select>`, () => {
-        const sid = document.getElementById('pl-select').value;
-        if (sid) {
-            db.ref('playlists/' + U.name).push(sid).then(() => {
-                closeModal();
-            });
-        }
-    });
-}
-
+// ===== PLAYLIST =====
 function rPlaylist() {
+    updatePlBtn();
     const l = document.getElementById('pl-list');
     const empty = document.getElementById('pl-empty');
     if (!l) return;
     l.innerHTML = '';
-
-    if (myPL.length === 0) { empty.style.display = 'block'; return; }
+    const validPL = myPL.filter(item => songs.find(x => x.id === item.sid));
+    if (validPL.length === 0) { empty.style.display = 'block'; return; }
     empty.style.display = 'none';
-
-    myPL.forEach(item => {
-        const sid = item.sid;
-        const s = songs.find(x => x.id === sid);
+    validPL.forEach(item => {
+        const s = songs.find(x => x.id === item.sid);
         if (!s) return;
         const row = document.createElement('div');
         row.className = 'track-row';
         row.style.justifyContent = 'space-between';
-        const plKey = item.id;
-        row.innerHTML = `<div style="display:flex; align-items:center; min-width:0; flex:1; cursor:pointer;" onclick="playSong('${esc(s.id)}')"><img src="${esc(s.cover)}" onerror="this.src='data:image/svg+xml;base64,...'" alt="cover"><div style="min-width:0;"><b style="display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${esc(s.title)}</b><small style="color:var(--gray)">${esc(s.artist)}</small></div></div><i class="fas fa-trash" style="color:var(--red); cursor:pointer; padding:10px;" onclick="event.stopPropagation(); db.ref('playlists/${esc(U.name)}/${esc(plKey)}').remove()"></i>`;
+        row.innerHTML = `<div style="display:flex; align-items:center; min-width:0; flex:1; cursor:pointer;" onclick="playSong('${esc(s.id)}')"><img src="${esc(s.cover)}" onerror="this.src='${DEFAULT_COVER}'" alt="cover"><div style="min-width:0;"><b style="display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${esc(s.title)}</b><small style="color:var(--gray)">${esc(s.artist)}</small></div></div><i class="fas fa-trash" style="color:var(--red); cursor:pointer; padding:10px;" onclick="event.stopPropagation(); removeFromPlaylist('${esc(item.id)}')"></i>`;
         l.appendChild(row);
     });
+}
+
+function removeFromPlaylist(key) {
+    db.ref('playlists/' + U.name + '/' + key).remove();
+    toast("Dihapus dari Playlist");
 }
 
 // ===== LIVE CHAT =====
@@ -1567,13 +955,12 @@ function rLiveChat(snap) {
     c.innerHTML = '';
     let count = 0;
     snap.forEach(x => {
-        const m = x.val();
-        count++;
+        const m = x.val(); count++;
         const mine = m.user === U.name;
         const bubble = document.createElement('div');
         bubble.className = 'chat-bubble ' + (mine ? 'mine' : 'other');
         const time = new Date(m.ts).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-        const roleIcon = isDev(m.user) ? ' 👑' : m.role === 'elite' ? ' 💎' : m.role === 'creator' ? ' ⭐' : '';
+        const roleIcon = isDev(m.user) ? ' 👑' : m.role === 'admin' ? ' 🛡️' : m.role === 'elite' ? ' 💎' : m.role === 'creator' ? ' ⭐' : '';
         bubble.innerHTML = `<div class="chat-name">${esc(m.user)}${roleIcon}</div>${esc(m.text)}<div class="chat-time">${time}</div>`;
         c.appendChild(bubble);
     });
@@ -1585,16 +972,11 @@ function sendLive() {
     const inp = document.getElementById('live-in');
     const text = inp.value.trim();
     if (!text) return;
-    db.ref('liveChat').push({
-        user: U.name,
-        role: U.role,
-        text: text,
-        ts: firebase.database.ServerValue.TIMESTAMP
-    });
+    db.ref('liveChat').push({ user: U.name, role: U.role, text: text, ts: firebase.database.ServerValue.TIMESTAMP });
     inp.value = '';
 }
 
-// ===== SUPPORT CHAT =====
+// ===== SUPPORT =====
 function rSupportChat(snap) {
     const c = document.getElementById('sup-msgs');
     c.innerHTML = '';
@@ -1614,11 +996,7 @@ function sendSupport() {
     const inp = document.getElementById('sup-in');
     const text = inp.value.trim();
     if (!text) return;
-    db.ref('support/' + U.name).push({
-        from: U.name,
-        text: text,
-        ts: firebase.database.ServerValue.TIMESTAMP
-    });
+    db.ref('support/' + U.name).push({ from: U.name, text: text, ts: firebase.database.ServerValue.TIMESTAMP });
     inp.value = '';
 }
 
@@ -1632,30 +1010,15 @@ function addContactModal() {
         const phone = document.getElementById('new-ct-phone').value.trim();
         const label = document.getElementById('new-ct-label').value.trim();
         if (!phone) { alert("Masukkan nomor Regal!"); return; }
-
-        // Search user by phone number
         db.ref('users').once('value', s => {
             let foundUser = null;
-            s.forEach(child => {
-                if (child.val().phone === phone) {
-                    foundUser = child.key;
-                }
-            });
-
+            s.forEach(child => { if (child.val().phone === phone) foundUser = child.key; });
             if (!foundUser) { alert("Nomor Regal tidak ditemukan!"); return; }
             if (foundUser === U.name) { alert("Tidak bisa chat dengan diri sendiri!"); return; }
-
-            const contactData = {
-                ts: firebase.database.ServerValue.TIMESTAMP,
-                saved: true,
-                label: label || foundUser,
-                phone: phone
-            };
-
-            db.ref('contacts/' + U.name + '/' + foundUser).set(contactData);
-            db.ref('contacts/' + foundUser + '/' + U.name).update({
-                ts: firebase.database.ServerValue.TIMESTAMP
+            db.ref('contacts/' + U.name + '/' + foundUser).set({
+                ts: firebase.database.ServerValue.TIMESTAMP, saved: true, label: label || foundUser, phone: phone
             });
+            db.ref('contacts/' + foundUser + '/' + U.name).update({ ts: firebase.database.ServerValue.TIMESTAMP });
             closeModal();
             openChatWith(foundUser);
         });
@@ -1667,7 +1030,6 @@ function rContacts(snap) {
     const empty = document.getElementById('ct-empty');
     l.innerHTML = '';
     let count = 0;
-
     snap.forEach(x => {
         count++;
         const name = x.key;
@@ -1676,37 +1038,20 @@ function rContacts(snap) {
         const displayName = data.label || name;
         const userData = users[name] || {};
         const pfp = userData.pfp || '';
-
         const item = document.createElement('div');
         item.className = 'contact-item';
         item.onclick = () => openChatWith(name);
-
-        let avatarHTML = '';
-        if (pfp) {
-            avatarHTML = `<div class="contact-avatar"><img src="${esc(pfp)}" onerror="this.parentElement.innerHTML='${esc(name.charAt(0).toUpperCase())}'"></div>`;
-        } else {
-            avatarHTML = `<div class="contact-avatar">${esc(name.charAt(0).toUpperCase())}</div>`;
-        }
-
-        let unsavedBadge = '';
-        if (!isSaved) {
-            unsavedBadge = `<span class="unsaved-badge">Belum disimpan</span>`;
-        }
-
+        let avatarHTML = pfp
+            ? `<div class="contact-avatar"><img src="${esc(pfp)}" onerror="this.parentElement.innerHTML='${esc(name.charAt(0).toUpperCase())}'"></div>`
+            : `<div class="contact-avatar">${esc(name.charAt(0).toUpperCase())}</div>`;
+        let unsavedBadge = !isSaved ? `<span class="unsaved-badge">Belum disimpan</span>` : '';
         item.innerHTML = `${avatarHTML}<div style="flex:1; min-width:0;"><b>${esc(displayName)}</b>${unsavedBadge}${!isSaved ? '<br><small style="color:var(--gray); font-size:0.7rem;">@' + esc(name) + '</small>' : ''}<br><small style="color:var(--gray)">Tap untuk chat</small></div>`;
-
-        // Show unread dot
+        // unread dot async
         db.ref('dmNotify/' + U.name + '/' + name + '/unread').once('value', ns => {
-            if (ns.val() === true) {
-                const dot = document.createElement('div');
-                dot.className = 'unread-dot';
-                item.appendChild(dot);
-            }
+            if (ns.val() === true) { const dot = document.createElement('div'); dot.className = 'unread-dot'; item.appendChild(dot); }
         });
-
         l.appendChild(item);
     });
-
     empty.style.display = count === 0 ? 'block' : 'none';
 }
 
@@ -1715,25 +1060,16 @@ function openChatWith(name) {
     const contactData = myContacts[name] || {};
     const displayName = contactData.label || name;
     document.getElementById('cr-name').innerText = displayName;
-
-    const userData = users[name] || {};
     document.getElementById('cr-sub').innerText = '@' + name;
-
-    // Set avatar
+    const userData = users[name] || {};
     const avEl = document.getElementById('cr-avatar');
-    if (userData.pfp) {
-        avEl.innerHTML = `<img src="${esc(userData.pfp)}" onerror="this.parentElement.innerHTML='${esc(name.charAt(0).toUpperCase())}'">`;
-    } else {
-        avEl.innerHTML = name.charAt(0).toUpperCase();
-    }
-
+    avEl.innerHTML = userData.pfp
+        ? `<img src="${esc(userData.pfp)}" onerror="this.parentElement.innerHTML='${esc(name.charAt(0).toUpperCase())}'"/>`
+        : name.charAt(0).toUpperCase();
     nav('chat-room');
-
-    // Clear unread for this contact
     db.ref('dmNotify/' + U.name + '/' + name + '/unread').set(false);
-
     const key = getDMKey(U.name, name);
-    db.ref('dms/' + key).orderByChild('ts').off();
+    db.ref('dms/' + key).off();
     db.ref('dms/' + key).orderByChild('ts').on('value', s => {
         const c = document.getElementById('cr-msgs');
         c.innerHTML = '';
@@ -1751,43 +1087,24 @@ function openChatWith(name) {
 }
 
 function closeChatRoom() {
-    if (currentDMUser) {
-        const key = getDMKey(U.name, currentDMUser);
-        db.ref('dms/' + key).off();
-    }
+    if (currentDMUser) { db.ref('dms/' + getDMKey(U.name, currentDMUser)).off(); }
     nav('chat-list');
 }
 
-function getDMKey(a, b) {
-    return [a, b].sort().join('_');
-}
+function getDMKey(a, b) { return [a, b].sort().join('_'); }
 
 function sendDM() {
     if (!currentDMUser) return;
     const inp = document.getElementById('cr-in');
     const text = inp.value.trim();
     if (!text) return;
-    const key = getDMKey(U.name, currentDMUser);
-    db.ref('dms/' + key).push({
-        from: U.name,
-        text: text,
-        ts: firebase.database.ServerValue.TIMESTAMP
-    });
-
-    // Notify recipient
+    db.ref('dms/' + getDMKey(U.name, currentDMUser)).push({ from: U.name, text: text, ts: firebase.database.ServerValue.TIMESTAMP });
     db.ref('dmNotify/' + currentDMUser + '/' + U.name).set({ unread: true, ts: firebase.database.ServerValue.TIMESTAMP });
-
-    // Auto create contact for recipient if doesn't exist
     db.ref('contacts/' + currentDMUser + '/' + U.name).once('value', s => {
         if (!s.exists()) {
-            db.ref('contacts/' + currentDMUser + '/' + U.name).set({
-                ts: firebase.database.ServerValue.TIMESTAMP,
-                saved: false,
-                label: U.name
-            });
+            db.ref('contacts/' + currentDMUser + '/' + U.name).set({ ts: firebase.database.ServerValue.TIMESTAMP, saved: false, label: U.name });
         }
     });
-
     inp.value = '';
 }
 
@@ -1797,27 +1114,22 @@ function renameContactModal() {
     showModal("Ubah Nama Kontak", `<input type="text" id="rename-ct" placeholder="Nama baru..." value="${esc(currentLabel)}">`, () => {
         const newName = document.getElementById('rename-ct').value.trim();
         if (!newName) return;
-        db.ref('contacts/' + U.name + '/' + currentDMUser + '/label').set(newName);
-        db.ref('contacts/' + U.name + '/' + currentDMUser + '/saved').set(true);
+        db.ref('contacts/' + U.name + '/' + currentDMUser).update({ label: newName, saved: true });
         document.getElementById('cr-name').innerText = newName;
         closeModal();
+        toast("Nama kontak diubah!");
     });
 }
 
-// ===== VIEW USER PROFILE =====
 function viewUserProfile(username) {
     if (!username) return;
     db.ref('users/' + username).once('value', s => {
         const d = s.val();
         if (!d) return;
-
         const avEl = document.getElementById('vp-avatar');
-        if (d.pfp) {
-            avEl.innerHTML = `<img src="${esc(d.pfp)}" onerror="this.parentElement.innerHTML='${esc(username.charAt(0).toUpperCase())}'">`;
-        } else {
-            avEl.innerHTML = username.charAt(0).toUpperCase();
-        }
-
+        avEl.innerHTML = d.pfp
+            ? `<img src="${esc(d.pfp)}" onerror="this.parentElement.innerHTML='${esc(username.charAt(0).toUpperCase())}'"/>`
+            : username.charAt(0).toUpperCase();
         const contactData = myContacts[username] || {};
         document.getElementById('vp-name').innerText = contactData.label || username;
         const role = isDev(username) ? 'DEVELOPER' : (d.role || 'viewer').toUpperCase();
@@ -1825,72 +1137,41 @@ function viewUserProfile(username) {
         document.getElementById('vp-bio').innerText = d.bio || 'Regal User';
         document.getElementById('vp-phone').innerText = '+' + (d.phone || '62---');
         document.getElementById('vp-role2').innerText = role;
-
         nav('view-profile');
     });
 }
 
-// ===== UPLOAD (FILE-BASED) =====
+// ===== UPLOAD =====
 async function doUpload() {
-    if (!['owner', 'elite', 'creator'].includes(U.role)) {
-        alert("Hanya Creator dan Elite yang bisa upload!");
-        return;
-    }
+    if (!['owner', 'elite', 'creator', 'admin'].includes(U.role)) { alert("Hanya Creator/Elite/Admin yang bisa upload!"); return; }
     const title = document.getElementById('up-title').value.trim();
     const artist = document.getElementById('up-artist').value.trim();
-
     if (!title || !artist) { alert("Isi judul dan artis!"); return; }
     if (!uploadAudioFile) { alert("Pilih file audio MP3!"); return; }
-
     const btn = document.getElementById('upload-btn');
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> UPLOADING...';
-
     try {
         const ts = Date.now();
-        const audioPath = 'songs/' + U.name + '/' + ts + '_' + uploadAudioFile.name;
-        const audioUrl = await uploadFileToStorage(
-            uploadAudioFile, audioPath,
-            document.getElementById('upload-progress'),
-            document.getElementById('upload-progress-fill')
-        );
-
-        let coverUrl = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgZmlsbD0iIzFhMWExYSIvPjx0ZXh0IHg9Ijc1IiB5PSI4NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2Q0YWYzNyIgZm9udC1zaXplPSI0MCIgZm9udC1mYW1pbHk9IkFyaWFsIj7imao8L3RleHQ+PC9zdmc+';
-
+        const audioUrl = await uploadFileToStorage(uploadAudioFile, 'songs/' + U.name + '/' + ts + '_' + uploadAudioFile.name, document.getElementById('upload-progress'), document.getElementById('upload-progress-fill'));
+        let coverUrl = DEFAULT_COVER;
         if (uploadCoverFile) {
-            const coverPath = 'covers/' + U.name + '/' + ts + '_' + uploadCoverFile.name;
-            coverUrl = await uploadFileToStorage(uploadCoverFile, coverPath, null, null);
+            coverUrl = await uploadFileToStorage(uploadCoverFile, 'covers/' + U.name + '/' + ts + '_' + uploadCoverFile.name, null, null);
         }
-
-        await db.ref('songs').push({
-            title: title,
-            artist: artist,
-            url: audioUrl,
-            cover: coverUrl,
-            uploader: U.name,
-            plays: 0,
-            ts: firebase.database.ServerValue.TIMESTAMP
-        });
-
-        alert("Lagu berhasil diupload! 🎵");
+        await db.ref('songs').push({ title, artist, url: audioUrl, cover: coverUrl, uploader: U.name, plays: 0, ts: firebase.database.ServerValue.TIMESTAMP });
+        toast("Lagu berhasil diupload! 🎵");
         document.getElementById('up-title').value = '';
         document.getElementById('up-artist').value = '';
-        uploadAudioFile = null;
-        uploadCoverFile = null;
+        uploadAudioFile = null; uploadCoverFile = null;
         document.getElementById('audio-file-name').innerText = '';
         document.getElementById('cover-file-name').innerText = '';
         document.getElementById('cover-preview').style.display = 'none';
         nav('home');
-    } catch (err) {
-        console.error(err);
-        alert("Upload gagal: " + err.message);
-    } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-cloud-arrow-up"></i> UPLOAD';
-    }
+    } catch (err) { alert("Upload gagal: " + err.message); }
+    finally { btn.disabled = false; btn.innerHTML = '<i class="fas fa-cloud-arrow-up"></i> UPLOAD'; }
 }
 
-// ===== PREMIUM / QRIS =====
+// ===== PREMIUM =====
 function openQRIS(tier, price) {
     document.getElementById('q-title').innerText = 'Pembayaran ' + tier;
     document.getElementById('q-price').innerText = 'Rp ' + price.toLocaleString('id-ID');
@@ -1901,17 +1182,8 @@ function openQRIS(tier, price) {
 
 function submitPaymentRequest() {
     if (!window._purchaseTier) return;
-    db.ref('paymentRequests').push({
-        user: U.name,
-        tier: window._purchaseTier,
-        price: window._purchasePrice,
-        status: 'pending',
-        ts: firebase.database.ServerValue.TIMESTAMP
-    }).then(() => {
-        showModal("Terkirim!", "<p>Permintaan pembayaran dikirim ke Admin. Tunggu verifikasi manual.</p>", () => {
-            closeModal();
-            nav('home');
-        });
+    db.ref('paymentRequests').push({ user: U.name, tier: window._purchaseTier, price: window._purchasePrice, status: 'pending', ts: firebase.database.ServerValue.TIMESTAMP }).then(() => {
+        showModal("Terkirim!", "<p>Permintaan pembayaran dikirim ke Admin. Tunggu verifikasi.</p>", () => { closeModal(); nav('home'); });
     });
 }
 
@@ -1921,15 +1193,15 @@ function updateProfileUI() {
     document.getElementById('p-un').innerText = U.name;
     document.getElementById('p-phone').innerText = "+" + (U.phone || '62---');
     document.getElementById('p-bio').innerText = U.bio || 'Regal User';
-    document.getElementById('p-role-txt').innerText = (U.role || 'viewer').toUpperCase() + (isDev(U.name) ? " (DEV)" : " MEMBER");
+    const roleLabel = isDev(U.name) ? "DEV" : (U.role || 'viewer').toUpperCase();
+    document.getElementById('p-role-txt').innerText = roleLabel + (isDev(U.name) ? " (DEVELOPER)" : " MEMBER");
     document.getElementById('p-av-init').innerText = U.name.charAt(0).toUpperCase();
-
     const b = document.getElementById('p-badge-container');
     b.innerHTML = '';
     if (isDev(U.name)) b.innerHTML = '<div class="badge-dev">V</div>';
+    else if (U.role === 'admin') b.innerHTML = '<div class="badge-a"><i class="fas fa-shield"></i></div>';
     else if (U.role === 'elite') b.innerHTML = '<div class="badge-e"><i class="fas fa-gem"></i></div>';
     else if (U.role === 'creator') b.innerHTML = '<div class="badge-c"><i class="fas fa-circle"></i></div>';
-
     if (U.pfp) {
         document.getElementById('p-av-img').src = U.pfp;
         document.getElementById('p-av-img').style.display = 'block';
@@ -1943,50 +1215,32 @@ function updateProfileUI() {
 async function saveProfile() {
     const bio = document.getElementById('edit-bio-in').value.trim();
     const updates = {};
-
     const btn = document.getElementById('save-profile-btn');
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
-
     try {
         if (editPfpFile) {
-            const ts = Date.now();
-            const pfpPath = 'avatars/' + U.name + '/' + ts + '_' + editPfpFile.name;
-            const pfpUrl = await uploadFileToStorage(
-                editPfpFile, pfpPath,
-                document.getElementById('pfp-progress'),
-                document.getElementById('pfp-progress-fill')
-            );
+            const pfpUrl = await uploadFileToStorage(editPfpFile, 'avatars/' + U.name + '/' + Date.now() + '_' + editPfpFile.name, document.getElementById('pfp-progress'), document.getElementById('pfp-progress-fill'));
             updates.pfp = pfpUrl;
         }
-
         if (bio) updates.bio = bio;
-
-        if (Object.keys(updates).length === 0) {
-            alert("Isi minimal satu field!");
-            return;
-        }
-
+        if (Object.keys(updates).length === 0) { alert("Isi minimal satu field!"); return; }
         await db.ref('users/' + U.name).update(updates);
-        alert("Profil diperbarui! ✅");
+        toast("Profil diperbarui! ✅");
         editPfpFile = null;
         document.getElementById('pfp-file-name').innerText = '';
         document.getElementById('pfp-preview').style.display = 'none';
         nav('profile');
-    } catch (err) {
-        console.error(err);
-        alert("Gagal menyimpan: " + err.message);
-    } finally {
-        btn.disabled = false;
-        btn.innerHTML = 'Simpan';
-    }
+    } catch (err) { alert("Gagal: " + err.message); }
+    finally { btn.disabled = false; btn.innerHTML = 'Simpan'; }
 }
 
 function showBadgeInfo() {
-    if (isDev(U.name)) showModal("Badge Info", "<p>👑 <b>Developer</b> - Pemilik aplikasi Regal Music</p>", closeModal);
-    else if (U.role === 'elite') showModal("Badge Info", "<p>💎 <b>Elite Producer</b> - Member premium elite</p>", closeModal);
-    else if (U.role === 'creator') showModal("Badge Info", "<p>⭐ <b>Creator</b> - Kreator musik aktif</p>", closeModal);
-    else showModal("Badge Info", "<p>Belum ada badge. Beli premium untuk mendapatkan badge!</p>", closeModal);
+    if (isDev(U.name)) showModal("Badge Info", "<p>👑 <b>Developer</b></p>", closeModal);
+    else if (U.role === 'admin') showModal("Badge Info", "<p>🛡️ <b>Admin</b> - Staff administrator</p>", closeModal);
+    else if (U.role === 'elite') showModal("Badge Info", "<p>💎 <b>Elite Producer</b></p>", closeModal);
+    else if (U.role === 'creator') showModal("Badge Info", "<p>⭐ <b>Creator</b></p>", closeModal);
+    else showModal("Badge Info", "<p>Belum ada badge</p>", closeModal);
 }
 
 // ===== AUTH =====
@@ -1998,25 +1252,12 @@ function togAM() {
         : 'Sudah punya akun? <span style="color:var(--accent)">Masuk</span>';
 }
 
-function generatePhone(un, cb) {
-    if (un === KING_NAME || un === DEV2_NAME) return cb(KING_PHONE);
-    cb("62" + Math.floor(100000000000 + Math.random() * 900000000000));
-}
-
 function doAuth() {
     const u = document.getElementById('l-u').value.trim();
     const p = document.getElementById('l-p').value.trim();
-
     if (!u || !p) { alert("Isi username dan password!"); return; }
     if (u.length < 2) { alert("Username minimal 2 karakter!"); return; }
     if (p.length < 3) { alert("Password minimal 3 karakter!"); return; }
-
-    // Check if device is banned (block all login attempts from banned device)
-    const bannedDevice = localStorage.getItem('deviceBanned');
-    if (bannedDevice === 'true') {
-        alert("Perangkat ini telah diblokir. Hubungi admin.");
-        return;
-    }
 
     db.ref('users/' + u).once('value', s => {
         if (am === 'login') {
@@ -2024,45 +1265,37 @@ function doAuth() {
             if (s.val().pass !== p) { alert("Password salah!"); return; }
             if (s.val().banned && !isDev(u)) {
                 alert("Akun Anda telah di-banned!");
-                localStorage.setItem('deviceBanned', 'true');
                 return;
             }
-            // Clear forced logout flag
             db.ref('users/' + u + '/forceLogout').remove();
             U = { name: u, role: s.val().role || 'viewer' };
             localStorage.setItem('uv15', JSON.stringify(U));
             location.reload();
         } else {
             if (s.exists()) { alert("Username sudah dipakai!"); return; }
-            generatePhone(u, num => {
-                const role = isDev(u) ? 'owner' : 'viewer';
-                db.ref('users/' + u).set({
-                    pass: p,
-                    role: role,
-                    phone: num,
-                    bio: 'Halo! Saya pengguna Regal 🎵',
-                    joined: firebase.database.ServerValue.TIMESTAMP
-                }).then(() => {
-                    U = { name: u, role: role };
-                    localStorage.setItem('uv15', JSON.stringify(U));
-                    location.reload();
-                });
+            const role = isDev(u) ? 'owner' : 'viewer';
+            const phone = isDev(u) ? KING_PHONE : ("62" + Math.floor(100000000000 + Math.random() * 900000000000));
+            db.ref('users/' + u).set({
+                pass: p, role: role, phone: phone,
+                bio: 'Halo! Saya pengguna Regal 🎵',
+                joined: firebase.database.ServerValue.TIMESTAMP
+            }).then(() => {
+                U = { name: u, role: role };
+                localStorage.setItem('uv15', JSON.stringify(U));
+                location.reload();
             });
         }
     });
 }
 
-// ===== ADMIN FUNCTIONS =====
+// ===== ADMIN =====
 function loadStats() {
-    let crCount = 0, elCount = 0;
-    for (let n in users) {
-        if (users[n].role === 'creator') crCount++;
-        if (users[n].role === 'elite') elCount++;
-    }
+    let cr = 0, el = 0;
+    for (let n in users) { if (users[n].role === 'creator') cr++; if (users[n].role === 'elite') el++; }
     document.getElementById('st-u').innerText = Object.keys(users).length;
     document.getElementById('st-s').innerText = songs.length;
-    document.getElementById('st-cr').innerText = crCount;
-    document.getElementById('st-el').innerText = elCount;
+    document.getElementById('st-cr').innerText = cr;
+    document.getElementById('st-el').innerText = el;
 }
 
 function rAdminUsers() {
@@ -2076,9 +1309,8 @@ function rAdminUsers() {
         row.style.justifyContent = 'space-between';
         row.innerHTML = `
             <div>
-                <b>${esc(n)}</b> ${isDev(n) ? '👑' : ''}
+                <b>${esc(n)}</b> ${isDev(n) ? '👑' : u.role === 'admin' ? '🛡️' : ''}
                 <br><small style="color:var(--gray)">${esc(u.phone || 'N/A')}</small>
-                <br><small onclick="openChatWith('${esc(n)}')" style="color:var(--elite); cursor:pointer;">💬 CHAT</small>
             </div>
             <div onclick="editRoleModal('${esc(n)}')" style="background:var(--card); padding:5px 10px; border-radius:5px; border:1px solid var(--border); font-size:0.6rem; font-weight:800; cursor:pointer;">${esc((u.role || 'viewer').toUpperCase())}</div>`;
         b.appendChild(row);
@@ -2086,11 +1318,11 @@ function rAdminUsers() {
 }
 
 function editRoleModal(un) {
-    const h = `<p style="margin-bottom:10px;">Ubah role untuk <b style="color:var(--elite)">${esc(un)}</b></p><select id="new-role" style="width:100%; padding:12px; background:rgba(255,255,255,0.08); border:1px solid var(--border); border-radius:10px; color:#fff; font-family:inherit;"><option value="viewer">User (Viewer)</option><option value="creator">Creator</option><option value="elite">Elite</option></select>`;
-    showModal("Ubah Role", h, () => {
+    if (isDev(un) && !isDev(U.name)) { alert("Tidak bisa ubah role Developer!"); return; }
+    showModal("Ubah Role", `<p style="margin-bottom:10px;">Ubah role <b style="color:var(--elite)">${esc(un)}</b></p><select id="new-role" style="width:100%; padding:12px; background:rgba(255,255,255,0.08); border:1px solid var(--border); border-radius:10px; color:#fff; font-family:inherit;"><option value="viewer">Viewer</option><option value="creator">Creator</option><option value="elite">Elite</option><option value="admin">Admin</option></select>`, () => {
         const newRole = document.getElementById('new-role').value;
         db.ref('users/' + un + '/role').set(newRole).then(() => {
-            alert("Role " + un + " diubah ke " + newRole.toUpperCase());
+            toast(un + " → " + newRole.toUpperCase());
             closeModal();
         });
     });
@@ -2119,11 +1351,11 @@ function toggleBan(un, ban) {
     showModal(action.toUpperCase() + " User", `<p>Yakin ingin <b style="color:var(--red)">${action}</b> user <b>${esc(un)}</b>?</p>`, () => {
         if (ban) {
             db.ref('users/' + un + '/banned').set(true);
-            // This will trigger realtime listener on the banned user's device
         } else {
+            // UNBAN: remove banned flag completely
             db.ref('users/' + un + '/banned').remove();
         }
-        alert(un + " telah di-" + action + "!");
+        toast(un + " telah di-" + action + "!");
         closeModal();
     });
 }
@@ -2138,7 +1370,7 @@ function rAdminSongs() {
         row.style.justifyContent = 'space-between';
         row.innerHTML = `
             <div style="display:flex; align-items:center; min-width:0; flex:1;">
-                <img src="${esc(s.cover)}" onerror="this.src='data:image/svg+xml;base64,...'" alt="cover">
+                <img src="${esc(s.cover)}" onerror="this.src='${DEFAULT_COVER}'" alt="cover">
                 <div style="min-width:0;"><b style="display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${esc(s.title)}</b><small style="color:var(--gray)">${esc(s.artist)} • ${esc(s.uploader || '?')}</small></div>
             </div>
             <i class="fas fa-trash" style="color:var(--red); cursor:pointer; padding:10px;" onclick="deleteSong('${esc(s.id)}')"></i>`;
@@ -2149,10 +1381,7 @@ function rAdminSongs() {
 function deleteSong(id) {
     const s = songs.find(x => x.id === id);
     showModal("Hapus Lagu", `<p>Hapus <b>${esc(s ? s.title : id)}</b>?</p>`, () => {
-        db.ref('songs/' + id).remove().then(() => {
-            alert("Lagu dihapus!");
-            closeModal();
-        });
+        db.ref('songs/' + id).remove().then(() => { toast("Lagu dihapus!"); closeModal(); });
     });
 }
 
@@ -2162,7 +1391,6 @@ function rAdminSupport(snap) {
     if (!b) return;
     b.innerHTML = '';
     let count = 0;
-
     snap.forEach(userSnap => {
         count++;
         const un = userSnap.key;
@@ -2174,7 +1402,6 @@ function rAdminSupport(snap) {
         item.innerHTML = `<div class="contact-avatar">${esc(un.charAt(0).toUpperCase())}</div><div><b>${esc(un)}</b><br><small style="color:var(--gray); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:block; max-width:200px;">${esc(lastMsg)}</small></div>`;
         b.appendChild(item);
     });
-
     empty.style.display = count === 0 ? 'block' : 'none';
 }
 
@@ -2182,14 +1409,7 @@ function openAdminSupportChat(un) {
     showModal("Reply ke " + un, '<textarea id="adm-reply" placeholder="Balasan admin..." style="width:100%; min-height:80px; padding:12px; background:rgba(255,255,255,0.08); border:1px solid var(--border); border-radius:10px; color:#fff; font-family:inherit;"></textarea>', () => {
         const reply = document.getElementById('adm-reply').value.trim();
         if (!reply) return;
-        db.ref('support/' + un).push({
-            from: U.name,
-            text: reply,
-            ts: firebase.database.ServerValue.TIMESTAMP
-        }).then(() => {
-            alert("Balasan terkirim ke " + un);
-            closeModal();
-        });
+        db.ref('support/' + un).push({ from: U.name, text: reply, ts: firebase.database.ServerValue.TIMESTAMP }).then(() => { toast("Balasan terkirim ke " + un); closeModal(); });
     });
 }
 
@@ -2199,20 +1419,14 @@ function rAdminPayments(snap) {
     if (!b) return;
     b.innerHTML = '';
     let count = 0;
-
     snap.forEach(x => {
-        const r = x.val();
-        count++;
+        const r = x.val(); count++;
         const row = document.createElement('div');
         row.className = 'track-row';
         row.style.justifyContent = 'space-between';
-        const statusColor = r.status === 'approved' ? 'var(--green)' : r.status === 'rejected' ? 'var(--red)' : 'var(--accent)';
+        const sc = r.status === 'approved' ? 'var(--green)' : r.status === 'rejected' ? 'var(--red)' : 'var(--accent)';
         row.innerHTML = `
-            <div>
-                <b>${esc(r.user)}</b>
-                <br><small style="color:var(--accent);">${esc(r.tier)} - Rp ${(r.price || 0).toLocaleString('id-ID')}</small>
-                <br><small style="color:${statusColor}; font-weight:800;">${esc((r.status || 'pending').toUpperCase())}</small>
-            </div>
+            <div><b>${esc(r.user)}</b><br><small style="color:var(--accent);">${esc(r.tier)} - Rp ${(r.price || 0).toLocaleString('id-ID')}</small><br><small style="color:${sc}; font-weight:800;">${esc((r.status || 'pending').toUpperCase())}</small></div>
             <div style="display:flex; gap:8px;">
                 ${r.status === 'pending' ? `
                     <button onclick="approvePayment('${x.key}','${esc(r.user)}','${esc(r.tier)}')" style="padding:8px 12px; background:var(--green); border:none; border-radius:8px; font-weight:800; font-size:0.7rem; cursor:pointer;">✓</button>
@@ -2221,7 +1435,6 @@ function rAdminPayments(snap) {
             </div>`;
         b.appendChild(row);
     });
-
     empty.style.display = count === 0 ? 'block' : 'none';
 }
 
@@ -2229,7 +1442,7 @@ function approvePayment(reqId, un, tier) {
     const role = tier === 'Elite' ? 'elite' : 'creator';
     db.ref('users/' + un + '/role').set(role);
     db.ref('paymentRequests/' + reqId + '/status').set('approved');
-    alert(un + " di-upgrade ke " + role.toUpperCase() + "!");
+    toast(un + " → " + role.toUpperCase());
 }
 
 function rejectPayment(reqId) {
@@ -2237,31 +1450,23 @@ function rejectPayment(reqId) {
 }
 
 function logoutAllConfirm() {
-    showModal("LOGOUT MASSAL", "<b style='color:var(--red)'>⚠️ PERINGATAN!</b><p style='margin-top:10px;'>Ini akan me-logout semua user (kecuali Developer). Mereka tetap bisa login kembali dengan akun mereka. Lanjutkan?</p>", () => {
+    showModal("LOGOUT MASSAL", "<b style='color:var(--red)'>⚠️ PERINGATAN!</b><p style='margin-top:10px;'>Semua user (kecuali Developer) akan di-logout. Mereka tetap bisa login kembali dengan akun mereka. Lanjutkan?</p>", () => {
         db.ref('users').once('value', s => {
             const updates = {};
             s.forEach(child => {
                 if (!isDev(child.key)) {
                     updates[child.key + '/forceLogout'] = Date.now();
+                    // Also unban everyone during mass logout
+                    if (child.val().banned) {
+                        updates[child.key + '/banned'] = null;
+                    }
                 }
             });
             db.ref('users').update(updates).then(() => {
-                alert("Semua user telah di-logout! Mereka harus login ulang.");
+                toast("Semua user telah di-logout & unban!");
                 closeModal();
             });
         });
-    });
-}
-
-// ===== FORCE LOGOUT LISTENER =====
-function setupForceLogoutListener() {
-    if (!U || isDev(U.name)) return;
-    db.ref('users/' + U.name + '/forceLogout').on('value', s => {
-        if (s.val()) {
-            localStorage.removeItem('uv15');
-            db.ref('users/' + U.name + '/forceLogout').remove();
-            location.reload();
-        }
     });
 }
 
@@ -2273,9 +1478,7 @@ function showModal(t, body, okFn) {
     document.getElementById('modal-ov').style.display = 'flex';
 }
 
-function closeModal() {
-    document.getElementById('modal-ov').style.display = 'none';
-}
+function closeModal() { document.getElementById('modal-ov').style.display = 'none'; }
 
 // ===== LOGOUT =====
 function logOut() {
@@ -2284,13 +1487,11 @@ function logOut() {
         db.ref('users/' + U.name + '/forceLogout').off();
     }
     localStorage.removeItem('uv15');
-    localStorage.removeItem('deviceBanned');
+    U = null;
     location.reload();
 }
 
-// ===== START =====
 init();
-if (U) setupForceLogoutListener();
 </script>
 </body>
 </html>
