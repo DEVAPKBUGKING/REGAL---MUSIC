@@ -3,1493 +3,873 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Regal Music Sovereign v16.0</title>
+    <title>Regal Music Sovereign v17.0</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
     <style>
-        :root {
-            --accent: #d4af37;
-            --bg: #050a0f;
-            --card: rgba(15, 25, 35, 0.9);
-            --text: #ffffff;
-            --gray: #b3b3b3;
-            --elite: #00e5ff;
-            --red: #ff4444;
-            --green: #1db954;
-            --border: rgba(255, 255, 255, 0.1);
-        }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; margin: 0; padding: 0; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); overflow: hidden; height: 100vh; }
-        .bg-app { position: fixed; inset: 0; background: linear-gradient(160deg, #050a0f 0%, #0a1f2f 100%); z-index: -1; }
-        .bg-app::before { content: ''; position: absolute; inset: 0; background: url('https://images.unsplash.com/photo-1514525253344-f814d074e015?q=80&w=1974&auto=format&fit=crop') no-repeat center center/cover; opacity: 0.1; filter: blur(50px); }
-        ::-webkit-scrollbar { display: none; }
-        .page { display: none; position: absolute; inset: 0; padding: 20px 20px 160px; overflow-y: auto; }
-        .page.active { display: block; animation: spotifyFade 0.4s ease; }
-        @keyframes spotifyFade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        #loader-ov { position: fixed; inset: 0; background: var(--bg); z-index: 99999; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 20px; transition: opacity 0.5s; }
-        .loader-spinner { width: 50px; height: 50px; border: 4px solid rgba(255,255,255,0.1); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .greet-box { margin-top: 40px; margin-bottom: 20px; }
-        .greet-box h1 { font-size: 1.8rem; font-weight: 800; background: linear-gradient(to right, #fff, var(--gray)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        input[type="text"], input[type="password"], input[type="url"], input[type="number"], textarea, select {
-            width: 100%; padding: 15px 20px; background: rgba(255,255,255,0.08); border: 1px solid var(--border); border-radius: 12px; color: var(--text); font-family: inherit; font-size: 0.9rem; margin-bottom: 12px; transition: border 0.3s;
-        }
-        input::placeholder, textarea::placeholder { color: var(--gray); }
-        input:focus, textarea:focus, select:focus { border-color: var(--accent); }
-        textarea { min-height: 100px; resize: vertical; }
-        select { appearance: none; cursor: pointer; }
-        .search-pill { width: 100%; padding: 16px 20px 16px 55px; background: #fff; border: none; border-radius: 50px; color: #000; font-weight: 700; font-size: 0.9rem; margin-top: 10px; }
-        .search-pill:focus { border-color: transparent; }
-        .search-wrap { position: relative; margin-bottom: 25px; }
-        .search-wrap i { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: #555; z-index: 10; font-size: 1.2rem; }
-        .bottom-nav-scroll { position: fixed; bottom: 0; width: 100%; height: 75px; background: rgba(0,0,0,0.95); border-top: 1px solid var(--border); z-index: 10000; display: flex; align-items: center; overflow-x: auto; padding: 0 10px; backdrop-filter: blur(20px); }
-        .nav-item { min-width: 75px; display: flex; flex-direction: column; align-items: center; color: var(--gray); cursor: pointer; transition: color 0.2s; position: relative; }
-        .nav-item.active { color: #fff; }
-        .nav-item i { font-size: 1.2rem; margin-bottom: 5px; }
-        .nav-item span { font-size: 0.6rem; font-weight: 700; }
-        .nav-badge { position: absolute; top: 2px; right: 15px; width: 10px; height: 10px; background: var(--red); border-radius: 50%; display: none; }
-        .chat-footer { position: fixed; bottom: 75px; width: 100%; left: 0; padding: 12px 15px; background: rgba(0,0,0,0.98); display: flex; gap: 10px; border-top: 1px solid var(--border); z-index: 9500; }
-        .chat-footer input { flex: 1; margin-bottom: 0; border-radius: 20px; padding: 12px 18px; }
-        body.player-active .chat-footer { bottom: 160px; }
-        .chat-bubble { max-width: 80%; padding: 10px 15px; border-radius: 18px; font-size: 0.85rem; line-height: 1.4; word-wrap: break-word; }
-        .chat-bubble.mine { align-self: flex-end; background: var(--green); color: #000; border-bottom-right-radius: 4px; }
-        .chat-bubble.other { align-self: flex-start; background: rgba(255,255,255,0.1); color: var(--text); border-bottom-left-radius: 4px; }
-        .chat-bubble .chat-name { font-size: 0.65rem; font-weight: 800; color: var(--accent); margin-bottom: 3px; }
-        .chat-bubble.mine .chat-name { color: #064e26; }
-        .chat-bubble .chat-time { font-size: 0.55rem; opacity: 0.6; margin-top: 4px; text-align: right; }
-        .adm-header-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 30px; }
-        .stat-card { background: var(--card); padding: 15px 5px; border-radius: 12px; border: 1px solid var(--border); text-align: center; }
-        .stat-card b { color: var(--accent); font-size: 1rem; }
-        .stat-card p { font-size: 0.5rem; font-weight: 800; color: var(--gray); }
-        .btn-gold { background: var(--accent); color: #000; padding: 15px; border-radius: 30px; border: none; font-weight: 800; width: 100%; cursor: pointer; font-size: 0.9rem; transition: transform 0.2s, opacity 0.2s; }
-        .btn-gold:active { transform: scale(0.97); opacity: 0.9; }
-        #modal-ov { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 50000; display: none; align-items: center; justify-content: center; padding: 20px; }
-        .m-box { background: #121212; padding: 30px; border-radius: 25px; width: 100%; max-width: 350px; text-align: center; border: 1px solid var(--border); max-height: 80vh; overflow-y: auto; }
-        .player-bar { position: fixed; bottom: 80px; left: 8px; right: 8px; background: rgba(20,30,40,0.98); border-radius: 12px; padding: 10px 14px; display: none; align-items: center; gap: 12px; z-index: 9000; border: 1px solid var(--border); backdrop-filter: blur(20px); }
-        .player-bar img { width: 42px; height: 42px; border-radius: 6px; object-fit: cover; flex-shrink: 0; }
-        .p-ctrls { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
-        .p-ctrls i { font-size: 1.1rem; cursor: pointer; color: #fff; transition: color 0.2s; }
-        .p-ctrls i:active { color: var(--accent); }
-        .p-ctrls .fa-heart { color: var(--red); }
-        .p-ctrls .fa-plus-circle { color: var(--green); }
-        .track-row { display: flex; align-items: center; padding: 12px; background: var(--card); border-radius: 12px; margin-bottom: 10px; border: 1px solid var(--border); cursor: pointer; transition: background 0.2s; }
-        .track-row:active { background: rgba(255,255,255,0.05); }
-        .track-row img { width: 45px; height: 45px; border-radius: 5px; margin-right: 15px; object-fit: cover; flex-shrink: 0; }
-        .badge-fixed { position: absolute; top: -5px; right: -5px; z-index: 5; }
-        .badge-dev { background: var(--red); color: var(--accent); padding: 4px 10px; border-radius: 6px; font-weight: 900; border: 1px solid var(--accent); font-size: 10px; }
-        .badge-e { background: var(--elite); color: #000; padding: 5px 8px; border-radius: 50%; font-size: 10px; }
-        .badge-c { background: var(--green); color: #000; padding: 5px 8px; border-radius: 50%; font-size: 10px; }
-        .badge-a { background: #ff6600; color: #000; padding: 5px 8px; border-radius: 50%; font-size: 10px; }
-        .contact-item { display: flex; align-items: center; padding: 15px; background: var(--card); border-radius: 12px; margin-bottom: 10px; border: 1px solid var(--border); cursor: pointer; gap: 15px; position: relative; }
-        .contact-item:active { background: rgba(255,255,255,0.05); }
-        .contact-avatar { width: 45px; height: 45px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 800; color: #000; font-size: 1.1rem; flex-shrink: 0; overflow: hidden; }
-        .contact-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .unsaved-badge { background: var(--red); color: #fff; font-size: 0.55rem; padding: 2px 8px; border-radius: 10px; font-weight: 800; margin-left: 8px; }
-        .unread-dot { width: 12px; height: 12px; background: var(--red); border-radius: 50%; position: absolute; right: 15px; top: 50%; transform: translateY(-50%); }
-        .upload-section { background: var(--card); padding: 25px; border-radius: 20px; border: 1px solid var(--border); margin-top: 20px; }
-        .upload-section label { font-size: 0.75rem; font-weight: 700; color: var(--gray); margin-bottom: 5px; display: block; }
-        .file-input-wrap { width: 100%; padding: 15px 20px; background: rgba(255,255,255,0.08); border: 2px dashed var(--border); border-radius: 12px; color: var(--gray); font-size: 0.85rem; margin-bottom: 12px; text-align: center; cursor: pointer; transition: border 0.3s; position: relative; overflow: hidden; }
-        .file-input-wrap:hover { border-color: var(--accent); }
-        .file-input-wrap input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; padding: 0; margin: 0; }
-        .file-input-wrap .file-label { display: flex; flex-direction: column; align-items: center; gap: 5px; }
-        .file-input-wrap .file-label i { font-size: 1.5rem; color: var(--accent); }
-        .file-input-wrap .file-name { color: var(--green); font-weight: 700; font-size: 0.75rem; margin-top: 5px; }
-        .premium-card { background: var(--card); padding: 25px; border-radius: 20px; margin-top: 20px; }
-        .premium-card ul { list-style: none; margin: 15px 0; }
-        .premium-card ul li { padding: 6px 0; font-size: 0.85rem; color: var(--gray); }
-        .premium-card ul li i { color: var(--green); margin-right: 8px; }
-        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .back-btn { cursor: pointer; padding: 10px 0; margin-bottom: 15px; font-size: 0.9rem; color: var(--gray); display: flex; align-items: center; gap: 8px; }
-        .back-btn:hover { color: #fff; }
-        .empty-state { text-align: center; padding: 60px 20px; color: var(--gray); }
-        .empty-state i { font-size: 3rem; margin-bottom: 15px; opacity: 0.3; }
-        .empty-state p { font-size: 0.85rem; }
-        .recent-search-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .recent-search-header h3 { font-size: 0.9rem; font-weight: 700; }
-        .recent-search-header span { color: var(--accent); font-size: 0.75rem; font-weight: 700; cursor: pointer; }
-        .ban-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.97); z-index: 999999; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 20px; }
-        .ban-overlay i { font-size: 4rem; color: var(--red); }
-        .ban-overlay h2 { color: var(--red); }
-        .ban-overlay p { color: var(--gray); text-align: center; padding: 0 30px; }
-        .profile-view-page { text-align: center; padding-top: 40px; }
-        .profile-view-avatar { width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 20px; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: 800; color: #000; overflow: hidden; border: 4px solid #1a1a1a; }
-        .profile-view-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .profile-info-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-top: 20px; text-align: left; }
-        .profile-info-card .info-row { padding: 10px 0; border-bottom: 1px solid var(--border); }
-        .profile-info-card .info-row:last-child { border-bottom: none; }
-        .profile-info-card .info-row small { color: var(--gray); font-size: 0.7rem; }
-        .profile-info-card .info-row b { display: block; margin-top: 3px; font-size: 0.9rem; }
-        .upload-progress-bar { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; margin: 10px 0; overflow: hidden; display: none; }
-        .upload-progress-bar .fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width 0.3s; width: 0%; }
-        .toast-msg { position: fixed; top: 40px; left: 50%; transform: translateX(-50%); background: var(--green); color: #000; padding: 12px 25px; border-radius: 30px; font-weight: 800; font-size: 0.8rem; z-index: 999999; animation: toastIn 0.3s ease; pointer-events: none; }
-        @keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(-20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+        :root{--accent:#d4af37;--bg:#050a0f;--card:rgba(15,25,35,0.9);--text:#fff;--gray:#b3b3b3;--elite:#00e5ff;--red:#ff4444;--green:#1db954;--border:rgba(255,255,255,0.1)}
+        *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;outline:none;margin:0;padding:0}
+        body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);overflow:hidden;height:100vh}
+        .bg-app{position:fixed;inset:0;background:linear-gradient(160deg,#050a0f 0%,#0a1f2f 100%);z-index:-1}
+        ::-webkit-scrollbar{display:none}
+        .page{display:none;position:absolute;inset:0;padding:20px 20px 160px;overflow-y:auto}
+        .page.active{display:block;animation:sf .4s ease}
+        @keyframes sf{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+        #loader-ov{position:fixed;inset:0;background:var(--bg);z-index:99999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:20px;transition:opacity .5s}
+        .loader-spinner{width:50px;height:50px;border:4px solid rgba(255,255,255,.1);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        .greet-box{margin-top:40px;margin-bottom:20px}
+        .greet-box h1{font-size:1.8rem;font-weight:800;background:linear-gradient(to right,#fff,var(--gray));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        input[type="text"],input[type="password"],input[type="url"],input[type="number"],textarea,select{width:100%;padding:15px 20px;background:rgba(255,255,255,.08);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:inherit;font-size:.9rem;margin-bottom:12px;transition:border .3s}
+        input::placeholder,textarea::placeholder{color:var(--gray)}
+        input:focus,textarea:focus,select:focus{border-color:var(--accent)}
+        textarea{min-height:100px;resize:vertical}
+        select{appearance:none;cursor:pointer}
+        .search-pill{width:100%;padding:16px 20px 16px 55px;background:#fff;border:none;border-radius:50px;color:#000;font-weight:700;font-size:.9rem;margin-top:10px}
+        .search-pill:focus{border-color:transparent}
+        .search-wrap{position:relative;margin-bottom:25px}
+        .search-wrap i{position:absolute;left:20px;top:50%;transform:translateY(-50%);color:#555;z-index:10;font-size:1.2rem}
+        .bottom-nav-scroll{position:fixed;bottom:0;width:100%;height:70px;background:rgba(0,0,0,.95);border-top:1px solid var(--border);z-index:10000;display:flex;align-items:center;overflow-x:auto;padding:0 5px;backdrop-filter:blur(20px)}
+        .nav-item{min-width:65px;display:flex;flex-direction:column;align-items:center;color:var(--gray);cursor:pointer;transition:color .2s;position:relative}
+        .nav-item.active{color:#fff}
+        .nav-item i{font-size:1.1rem;margin-bottom:4px}
+        .nav-item span{font-size:.55rem;font-weight:700}
+        .nav-badge{position:absolute;top:0;right:12px;width:8px;height:8px;background:var(--red);border-radius:50%;display:none}
+        .chat-footer{position:fixed;bottom:70px;width:100%;left:0;padding:10px 15px;background:rgba(0,0,0,.98);display:flex;gap:10px;border-top:1px solid var(--border);z-index:9500}
+        .chat-footer input{flex:1;margin-bottom:0;border-radius:20px;padding:12px 18px}
+        body.player-active .chat-footer{bottom:155px}
+        .chat-bubble{max-width:80%;padding:10px 15px;border-radius:18px;font-size:.85rem;line-height:1.4;word-wrap:break-word}
+        .chat-bubble.mine{align-self:flex-end;background:var(--green);color:#000;border-bottom-right-radius:4px}
+        .chat-bubble.other{align-self:flex-start;background:rgba(255,255,255,.1);color:var(--text);border-bottom-left-radius:4px}
+        .chat-bubble .chat-name{font-size:.65rem;font-weight:800;color:var(--accent);margin-bottom:3px;cursor:pointer}
+        .chat-bubble.mine .chat-name{color:#064e26}
+        .chat-bubble .chat-time{font-size:.55rem;opacity:.6;margin-top:4px;text-align:right}
+        .adm-header-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:25px}
+        .stat-card{background:var(--card);padding:15px 5px;border-radius:12px;border:1px solid var(--border);text-align:center}
+        .stat-card b{color:var(--accent);font-size:1rem}
+        .stat-card p{font-size:.5rem;font-weight:800;color:var(--gray)}
+        .btn-gold{background:var(--accent);color:#000;padding:15px;border-radius:30px;border:none;font-weight:800;width:100%;cursor:pointer;font-size:.9rem;transition:transform .2s,opacity .2s}
+        .btn-gold:active{transform:scale(.97);opacity:.9}
+        .btn-gold:disabled{opacity:.5;cursor:not-allowed}
+        #modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:50000;display:none;align-items:center;justify-content:center;padding:20px}
+        .m-box{background:#121212;padding:30px;border-radius:25px;width:100%;max-width:350px;text-align:center;border:1px solid var(--border);max-height:80vh;overflow-y:auto}
+        .player-bar{position:fixed;bottom:75px;left:8px;right:8px;background:rgba(20,30,40,.98);border-radius:12px;padding:10px 14px;display:none;align-items:center;gap:10px;z-index:9000;border:1px solid var(--border);backdrop-filter:blur(20px);transition:transform .3s ease}
+        .player-bar.collapsed{transform:translateY(calc(100% + 10px))}
+        .player-bar img{width:42px;height:42px;border-radius:6px;object-fit:cover;flex-shrink:0}
+        .p-ctrls{display:flex;align-items:center;gap:12px;flex-shrink:0}
+        .p-ctrls i{font-size:1rem;cursor:pointer;color:#fff;transition:color .2s}
+        .p-ctrls i:active{color:var(--accent)}
+        .p-ctrls .fa-heart{color:var(--red)}
+        .p-toggle-bar{position:fixed;bottom:75px;left:50%;transform:translateX(-50%);z-index:9001;width:50px;height:24px;background:rgba(20,30,40,.98);border-radius:12px 12px 0 0;display:none;align-items:center;justify-content:center;cursor:pointer;border:1px solid var(--border);border-bottom:none;transition:bottom .3s}
+        .p-toggle-bar i{font-size:.8rem;color:var(--gray)}
+        .track-row{display:flex;align-items:center;padding:12px;background:var(--card);border-radius:12px;margin-bottom:10px;border:1px solid var(--border);cursor:pointer;transition:background .2s}
+        .track-row:active{background:rgba(255,255,255,.05)}
+        .track-row img{width:45px;height:45px;border-radius:5px;margin-right:15px;object-fit:cover;flex-shrink:0}
+        .badge-fixed{position:absolute;top:-5px;right:-5px;z-index:5}
+        .badge-dev{background:var(--red);color:var(--accent);padding:4px 10px;border-radius:6px;font-weight:900;border:1px solid var(--accent);font-size:10px}
+        .badge-e{background:var(--elite);color:#000;padding:5px 8px;border-radius:50%;font-size:10px}
+        .badge-c{background:var(--green);color:#000;padding:5px 8px;border-radius:50%;font-size:10px}
+        .badge-a{background:#ff6600;color:#000;padding:5px 8px;border-radius:50%;font-size:10px}
+        .contact-item{display:flex;align-items:center;padding:15px;background:var(--card);border-radius:12px;margin-bottom:10px;border:1px solid var(--border);cursor:pointer;gap:15px;position:relative}
+        .contact-item:active{background:rgba(255,255,255,.05)}
+        .contact-avatar{width:45px;height:45px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:800;color:#000;font-size:1.1rem;flex-shrink:0;overflow:hidden}
+        .contact-avatar img{width:100%;height:100%;object-fit:cover}
+        .unsaved-badge{background:var(--red);color:#fff;font-size:.55rem;padding:2px 8px;border-radius:10px;font-weight:800;margin-left:8px}
+        .unread-dot{width:12px;height:12px;background:var(--red);border-radius:50%;position:absolute;right:15px;top:50%;transform:translateY(-50%)}
+        .upload-section{background:var(--card);padding:25px;border-radius:20px;border:1px solid var(--border);margin-top:20px}
+        .upload-section label{font-size:.75rem;font-weight:700;color:var(--gray);margin-bottom:5px;display:block}
+        .file-input-wrap{width:100%;padding:15px 20px;background:rgba(255,255,255,.08);border:2px dashed var(--border);border-radius:12px;color:var(--gray);font-size:.85rem;margin-bottom:12px;text-align:center;cursor:pointer;transition:border .3s;position:relative;overflow:hidden}
+        .file-input-wrap:hover{border-color:var(--accent)}
+        .file-input-wrap input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;padding:0;margin:0}
+        .file-input-wrap .file-label{display:flex;flex-direction:column;align-items:center;gap:5px}
+        .file-input-wrap .file-label i{font-size:1.5rem;color:var(--accent)}
+        .file-input-wrap .file-name{color:var(--green);font-weight:700;font-size:.75rem;margin-top:5px}
+        .premium-card{background:var(--card);padding:25px;border-radius:20px;margin-top:20px;position:relative;overflow:hidden}
+        .premium-card ul{list-style:none;margin:15px 0}
+        .premium-card ul li{padding:6px 0;font-size:.85rem;color:var(--gray)}
+        .premium-card ul li i{color:var(--green);margin-right:8px}
+        .active-badge-premium{position:absolute;top:15px;right:15px;background:var(--green);color:#000;padding:5px 12px;border-radius:20px;font-size:.65rem;font-weight:800}
+        .section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
+        .back-btn{cursor:pointer;padding:10px 0;margin-bottom:15px;font-size:.9rem;color:var(--gray);display:flex;align-items:center;gap:8px}
+        .back-btn:hover{color:#fff}
+        .empty-state{text-align:center;padding:60px 20px;color:var(--gray)}
+        .empty-state i{font-size:3rem;margin-bottom:15px;opacity:.3}
+        .empty-state p{font-size:.85rem}
+        .recent-search-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+        .recent-search-header h3{font-size:.9rem;font-weight:700}
+        .recent-search-header span{color:var(--accent);font-size:.75rem;font-weight:700;cursor:pointer}
+        .ban-overlay{position:fixed;inset:0;background:rgba(0,0,0,.97);z-index:999999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:20px}
+        .ban-overlay i{font-size:4rem;color:var(--red)}
+        .ban-overlay h2{color:var(--red)}
+        .ban-overlay p{color:var(--gray);text-align:center;padding:0 30px}
+        .profile-view-page{text-align:center;padding-top:40px}
+        .profile-view-avatar{width:120px;height:120px;border-radius:50%;margin:0 auto 20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:3rem;font-weight:800;color:#000;overflow:hidden;border:4px solid #1a1a1a}
+        .profile-view-avatar img{width:100%;height:100%;object-fit:cover}
+        .profile-info-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:20px;margin-top:20px;text-align:left}
+        .profile-info-card .info-row{padding:10px 0;border-bottom:1px solid var(--border)}
+        .profile-info-card .info-row:last-child{border-bottom:none}
+        .profile-info-card .info-row small{color:var(--gray);font-size:.7rem}
+        .profile-info-card .info-row b{display:block;margin-top:3px;font-size:.9rem}
+        .upload-progress-bar{width:100%;height:6px;background:rgba(255,255,255,.1);border-radius:3px;margin:10px 0;overflow:hidden;display:none}
+        .upload-progress-bar .fill{height:100%;background:var(--accent);border-radius:3px;transition:width .3s;width:0%}
+        .toast-msg{position:fixed;top:40px;left:50%;transform:translateX(-50%);background:var(--green);color:#000;padding:12px 25px;border-radius:30px;font-weight:800;font-size:.8rem;z-index:999999;animation:toastIn .3s ease;pointer-events:none;white-space:nowrap}
+        .toast-msg.warn{background:var(--red);color:#fff}
+        @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(-20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+        .warn-bar{background:rgba(255,68,68,.15);border:1px solid var(--red);border-radius:10px;padding:10px 15px;margin-bottom:15px;font-size:.75rem;color:var(--red);text-align:center}
     </style>
 </head>
 <body>
-
 <div class="bg-app"></div>
+<div id="loader-ov"><h1 style="color:var(--accent);letter-spacing:10px;font-size:2rem">REGAL</h1><div class="loader-spinner"></div></div>
 
-<div id="loader-ov">
-    <h1 style="color:var(--accent); letter-spacing:10px; font-size:2rem;">REGAL</h1>
-    <div class="loader-spinner"></div>
-</div>
-
-<div id="modal-ov">
-    <div class="m-box">
-        <h3 id="m-title" style="color:var(--accent)">System</h3>
-        <div id="m-body" style="margin: 15px 0;"></div>
-        <div style="display:flex; gap:10px;">
-            <button onclick="closeModal()" style="flex:1; padding:12px; background:#333; color:#fff; border:none; border-radius:10px; cursor:pointer;">Batal</button>
-            <button id="m-ok" style="flex:1; padding:12px; background:var(--accent); color:#000; font-weight:800; border:none; border-radius:10px; cursor:pointer;">Oke</button>
-        </div>
+<div id="modal-ov"><div class="m-box">
+    <h3 id="m-title" style="color:var(--accent)">System</h3>
+    <div id="m-body" style="margin:15px 0"></div>
+    <div style="display:flex;gap:10px">
+        <button onclick="closeModal()" style="flex:1;padding:12px;background:#333;color:#fff;border:none;border-radius:10px;cursor:pointer">Batal</button>
+        <button id="m-ok" style="flex:1;padding:12px;background:var(--accent);color:#000;font-weight:800;border:none;border-radius:10px;cursor:pointer">Oke</button>
     </div>
+</div></div>
+
+<div id="ban-overlay" class="ban-overlay" style="display:none">
+    <i class="fas fa-ban"></i><h2>AKUN DI-BANNED</h2>
+    <p id="ban-msg">Akun Anda telah diblokir oleh Administrator.</p>
+    <button onclick="logOut()" style="padding:15px 40px;background:var(--red);color:#fff;border:none;border-radius:15px;font-weight:800;cursor:pointer;margin-top:10px">KELUAR</button>
 </div>
 
-<div id="ban-overlay" class="ban-overlay" style="display:none;">
-    <i class="fas fa-ban"></i>
-    <h2>AKUN DI-BANNED</h2>
-    <p>Akun Anda telah diblokir oleh Administrator. Anda tidak dapat menggunakan aplikasi ini.</p>
-    <button onclick="logOut()" style="padding:15px 40px; background:var(--red); color:#fff; border:none; border-radius:15px; font-weight:800; cursor:pointer; margin-top:10px;">KELUAR</button>
+<div class="bottom-nav-scroll" id="bot-nav" style="display:none">
+    <div class="nav-item active" onclick="nav('home',this)"><i class="fas fa-house"></i><span>Beranda</span></div>
+    <div class="nav-item" onclick="nav('search-page',this)"><i class="fas fa-search"></i><span>Cari</span></div>
+    <div class="nav-item" onclick="nav('chat-list',this)" id="n-chat"><div class="nav-badge" id="chat-nav-badge"></div><i class="fas fa-comment-dots"></i><span>Pesan</span></div>
+    <div class="nav-item" onclick="nav('live-chat',this)"><i class="fas fa-tower-broadcast"></i><span>Live</span></div>
+    <div class="nav-item" onclick="nav('buy-role',this)"><i class="fas fa-gem"></i><span>Premium</span></div>
+    <div class="nav-item" onclick="nav('support',this)"><i class="fas fa-headset"></i><span>Dukungan</span></div>
+    <div class="nav-item" onclick="nav('upload',this)" id="n-up" style="display:none"><i class="fas fa-cloud-arrow-up"></i><span>Upload</span></div>
+    <div class="nav-item" onclick="nav('adm',this)" id="n-ad" style="display:none"><i class="fas fa-user-shield"></i><span>Admin</span></div>
+    <div class="nav-item" onclick="nav('profile',this)"><i class="fas fa-circle-user"></i><span>Profil</span></div>
 </div>
 
-<div class="bottom-nav-scroll" id="bot-nav" style="display:none;">
-    <div class="nav-item active" onclick="nav('home', this)"><i class="fas fa-house"></i><span>Beranda</span></div>
-    <div class="nav-item" onclick="nav('search-page', this)"><i class="fas fa-search"></i><span>Cari</span></div>
-    <div class="nav-item" onclick="nav('chat-list', this)" id="n-chat"><div class="nav-badge" id="chat-nav-badge"></div><i class="fas fa-comment-dots"></i><span>Pesan</span></div>
-    <div class="nav-item" onclick="nav('live-chat', this)"><i class="fas fa-tower-broadcast"></i><span>Live</span></div>
-    <div class="nav-item" onclick="nav('buy-role', this)"><i class="fas fa-gem"></i><span>Premium</span></div>
-    <div class="nav-item" onclick="nav('support', this)"><i class="fas fa-headset"></i><span>Dukungan</span></div>
-    <div class="nav-item" onclick="nav('upload', this)" id="n-up" style="display:none;"><i class="fas fa-cloud-arrow-up"></i><span>Upload</span></div>
-    <div class="nav-item" onclick="nav('adm', this)" id="n-ad" style="display:none;"><i class="fas fa-user-shield"></i><span>Admin</span></div>
-    <div class="nav-item" onclick="nav('profile', this)"><i class="fas fa-circle-user"></i><span>Profil</span></div>
-</div>
-
-<!-- AUTH -->
-<div id="auth" class="page active" style="display:flex; align-items:center; justify-content:center; z-index:20000;">
-    <div style="text-align:center; width:100%; max-width:320px;">
-        <h1 style="color:var(--accent); letter-spacing:10px; font-size:3.5rem; margin-bottom:10px;">REGAL</h1>
-        <p style="color:var(--gray); margin-bottom:40px; font-size:0.8rem;">Music Sovereign Platform</p>
+<div id="auth" class="page active" style="display:flex;align-items:center;justify-content:center;z-index:20000">
+    <div style="text-align:center;width:100%;max-width:320px">
+        <h1 style="color:var(--accent);letter-spacing:10px;font-size:3.5rem;margin-bottom:10px">REGAL</h1>
+        <p style="color:var(--gray);margin-bottom:40px;font-size:.8rem">Music Sovereign Platform</p>
         <input type="text" id="l-u" placeholder="Username" autocomplete="off">
         <input type="password" id="l-p" placeholder="Password">
         <button onclick="doAuth()" class="btn-gold" id="auth-btn">MASUK</button>
-        <p onclick="togAM()" id="atog" style="margin-top:25px; color:var(--gray); cursor:pointer;">Belum punya akun? <span style="color:var(--accent)">Daftar</span></p>
+        <p onclick="togAM()" id="atog" style="margin-top:25px;color:var(--gray);cursor:pointer">Belum punya akun? <span style="color:var(--accent)">Daftar</span></p>
     </div>
 </div>
 
-<!-- BERANDA -->
 <div id="home" class="page">
     <div class="greet-box"><h1 id="greet-txt">Selamat ...</h1></div>
-    <div style="display:flex; gap:10px; margin-bottom:30px;">
-        <div onclick="nav('fav-detail')" style="flex:1; background:var(--card); padding:15px; border-radius:10px; text-align:center; border:1px solid var(--border); cursor:pointer;">
-            <i class="fas fa-heart" style="color:var(--red); font-size:1.2rem;"></i><br><small>Favorit</small>
-        </div>
-        <div onclick="nav('pl-detail')" style="flex:1; background:var(--card); padding:15px; border-radius:10px; text-align:center; border:1px solid var(--border); cursor:pointer;">
-            <i class="fas fa-list" style="color:var(--green); font-size:1.2rem;"></i><br><small>Playlist</small>
-        </div>
+    <div id="warn-display"></div>
+    <div style="display:flex;gap:10px;margin-bottom:30px">
+        <div onclick="nav('fav-detail')" style="flex:1;background:var(--card);padding:15px;border-radius:10px;text-align:center;border:1px solid var(--border);cursor:pointer"><i class="fas fa-heart" style="color:var(--red);font-size:1.2rem"></i><br><small>Favorit</small></div>
+        <div onclick="nav('pl-detail')" style="flex:1;background:var(--card);padding:15px;border-radius:10px;text-align:center;border:1px solid var(--border);cursor:pointer"><i class="fas fa-list" style="color:var(--green);font-size:1.2rem"></i><br><small>Playlist</small></div>
     </div>
-    <h2 style="font-weight:800; font-size:1.1rem; margin-bottom:15px;">Rekomendasi King 👑</h2>
+    <h2 style="font-weight:800;font-size:1.1rem;margin-bottom:15px">Rekomendasi 👑</h2>
     <div id="h-list"></div>
 </div>
 
-<!-- CARI -->
 <div id="search-page" class="page">
-    <h1 style="margin-top:40px; font-weight:800;">Cari</h1>
-    <div class="search-wrap">
-        <i class="fas fa-search"></i>
-        <input type="text" id="s-inp" class="search-pill" placeholder="Lagu, artis, atau album..." oninput="doSearch()">
-    </div>
+    <h1 style="margin-top:40px;font-weight:800">Cari</h1>
+    <div class="search-wrap"><i class="fas fa-search"></i><input type="text" id="s-inp" class="search-pill" placeholder="Lagu, artis..." oninput="doSearch()"></div>
     <div id="s-recent"></div>
     <div id="s-results"></div>
-    <div id="s-empty" class="empty-state">
-        <i class="fas fa-music"></i>
-        <p>Ketik untuk mencari lagu favoritmu</p>
-    </div>
+    <div id="s-empty" class="empty-state"><i class="fas fa-music"></i><p>Ketik untuk mencari</p></div>
 </div>
 
-<!-- FAVORIT DETAIL -->
 <div id="fav-detail" class="page">
     <div class="back-btn" onclick="nav('home')"><i class="fas fa-arrow-left"></i> Kembali</div>
-    <h1 style="font-weight:800; margin-bottom:20px;"><i class="fas fa-heart" style="color:var(--red);"></i> Favorit</h1>
-    <div id="fav-list"></div>
-    <div id="fav-empty" class="empty-state"><i class="far fa-heart"></i><p>Belum ada lagu favorit</p></div>
+    <h1 style="font-weight:800;margin-bottom:20px"><i class="fas fa-heart" style="color:var(--red)"></i> Favorit</h1>
+    <div id="fav-list"></div><div id="fav-empty" class="empty-state"><i class="far fa-heart"></i><p>Belum ada favorit</p></div>
 </div>
 
-<!-- PLAYLIST DETAIL -->
 <div id="pl-detail" class="page">
     <div class="back-btn" onclick="nav('home')"><i class="fas fa-arrow-left"></i> Kembali</div>
-    <h1 style="font-weight:800; margin-bottom:20px;"><i class="fas fa-list" style="color:var(--green);"></i> Playlist</h1>
-    <div id="pl-list"></div>
-    <div id="pl-empty" class="empty-state"><i class="fas fa-list"></i><p>Playlist kosong. Tekan + di player untuk menambah lagu!</p></div>
+    <h1 style="font-weight:800;margin-bottom:20px"><i class="fas fa-list" style="color:var(--green)"></i> Playlist</h1>
+    <div id="pl-list"></div><div id="pl-empty" class="empty-state"><i class="fas fa-list"></i><p>Tekan + di player untuk tambah lagu</p></div>
 </div>
 
-<!-- PESAN / DM LIST -->
 <div id="chat-list" class="page">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:40px; margin-bottom:20px;">
-        <h1 style="font-weight:800;">Messages</h1>
-        <i class="fas fa-plus-circle" onclick="addContactModal()" style="font-size:2rem; color:var(--green); cursor:pointer;"></i>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:40px;margin-bottom:20px">
+        <h1 style="font-weight:800">Messages</h1>
+        <i class="fas fa-plus-circle" onclick="addContactModal()" style="font-size:2rem;color:var(--green);cursor:pointer"></i>
     </div>
-    <div id="ct-list"></div>
-    <div id="ct-empty" class="empty-state"><i class="fas fa-comment-dots"></i><p>Belum ada percakapan. Tap + untuk mulai chat</p></div>
+    <div id="ct-list"></div><div id="ct-empty" class="empty-state"><i class="fas fa-comment-dots"></i><p>Tap + untuk mulai chat</p></div>
 </div>
 
-<!-- CHAT ROOM (DM) -->
-<div id="chat-room" class="page" style="padding:0;">
-    <div style="padding:15px 20px; background:#121212; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:12px;">
-        <i class="fas fa-arrow-left" onclick="closeChatRoom()" style="cursor:pointer; font-size:1.1rem;"></i>
-        <div class="contact-avatar" id="cr-avatar" onclick="viewUserProfile(currentDMUser)" style="width:35px; height:35px; font-size:0.9rem; cursor:pointer;"></div>
-        <div onclick="viewUserProfile(currentDMUser)" style="cursor:pointer;">
-            <b id="cr-name">Chat</b><br><small id="cr-sub" style="color:var(--gray); font-size:0.65rem;"></small>
-        </div>
+<div id="chat-room" class="page" style="padding:0">
+    <div style="padding:15px 20px;background:#121212;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px">
+        <i class="fas fa-arrow-left" onclick="closeChatRoom()" style="cursor:pointer;font-size:1.1rem"></i>
+        <div class="contact-avatar" id="cr-avatar" onclick="viewUserProfile(currentDMUser)" style="width:35px;height:35px;font-size:.9rem;cursor:pointer"></div>
+        <div onclick="viewUserProfile(currentDMUser)" style="cursor:pointer"><b id="cr-name">Chat</b><br><small id="cr-sub" style="color:var(--gray);font-size:.65rem"></small></div>
     </div>
-    <div id="cr-msgs" style="height:calc(100vh - 210px); overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:10px;"></div>
+    <div id="cr-msgs" style="height:calc(100vh - 210px);overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:10px"></div>
     <div class="chat-footer">
         <input type="text" id="cr-in" placeholder="Ketik pesan..." onkeydown="if(event.key==='Enter')sendDM()">
-        <button onclick="sendDM()" style="width:55px; height:45px; background:var(--green); border:none; border-radius:15px; cursor:pointer; flex-shrink:0;"><i class="fas fa-paper-plane" style="color:#000;"></i></button>
+        <button onclick="sendDM()" style="width:55px;height:45px;background:var(--green);border:none;border-radius:15px;cursor:pointer;flex-shrink:0"><i class="fas fa-paper-plane" style="color:#000"></i></button>
     </div>
 </div>
 
-<!-- VIEW USER PROFILE -->
 <div id="view-profile" class="page">
-    <div class="back-btn" onclick="nav('chat-room')"><i class="fas fa-arrow-left"></i> Kembali</div>
+    <div class="back-btn" id="vp-back-btn" onclick="nav('chat-room')"><i class="fas fa-arrow-left"></i> Kembali</div>
     <div class="profile-view-page">
         <div class="profile-view-avatar" id="vp-avatar"></div>
         <h2 id="vp-name">---</h2>
-        <p id="vp-role" style="font-size:0.75rem; color:var(--accent); font-weight:800; letter-spacing:2px; margin-top:5px;"></p>
+        <p id="vp-role" style="font-size:.75rem;color:var(--accent);font-weight:800;letter-spacing:2px;margin-top:5px"></p>
         <div class="profile-info-card">
             <div class="info-row"><small>Bio</small><b id="vp-bio">---</b></div>
-            <div class="info-row"><small>Nomor Regal</small><b id="vp-phone" style="color:var(--accent);">---</b></div>
+            <div class="info-row"><small>Nomor Regal</small><b id="vp-phone" style="color:var(--accent)">---</b></div>
             <div class="info-row"><small>Role</small><b id="vp-role2">---</b></div>
         </div>
-        <button id="vp-rename-btn" onclick="renameContactModal()" style="width:100%; padding:15px; margin-top:20px; border-radius:15px; border:1px solid #333; background:transparent; color:#fff; font-weight:800; cursor:pointer;">UBAH NAMA KONTAK</button>
+        <button id="vp-rename-btn" onclick="renameContactModal()" style="width:100%;padding:15px;margin-top:20px;border-radius:15px;border:1px solid #333;background:transparent;color:#fff;font-weight:800;cursor:pointer">UBAH NAMA KONTAK</button>
+        <button id="vp-save-btn" onclick="saveContactFromProfile()" style="width:100%;padding:15px;margin-top:10px;border-radius:15px;background:var(--green);color:#000;border:none;font-weight:800;cursor:pointer;display:none">💾 SIMPAN NOMOR INI & MULAI CHAT</button>
     </div>
 </div>
 
-<!-- LIVE CHAT -->
-<div id="live-chat" class="page" style="padding:0;">
-    <div style="padding:15px 20px; background:#121212; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px;">
-        <i class="fas fa-tower-broadcast" style="color:var(--red);"></i>
-        <b>Live Chat Room</b>
-        <span id="live-count" style="margin-left:auto; font-size:0.7rem; color:var(--gray);"></span>
+<div id="live-chat" class="page" style="padding:0">
+    <div style="padding:15px 20px;background:#121212;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px">
+        <i class="fas fa-tower-broadcast" style="color:var(--red)"></i><b>Live Chat</b>
+        <span id="live-count" style="margin-left:auto;font-size:.7rem;color:var(--gray)"></span>
     </div>
-    <div style="padding:8px 20px; background:rgba(255,0,0,0.1); font-size:0.65rem; color:var(--red); text-align:center;">
-        <i class="fas fa-clock"></i> Chat otomatis terhapus setiap jam 00:00 WIB
-    </div>
-    <div id="live-msgs" style="height:calc(100vh - 250px); overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:10px;"></div>
+    <div style="padding:6px 20px;background:rgba(255,0,0,.1);font-size:.6rem;color:var(--red);text-align:center"><i class="fas fa-clock"></i> Reset otomatis jam 00:00 WIB</div>
+    <div id="live-msgs" style="height:calc(100vh - 245px);overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:10px"></div>
     <div class="chat-footer">
-        <input type="text" id="live-in" placeholder="Ngetik pesan global..." onkeydown="if(event.key==='Enter')sendLive()">
-        <button onclick="sendLive()" style="width:55px; height:45px; background:var(--green); border:none; border-radius:15px; cursor:pointer; flex-shrink:0;"><i class="fas fa-paper-plane" style="color:#000;"></i></button>
+        <input type="text" id="live-in" placeholder="Pesan global..." onkeydown="if(event.key==='Enter')sendLive()">
+        <button onclick="sendLive()" style="width:55px;height:45px;background:var(--green);border:none;border-radius:15px;cursor:pointer;flex-shrink:0"><i class="fas fa-paper-plane" style="color:#000"></i></button>
     </div>
 </div>
 
-<!-- PREMIUM -->
 <div id="buy-role" class="page">
-    <h1 style="margin-top:40px; font-weight:800;">Langganan Premium</h1>
-    <div class="premium-card" style="border:1px solid var(--accent);">
-        <b style="color:var(--accent)">CREATOR TIER</b>
-        <h2 style="margin:10px 0;">Rp 25.000 <small style="color:var(--gray)">/ 1 Bulan</small></h2>
+    <h1 style="margin-top:40px;font-weight:800">Premium</h1>
+    <div class="premium-card" id="pc-creator" style="border:1px solid var(--accent)">
+        <div id="creator-active-badge" class="active-badge-premium" style="display:none">✅ AKTIF</div>
+        <b style="color:var(--accent)">CREATOR</b>
+        <h2 style="margin:10px 0" id="creator-price-display">Rp 10.000 <small style="color:var(--gray)">/ bulan</small></h2>
         <ul>
-            <li><i class="fas fa-check"></i> Upload lagu</li>
-            <li><i class="fas fa-check"></i> Badge Creator</li>
+            <li><i class="fas fa-check"></i> Upload lagu (max 3/hari)</li>
+            <li><i class="fas fa-check"></i> Badge Creator ⭐</li>
             <li><i class="fas fa-check"></i> Profil eksklusif</li>
         </ul>
-        <button onclick="openQRIS('Creator', 25000)" class="btn-gold">Beli Sekarang</button>
+        <button onclick="openQRIS('Creator')" class="btn-gold" id="btn-buy-creator">Beli Sekarang</button>
     </div>
-    <div class="premium-card" style="border:1px solid var(--elite);">
+    <div class="premium-card" id="pc-elite" style="border:1px solid var(--elite)">
+        <div id="elite-active-badge" class="active-badge-premium" style="display:none">✅ AKTIF</div>
         <b style="color:var(--elite)">ELITE PRODUCER</b>
-        <h2 style="margin:10px 0;">Rp 150.000 <small style="color:var(--gray)">/ 5 Bulan</small></h2>
+        <h2 style="margin:10px 0" id="elite-price-display">Rp 45.000 <small style="color:var(--gray)">/ bulan</small></h2>
         <ul>
             <li><i class="fas fa-check"></i> Semua fitur Creator</li>
-            <li><i class="fas fa-check"></i> Badge Elite</li>
+            <li><i class="fas fa-check"></i> Upload unlimited</li>
+            <li><i class="fas fa-check"></i> Badge Elite 💎</li>
             <li><i class="fas fa-check"></i> Prioritas support</li>
-            <li><i class="fas fa-check"></i> Unlimited upload</li>
+            <li><i class="fas fa-check"></i> Akses fitur eksklusif</li>
+            <li><i class="fas fa-check"></i> Nama berwarna di Live Chat</li>
         </ul>
-        <button onclick="openQRIS('Elite', 150000)" class="btn-gold" style="background:var(--elite); color:#000;">Beli Sekarang</button>
+        <button onclick="openQRIS('Elite')" class="btn-gold" style="background:var(--elite);color:#000" id="btn-buy-elite">Beli Sekarang</button>
     </div>
 </div>
 
-<!-- QRIS -->
 <div id="qris-page" class="page">
     <div class="back-btn" onclick="nav('buy-role')"><i class="fas fa-arrow-left"></i> Kembali</div>
-    <div style="text-align:center;">
+    <div style="text-align:center">
         <h2 id="q-title">Pembayaran</h2>
-        <p id="q-price" style="font-size:1.5rem; font-weight:800; color:var(--accent); margin:10px 0;"></p>
-        <div id="qris-img-container" style="margin:20px auto; width:100%; max-width:280px;">
-            <svg viewBox="0 0 280 280" xmlns="http://www.w3.org/2000/svg" style="width:100%; border-radius:20px; border:2px solid #222;">
-                <rect width="280" height="280" fill="#ffffff"/>
-                <rect x="20" y="20" width="80" height="80" rx="8" fill="none" stroke="#000" stroke-width="6"/>
-                <rect x="35" y="35" width="50" height="50" rx="4" fill="#000"/>
-                <rect x="180" y="20" width="80" height="80" rx="8" fill="none" stroke="#000" stroke-width="6"/>
-                <rect x="195" y="35" width="50" height="50" rx="4" fill="#000"/>
-                <rect x="20" y="180" width="80" height="80" rx="8" fill="none" stroke="#000" stroke-width="6"/>
-                <rect x="35" y="195" width="50" height="50" rx="4" fill="#000"/>
-                <rect x="120" y="20" width="12" height="12" fill="#000"/>
-                <rect x="120" y="44" width="12" height="12" fill="#000"/>
-                <rect x="120" y="68" width="12" height="12" fill="#000"/>
-                <rect x="144" y="20" width="12" height="12" fill="#000"/>
-                <rect x="120" y="92" width="12" height="12" fill="#000"/>
-                <rect x="144" y="56" width="12" height="12" fill="#000"/>
-                <rect x="120" y="120" width="12" height="12" fill="#000"/>
-                <rect x="144" y="120" width="12" height="12" fill="#000"/>
-                <rect x="20" y="120" width="12" height="12" fill="#000"/>
-                <rect x="44" y="120" width="12" height="12" fill="#000"/>
-                <rect x="68" y="120" width="12" height="12" fill="#000"/>
-                <rect x="92" y="120" width="12" height="12" fill="#000"/>
-                <rect x="180" y="120" width="12" height="12" fill="#000"/>
-                <rect x="204" y="120" width="12" height="12" fill="#000"/>
-                <rect x="228" y="120" width="12" height="12" fill="#000"/>
-                <rect x="252" y="120" width="12" height="12" fill="#000"/>
-                <rect x="180" y="144" width="12" height="12" fill="#000"/>
-                <rect x="204" y="168" width="12" height="12" fill="#000"/>
-                <rect x="228" y="144" width="12" height="12" fill="#000"/>
-                <rect x="252" y="168" width="12" height="12" fill="#000"/>
-                <rect x="180" y="192" width="12" height="12" fill="#000"/>
-                <rect x="228" y="192" width="12" height="12" fill="#000"/>
-                <rect x="252" y="216" width="12" height="12" fill="#000"/>
-                <rect x="180" y="240" width="12" height="12" fill="#000"/>
-                <rect x="204" y="252" width="12" height="12" fill="#000"/>
-                <rect x="240" y="248" width="20" height="20" rx="3" fill="#000"/>
-                <rect x="120" y="144" width="12" height="12" fill="#000"/>
-                <rect x="144" y="168" width="12" height="12" fill="#000"/>
-                <rect x="120" y="192" width="12" height="12" fill="#000"/>
-                <rect x="144" y="216" width="12" height="12" fill="#000"/>
-                <rect x="120" y="248" width="12" height="12" fill="#000"/>
-                <text x="140" y="275" text-anchor="middle" fill="#000" font-size="7" font-family="Arial" font-weight="bold">QRIS - REGAL MUSIC</text>
-            </svg>
+        <p id="q-price" style="font-size:1.5rem;font-weight:800;color:var(--accent);margin:10px 0"></p>
+        <div id="qris-img-box" style="margin:20px auto;width:100%;max-width:280px;background:#fff;border-radius:20px;padding:20px;text-align:center">
+            <p style="color:#000;font-weight:800;font-size:.8rem">QRIS PAYMENT</p>
+            <img id="qris-dynamic-img" src="" style="width:100%;border-radius:10px;margin-top:10px;display:none">
+            <div id="qris-placeholder" style="padding:40px;color:#999;font-size:.8rem">QRIS belum diatur oleh Admin</div>
         </div>
-        <p style="color:var(--gray); font-size:0.8rem; margin-bottom:20px;">Scan QRIS lalu verifikasi pembayaran</p>
-        <div style="background:var(--card); padding:20px; border-radius:15px;">
-            <button onclick="submitPaymentRequest()" class="btn-gold">KONFIRMASI PEMBAYARAN</button>
-        </div>
+        <p style="color:var(--gray);font-size:.8rem;margin-bottom:20px">Scan QRIS lalu konfirmasi</p>
+        <button onclick="submitPaymentRequest()" class="btn-gold">KONFIRMASI PEMBAYARAN</button>
     </div>
 </div>
 
-<!-- UPLOAD -->
 <div id="upload" class="page">
     <div class="back-btn" onclick="nav('home')"><i class="fas fa-arrow-left"></i> Kembali</div>
-    <h1 style="font-weight:800; margin-bottom:5px;">Upload Lagu</h1>
-    <p style="color:var(--gray); font-size:0.8rem; margin-bottom:20px;">Bagikan musikmu ke seluruh pendengar Regal</p>
+    <h1 style="font-weight:800;margin-bottom:5px">Upload Lagu</h1>
+    <p style="color:var(--gray);font-size:.8rem;margin-bottom:5px">Bagikan musikmu</p>
+    <div id="upload-limit-info" style="font-size:.7rem;color:var(--accent);margin-bottom:15px"></div>
     <div class="upload-section">
-        <label>Judul Lagu</label>
-        <input type="text" id="up-title" placeholder="Nama lagu...">
-        <label>Artis</label>
-        <input type="text" id="up-artist" placeholder="Nama artis...">
+        <label>Judul Lagu</label><input type="text" id="up-title" placeholder="Nama lagu...">
+        <label>Artis</label><input type="text" id="up-artist" placeholder="Nama artis...">
         <label>File Audio (MP3)</label>
-        <div class="file-input-wrap" id="audio-wrap">
-            <input type="file" accept="audio/mp3,audio/mpeg,audio/*" onchange="handleAudioFile(this)">
-            <div class="file-label"><i class="fas fa-music"></i><span>Pilih file MP3</span></div>
-            <div class="file-name" id="audio-file-name"></div>
-        </div>
-        <label>Cover Art (Gambar)</label>
-        <div class="file-input-wrap" id="cover-wrap">
-            <input type="file" accept="image/*" onchange="handleCoverFile(this)">
-            <div class="file-label"><i class="fas fa-image"></i><span>Pilih gambar cover</span></div>
-            <div class="file-name" id="cover-file-name"></div>
-        </div>
-        <img id="cover-preview" style="width:80px; height:80px; border-radius:10px; object-fit:cover; margin-bottom:12px; display:none;">
+        <div class="file-input-wrap"><input type="file" accept="audio/*" onchange="handleAudioFile(this)"><div class="file-label"><i class="fas fa-music"></i><span>Pilih file MP3</span></div><div class="file-name" id="audio-file-name"></div></div>
+        <label>Cover Art</label>
+        <div class="file-input-wrap"><input type="file" accept="image/*" onchange="handleCoverFile(this)"><div class="file-label"><i class="fas fa-image"></i><span>Pilih gambar</span></div><div class="file-name" id="cover-file-name"></div></div>
+        <img id="cover-preview" style="width:80px;height:80px;border-radius:10px;object-fit:cover;margin-bottom:12px;display:none">
         <div class="upload-progress-bar" id="upload-progress"><div class="fill" id="upload-progress-fill"></div></div>
-        <button onclick="doUpload()" class="btn-gold" style="margin-top:10px;" id="upload-btn">
-            <i class="fas fa-cloud-arrow-up"></i> UPLOAD
-        </button>
+        <button onclick="doUpload()" class="btn-gold" style="margin-top:10px" id="upload-btn"><i class="fas fa-cloud-arrow-up"></i> UPLOAD</button>
     </div>
 </div>
 
-<!-- DUKUNGAN / SUPPORT -->
-<div id="support" class="page" style="padding:0;">
-    <div style="padding:15px 20px; background:#121212; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px;">
-        <i class="fas fa-headset" style="color:var(--accent);"></i><b>Layanan Support</b>
-    </div>
-    <div id="sup-msgs" style="height:calc(100vh - 210px); overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:10px;"></div>
+<div id="support" class="page" style="padding:0">
+    <div style="padding:15px 20px;background:#121212;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px"><i class="fas fa-headset" style="color:var(--accent)"></i><b>Support</b></div>
+    <div id="sup-msgs" style="height:calc(100vh - 210px);overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:10px"></div>
     <div class="chat-footer">
-        <input type="text" id="sup-in" placeholder="Apa masalah Bos?..." onkeydown="if(event.key==='Enter')sendSupport()">
-        <button onclick="sendSupport()" style="width:55px; height:45px; background:var(--green); border:none; border-radius:15px; cursor:pointer; flex-shrink:0;"><i class="fas fa-paper-plane" style="color:#000;"></i></button>
+        <input type="text" id="sup-in" placeholder="Masalah Anda..." onkeydown="if(event.key==='Enter')sendSupport()">
+        <button onclick="sendSupport()" style="width:55px;height:45px;background:var(--green);border:none;border-radius:15px;cursor:pointer;flex-shrink:0"><i class="fas fa-paper-plane" style="color:#000"></i></button>
     </div>
 </div>
 
-<!-- PROFIL -->
 <div id="profile" class="page">
-    <div style="text-align:center; padding:40px 0;">
-        <div style="width:130px; height:130px; margin:0 auto 25px; position:relative;">
+    <div style="text-align:center;padding:40px 0">
+        <div style="width:130px;height:130px;margin:0 auto 25px;position:relative">
             <div id="p-badge-container" class="badge-fixed" onclick="showBadgeInfo()"></div>
-            <div style="width:100%; height:100%; background:var(--accent); border-radius:50%; display:flex; align-items:center; justify-content:center; overflow:hidden; border:4px solid #1a1a1a;">
-                <img id="p-av-img" src="" style="width:100%; height:100%; object-fit:cover; display:none;">
-                <span id="p-av-init" style="font-size:3.5rem; font-weight:800; color:black;">?</span>
+            <div style="width:100%;height:100%;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;border:4px solid #1a1a1a">
+                <img id="p-av-img" src="" style="width:100%;height:100%;object-fit:cover;display:none">
+                <span id="p-av-init" style="font-size:3.5rem;font-weight:800;color:black">?</span>
             </div>
         </div>
         <h2 id="p-un">---</h2>
-        <p id="p-role-txt" style="font-size:0.75rem; font-weight:800; color:var(--accent); letter-spacing:2px; margin-top:5px;"></p>
-        <div style="margin-top:35px; text-align:left; background:var(--card); padding:20px; border-radius:20px; border:1px solid var(--border);">
-            <small style="color:var(--gray)">Bio</small>
-            <p id="p-bio" style="font-size:0.9rem; margin-top:5px;"></p>
-            <small style="color:var(--gray); margin-top:15px; display:block;">Nomor Regal</small>
-            <b id="p-phone" style="color:var(--accent); letter-spacing:2px;">+62 ---</b>
+        <p id="p-role-txt" style="font-size:.75rem;font-weight:800;color:var(--accent);letter-spacing:2px;margin-top:5px"></p>
+        <div style="margin-top:35px;text-align:left;background:var(--card);padding:20px;border-radius:20px;border:1px solid var(--border)">
+            <small style="color:var(--gray)">Bio</small><p id="p-bio" style="font-size:.9rem;margin-top:5px"></p>
+            <small style="color:var(--gray);margin-top:15px;display:block">Nomor Regal</small><b id="p-phone" style="color:var(--accent);letter-spacing:2px">---</b>
+            <small style="color:var(--gray);margin-top:15px;display:block">Teguran</small><b id="p-warns" style="color:var(--red)">0 / 5</b>
         </div>
-        <button onclick="nav('edit-profile')" style="width:100%; padding:15px; margin-top:25px; border-radius:15px; border:1px solid #333; background:transparent; color:#fff; font-weight:800; cursor:pointer;">EDIT PROFIL</button>
-        <button onclick="logOut()" style="width:100%; padding:15px; margin-top:10px; border-radius:15px; background:rgba(255,0,0,0.1); color:red; border:none; font-weight:800; cursor:pointer;">LOGOUT</button>
+        <button onclick="nav('edit-profile')" style="width:100%;padding:15px;margin-top:25px;border-radius:15px;border:1px solid #333;background:transparent;color:#fff;font-weight:800;cursor:pointer">EDIT PROFIL</button>
+        <button onclick="logOut()" style="width:100%;padding:15px;margin-top:10px;border-radius:15px;background:rgba(255,0,0,.1);color:red;border:none;font-weight:800;cursor:pointer">LOGOUT</button>
     </div>
 </div>
 
-<!-- ADMIN PANEL -->
 <div id="adm" class="page">
-    <h1 style="margin-top:30px; font-weight:800; color:var(--accent);">Admin Panel</h1>
+    <h1 style="margin-top:30px;font-weight:800;color:var(--accent)">Admin Panel</h1>
     <div class="adm-header-stats">
         <div class="stat-card"><b id="st-u">0</b><p>USERS</p></div>
         <div class="stat-card"><b id="st-s">0</b><p>SONGS</p></div>
         <div class="stat-card"><b id="st-cr">0</b><p>CREATORS</p></div>
         <div class="stat-card"><b id="st-el">0</b><p>ELITE</p></div>
     </div>
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-        <div onclick="nav('a-users')" class="stat-card" style="padding:20px; cursor:pointer;"><i class="fas fa-users-gear" style="font-size:1.5rem; color:var(--elite);"></i><br><small>User Manager</small></div>
-        <div onclick="nav('a-ban')" class="stat-card" style="padding:20px; cursor:pointer;"><i class="fas fa-user-slash" style="font-size:1.5rem; color:var(--red);"></i><br><small>Ban Manager</small></div>
-        <div onclick="nav('a-songs')" class="stat-card" style="padding:20px; cursor:pointer;"><i class="fas fa-music" style="font-size:1.5rem; color:var(--green);"></i><br><small>Hapus Lagu</small></div>
-        <div onclick="nav('a-req')" class="stat-card" style="padding:20px; cursor:pointer;"><i class="fas fa-wallet" style="font-size:1.5rem; color:var(--accent);"></i><br><small>Payments</small></div>
-        <div onclick="nav('a-sup')" class="stat-card" style="padding:20px; cursor:pointer;"><i class="fas fa-headset" style="font-size:1.5rem; color:var(--accent);"></i><br><small>Support Box</small></div>
-        <div onclick="logoutAllConfirm()" class="stat-card" style="padding:20px; cursor:pointer; color:var(--red);"><i class="fas fa-power-off" style="font-size:1.5rem;"></i><br><small>Logout All</small></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div onclick="nav('a-users')" class="stat-card" style="padding:20px;cursor:pointer"><i class="fas fa-users-gear" style="font-size:1.5rem;color:var(--elite)"></i><br><small>Users</small></div>
+        <div onclick="nav('a-ban')" class="stat-card" style="padding:20px;cursor:pointer"><i class="fas fa-user-slash" style="font-size:1.5rem;color:var(--red)"></i><br><small>Ban</small></div>
+        <div onclick="nav('a-songs')" class="stat-card" style="padding:20px;cursor:pointer"><i class="fas fa-music" style="font-size:1.5rem;color:var(--green)"></i><br><small>Lagu</small></div>
+        <div onclick="nav('a-req')" class="stat-card" style="padding:20px;cursor:pointer"><i class="fas fa-wallet" style="font-size:1.5rem;color:var(--accent)"></i><br><small>Payments</small></div>
+        <div onclick="nav('a-sup')" class="stat-card" style="padding:20px;cursor:pointer"><i class="fas fa-headset" style="font-size:1.5rem;color:var(--accent)"></i><br><small>Support</small></div>
+        <div onclick="nav('a-qris')" class="stat-card" style="padding:20px;cursor:pointer"><i class="fas fa-qrcode" style="font-size:1.5rem;color:var(--green)"></i><br><small>QRIS</small></div>
+        <div onclick="logoutAllConfirm()" class="stat-card" style="padding:20px;cursor:pointer;color:var(--red)"><i class="fas fa-power-off" style="font-size:1.5rem"></i><br><small>Logout All</small></div>
     </div>
 </div>
 
-<div id="a-users" class="page">
-    <div class="back-btn" onclick="nav('adm')"><i class="fas fa-arrow-left"></i> User Manager</div>
-    <div id="au-list"></div>
+<div id="a-users" class="page"><div class="back-btn" onclick="nav('adm')"><i class="fas fa-arrow-left"></i> Users</div><div id="au-list"></div></div>
+<div id="a-ban" class="page"><div class="back-btn" onclick="nav('adm')"><i class="fas fa-arrow-left"></i> Ban</div><div id="ab-list"></div></div>
+<div id="a-songs" class="page"><div class="back-btn" onclick="nav('adm')"><i class="fas fa-arrow-left"></i> Songs</div><div id="as-list"></div></div>
+<div id="a-req" class="page"><div class="back-btn" onclick="nav('adm')"><i class="fas fa-arrow-left"></i> Payments</div><div id="arq-list"></div><div id="arq-empty" class="empty-state"><i class="fas fa-wallet"></i><p>Kosong</p></div></div>
+<div id="a-sup" class="page"><div class="back-btn" onclick="nav('adm')"><i class="fas fa-arrow-left"></i> Support</div><div id="asup-list"></div><div id="asup-empty" class="empty-state"><i class="fas fa-headset"></i><p>Kosong</p></div></div>
+
+<div id="a-qris" class="page">
+    <div class="back-btn" onclick="nav('adm')"><i class="fas fa-arrow-left"></i> QRIS Control</div>
+    <h1 style="font-weight:800;margin-bottom:20px">QRIS Control</h1>
+    <div class="upload-section">
+        <label>QRIS Image (URL gambar)</label>
+        <input type="url" id="aq-url" placeholder="https://example.com/qris.jpg">
+        <label>Harga Creator (Rp)</label>
+        <input type="number" id="aq-creator-price" placeholder="10000">
+        <label>Harga Elite (Rp)</label>
+        <input type="number" id="aq-elite-price" placeholder="45000">
+        <button onclick="saveQrisSettings()" class="btn-gold" style="margin-top:10px">SIMPAN PENGATURAN</button>
+    </div>
+    <div style="margin-top:20px;text-align:center">
+        <p style="color:var(--gray);font-size:.75rem;margin-bottom:10px">Preview QRIS saat ini:</p>
+        <img id="aq-preview" src="" style="max-width:200px;border-radius:15px;display:none">
+        <p id="aq-no-preview" style="color:var(--gray);font-size:.8rem">Belum ada QRIS</p>
+    </div>
 </div>
 
-<div id="a-ban" class="page">
-    <div class="back-btn" onclick="nav('adm')"><i class="fas fa-arrow-left"></i> Ban Manager</div>
-    <div id="ab-list"></div>
-</div>
-
-<div id="a-songs" class="page">
-    <div class="back-btn" onclick="nav('adm')"><i class="fas fa-arrow-left"></i> Song Manager</div>
-    <div id="as-list"></div>
-</div>
-
-<div id="a-req" class="page">
-    <div class="back-btn" onclick="nav('adm')"><i class="fas fa-arrow-left"></i> Payment Requests</div>
-    <div id="arq-list"></div>
-    <div id="arq-empty" class="empty-state"><i class="fas fa-wallet"></i><p>Belum ada permintaan pembayaran</p></div>
-</div>
-
-<div id="a-sup" class="page">
-    <div class="back-btn" onclick="nav('adm')"><i class="fas fa-arrow-left"></i> Support Messages</div>
-    <div id="asup-list"></div>
-    <div id="asup-empty" class="empty-state"><i class="fas fa-headset"></i><p>Belum ada pesan support</p></div>
-</div>
-
-<!-- EDIT PROFILE -->
 <div id="edit-profile" class="page">
     <div class="back-btn" onclick="nav('profile')"><i class="fas fa-arrow-left"></i> Edit Profil</div>
-    <h1 style="margin-bottom:20px;">Edit Profil</h1>
+    <h1 style="margin-bottom:20px">Edit Profil</h1>
     <div class="upload-section">
         <label>Foto Profil</label>
-        <div class="file-input-wrap" id="pfp-wrap">
-            <input type="file" accept="image/*" onchange="handlePfpFile(this)">
-            <div class="file-label"><i class="fas fa-camera"></i><span>Pilih foto profil</span></div>
-            <div class="file-name" id="pfp-file-name"></div>
-        </div>
-        <img id="pfp-preview" style="width:80px; height:80px; border-radius:50%; object-fit:cover; margin:0 auto 12px; display:none;">
+        <div class="file-input-wrap"><input type="file" accept="image/*" onchange="handlePfpFile(this)"><div class="file-label"><i class="fas fa-camera"></i><span>Pilih foto</span></div><div class="file-name" id="pfp-file-name"></div></div>
+        <img id="pfp-preview" style="width:80px;height:80px;border-radius:50%;object-fit:cover;margin:0 auto 12px;display:none">
         <div class="upload-progress-bar" id="pfp-progress"><div class="fill" id="pfp-progress-fill"></div></div>
-        <label>Bio</label>
-        <textarea id="edit-bio-in" placeholder="Bio baru..."></textarea>
-        <button onclick="saveProfile()" class="btn-gold" style="margin-top:10px;" id="save-profile-btn">Simpan</button>
+        <label>Bio</label><textarea id="edit-bio-in" placeholder="Bio baru..."></textarea>
+        <button onclick="saveProfile()" class="btn-gold" style="margin-top:10px" id="save-profile-btn">Simpan</button>
     </div>
 </div>
 
-<!-- PLAYER BAR - added + button -->
+<div id="p-toggle" class="p-toggle-bar" onclick="togglePlayerBar()"><i class="fas fa-chevron-up" id="p-toggle-icon"></i></div>
 <div id="mini-p" class="player-bar">
-    <img id="p-img" src="" alt="cover">
-    <div style="flex:1; min-width:0;">
-        <b id="p-ti" style="font-size:0.8rem; display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Lagu</b>
-        <small id="p-ar" style="font-size:0.65rem; color:var(--green);">Artis</small>
+    <img id="p-img" src="" alt="">
+    <div style="flex:1;min-width:0">
+        <b id="p-ti" style="font-size:.8rem;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Lagu</b>
+        <small id="p-ar" style="font-size:.65rem;color:var(--green)">Artis</small>
     </div>
     <div class="p-ctrls">
-        <i class="fas fa-plus-circle" id="p-pl-btn" onclick="addCurrentToPlaylist()" title="Tambah ke Playlist"></i>
+        <i class="fas fa-plus-circle" id="p-pl-btn" onclick="addCurrentToPlaylist()" style="color:var(--green)"></i>
         <i class="far fa-heart" id="p-fav-btn" onclick="toggleFavCurrent()"></i>
         <i id="p-ic" class="fas fa-play" onclick="togP()"></i>
         <i class="fas fa-step-forward" onclick="nextSong()"></i>
     </div>
 </div>
-
 <audio id="aud"></audio>
 
 <script>
-const KING_NAME = "King";
-const DEV2_NAME = "REGAL-ADMIN-ZEONLY";
-const KING_PHONE = "999999999999";
+const KING="King",DEV2="REGAL-ADMIN-ZEONLY",KING_PHONE="999999999999",DEV2_PHONE="000000000001";
+const BAD_WORDS=["anjing","bangsat","kontol","memek","babi","tolol","goblok","bodoh","bajingan","keparat","asu","jancok","ngentot","setan","iblis","tai","brengsek","kampret","monyet","idiot","sialan","pelacur","sundal","laknat","ngewe"];
 
-const config = {
-    apiKey: "AIzaSyBTb_DwvrKW35f15NvzNC5VTTbubZJD5JQ",
-    authDomain: "developer-9640f.firebaseapp.com",
-    databaseURL: "https://developer-9640f-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "developer-9640f",
-    storageBucket: "developer-9640f.firebasestorage.app",
-    messagingSenderId: "217471718457",
-    appId: "1:217471718457:web:e157fccbddc9ff5213a9e8"
-};
-
+const config={apiKey:"AIzaSyBTb_DwvrKW35f15NvzNC5VTTbubZJD5JQ",authDomain:"developer-9640f.firebaseapp.com",databaseURL:"https://developer-9640f-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"developer-9640f",storageBucket:"developer-9640f.firebasestorage.app",messagingSenderId:"217471718457",appId:"1:217471718457:web:e157fccbddc9ff5213a9e8"};
 firebase.initializeApp(config);
-const db = firebase.database();
-const storage = firebase.storage();
+const db=firebase.database(),storage=firebase.storage();
 
-let U = JSON.parse(localStorage.getItem('uv15')) || null;
-let am = 'login';
-let songs = [];
-let users = {};
-let favs = [];
-let myPL = [];
-let currentSongId = null;
-let currentDMUser = null;
-let myContacts = {};
-let searchHistory = [];
-let uploadAudioFile = null;
-let uploadCoverFile = null;
-let editPfpFile = null;
-const aud = document.getElementById('aud');
+let U=JSON.parse(localStorage.getItem('uv15'))||null,am='login',songs=[],users={},favs=[],myPL=[],currentSongId=null,currentDMUser=null,myContacts={},searchHistory=[],uploadAudioFile=null,uploadCoverFile=null,editPfpFile=null,playerCollapsed=false,qrisSettings={},viewProfileFrom='chat-room',viewingUser=null;
+const aud=document.getElementById('aud');
+const DC="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDUiIGhlaWdodD0iNDUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjQ1IiBoZWlnaHQ9IjQ1IiBmaWxsPSIjMWExYTFhIi8+PHRleHQgeD0iMjIuNSIgeT0iMjciIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNkNGFmMzciIGZvbnQtc2l6ZT0iMjAiPuKZqjwvdGV4dD48L3N2Zz4=";
 
-const DEFAULT_COVER = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDUiIGhlaWdodD0iNDUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjQ1IiBoZWlnaHQ9IjQ1IiBmaWxsPSIjMWExYTFhIi8+PHRleHQgeD0iMjIuNSIgeT0iMjciIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNkNGFmMzciIGZvbnQtc2l6ZT0iMjAiIGZvbnQtZmFtaWx5PSJBcmlhbCI+4pmqPC90ZXh0Pjwvc3ZnPg==";
+function isDev(n){return n===KING||n===DEV2}
+function hasAdmin(n){return isDev(n)||(users[n]&&users[n].role==='admin')}
+function esc(s){if(!s)return'';const d=document.createElement('div');d.textContent=s;return d.innerHTML}
+function toast(m,w){const t=document.createElement('div');t.className='toast-msg'+(w?' warn':'');t.innerText=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2500)}
 
-function isDev(n) { return n === KING_NAME || n === DEV2_NAME; }
-function hasAdminAccess(n) { return isDev(n) || (users[n] && users[n].role === 'admin'); }
+function containsBadWord(text){const lower=text.toLowerCase();return BAD_WORDS.some(w=>lower.includes(w))}
 
-function esc(str) {
-    if (!str) return '';
-    const d = document.createElement('div');
-    d.textContent = str;
-    return d.innerHTML;
-}
-
-function toast(msg) {
-    const t = document.createElement('div');
-    t.className = 'toast-msg';
-    t.innerText = msg;
-    document.body.appendChild(t);
-    setTimeout(() => t.remove(), 2500);
-}
-
-function handleAudioFile(input) {
-    if (input.files && input.files[0]) {
-        uploadAudioFile = input.files[0];
-        document.getElementById('audio-file-name').innerText = uploadAudioFile.name;
+async function checkAndWarn(text){
+    if(!containsBadWord(text))return false;
+    const snap=await db.ref('users/'+U.name+'/warnings').once('value');
+    let warns=(snap.val()||0)+1;
+    await db.ref('users/'+U.name+'/warnings').set(warns);
+    if(warns>=5){
+        const banUntil=Date.now()+(24*60*60*1000);
+        await db.ref('users/'+U.name+'/banned').set(true);
+        await db.ref('users/'+U.name+'/banUntil').set(banUntil);
+        await db.ref('users/'+U.name+'/warnings').set(0);
+        toast("⛔ 5 teguran! Banned 1 hari!",true);
+        showBanScreen();
+        return true;
     }
+    toast(`⚠️ Teguran ${warns}/5 - Kata kasar terdeteksi!`,true);
+    return true;
 }
 
-function handleCoverFile(input) {
-    if (input.files && input.files[0]) {
-        uploadCoverFile = input.files[0];
-        document.getElementById('cover-file-name').innerText = uploadCoverFile.name;
-        const r = new FileReader();
-        r.onload = e => { document.getElementById('cover-preview').src = e.target.result; document.getElementById('cover-preview').style.display = 'block'; };
-        r.readAsDataURL(uploadCoverFile);
-    }
-}
+function handleAudioFile(i){if(i.files&&i.files[0]){uploadAudioFile=i.files[0];document.getElementById('audio-file-name').innerText=uploadAudioFile.name}}
+function handleCoverFile(i){if(i.files&&i.files[0]){uploadCoverFile=i.files[0];document.getElementById('cover-file-name').innerText=uploadCoverFile.name;const r=new FileReader();r.onload=e=>{document.getElementById('cover-preview').src=e.target.result;document.getElementById('cover-preview').style.display='block'};r.readAsDataURL(uploadCoverFile)}}
+function handlePfpFile(i){if(i.files&&i.files[0]){editPfpFile=i.files[0];document.getElementById('pfp-file-name').innerText=editPfpFile.name;const r=new FileReader();r.onload=e=>{document.getElementById('pfp-preview').src=e.target.result;document.getElementById('pfp-preview').style.display='block'};r.readAsDataURL(editPfpFile)}}
 
-function handlePfpFile(input) {
-    if (input.files && input.files[0]) {
-        editPfpFile = input.files[0];
-        document.getElementById('pfp-file-name').innerText = editPfpFile.name;
-        const r = new FileReader();
-        r.onload = e => { document.getElementById('pfp-preview').src = e.target.result; document.getElementById('pfp-preview').style.display = 'block'; };
-        r.readAsDataURL(editPfpFile);
-    }
-}
-
-function uploadFileToStorage(file, path, pBar, pFill) {
-    return new Promise((resolve, reject) => {
-        const ref = storage.ref(path);
-        const task = ref.put(file);
-        if (pBar) pBar.style.display = 'block';
+function uploadFile(file,path,pBar,pFill){
+    return new Promise((res,rej)=>{
+        const ref=storage.ref(path),task=ref.put(file);
+        if(pBar)pBar.style.display='block';
         task.on('state_changed',
-            snap => { const pct = (snap.bytesTransferred / snap.totalBytes) * 100; if (pFill) pFill.style.width = pct + '%'; },
-            err => { if (pBar) pBar.style.display = 'none'; reject(err); },
-            () => { task.snapshot.ref.getDownloadURL().then(url => { if (pBar) pBar.style.display = 'none'; resolve(url); }); }
+            s=>{if(pFill)pFill.style.width=(s.bytesTransferred/s.totalBytes*100)+'%'},
+            e=>{if(pBar)pBar.style.display='none';rej(e)},
+            ()=>{task.snapshot.ref.getDownloadURL().then(url=>{if(pBar)pBar.style.display='none';res(url)}).catch(rej)}
         );
     });
 }
 
-// ===== INIT =====
-function init() {
-    if (!U) {
-        document.getElementById('loader-ov').style.display = 'none';
-        return;
-    }
-    searchHistory = JSON.parse(localStorage.getItem('sh_' + U.name) || '[]');
-
-    db.ref('users/' + U.name).once('value', s => {
-        const d = s.val();
-        if (!d) { logOut(); return; }
-        if (d.banned && !isDev(U.name)) {
-            document.getElementById('loader-ov').style.display = 'none';
-            document.getElementById('auth').style.display = 'none';
-            document.getElementById('auth').classList.remove('active');
-            showBanScreen();
+function init(){
+    if(!U){document.getElementById('loader-ov').style.display='none';return}
+    searchHistory=JSON.parse(localStorage.getItem('sh_'+U.name)||'[]');
+    db.ref('users/'+U.name).once('value',s=>{
+        const d=s.val();
+        if(!d){logOut();return}
+        if(d.banned&&!isDev(U.name)){
+            if(d.banUntil&&Date.now()>d.banUntil){
+                db.ref('users/'+U.name+'/banned').remove();
+                db.ref('users/'+U.name+'/banUntil').remove();
+                startApp();
+            } else {
+                document.getElementById('loader-ov').style.display='none';
+                document.getElementById('auth').style.display='none';
+                document.getElementById('auth').classList.remove('active');
+                showBanScreen();
+            }
             return;
         }
         startApp();
     });
 }
 
-function showBanScreen() {
-    document.getElementById('ban-overlay').style.display = 'flex';
-    document.getElementById('bot-nav').style.display = 'none';
-}
+function showBanScreen(){document.getElementById('ban-overlay').style.display='flex';document.getElementById('bot-nav').style.display='none'}
 
-function startApp() {
-    document.getElementById('auth').style.display = 'none';
+function startApp(){
+    document.getElementById('auth').style.display='none';
     document.getElementById('auth').classList.remove('active');
-    document.getElementById('bot-nav').style.display = 'flex';
+    document.getElementById('bot-nav').style.display='flex';
     document.getElementById('home').classList.add('active');
     renderRecentSearches();
 
-    db.ref('users/' + U.name).on('value', s => {
-        let d = s.val();
-        if (!d) return;
-        if (d.banned && !isDev(U.name)) {
-            showBanScreen();
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            return;
-        }
-        if (isDev(U.name)) d.role = "owner";
-        U.role = d.role || 'viewer';
-        U.phone = d.phone;
-        U.bio = d.bio || "Regal User";
-        U.pfp = d.pfp || '';
-        localStorage.setItem('uv15', JSON.stringify(U));
-        document.getElementById('n-ad').style.display = (hasAdminAccess(U.name) ? 'flex' : 'none');
-        document.getElementById('n-up').style.display = (['owner', 'elite', 'creator', 'admin'].includes(U.role) ? 'flex' : 'none');
-        updateProfileUI();
+    db.ref('users/'+U.name).on('value',s=>{
+        let d=s.val();if(!d)return;
+        if(d.banned&&!isDev(U.name)){showBanScreen();document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));return}
+        if(isDev(U.name))d.role="owner";
+        U.role=d.role||'viewer';U.phone=d.phone;U.bio=d.bio||"Regal User";U.pfp=d.pfp||'';U.warnings=d.warnings||0;
+        localStorage.setItem('uv15',JSON.stringify(U));
+        document.getElementById('n-ad').style.display=hasAdmin(U.name)?'flex':'none';
+        document.getElementById('n-up').style.display=['owner','elite','creator','admin'].includes(U.role)?'flex':'none';
+        updateProfileUI();updatePremiumUI();
     });
 
-    db.ref('songs').on('value', s => {
-        songs = [];
-        s.forEach(x => { songs.push({ id: x.key, ...x.val() }); });
-        rHome(); rAdminSongs();
-        cleanSearchHistory();
+    db.ref('songs').on('value',s=>{songs=[];s.forEach(x=>songs.push({id:x.key,...x.val()}));rHome();rAdminSongs();cleanSH()});
+    db.ref('users').on('value',s=>{users=s.val()||{};rAdminUsers();rAdminBan();loadStats()});
+    db.ref('favorites/'+U.name).on('value',s=>{favs=[];s.forEach(x=>favs.push(x.val()));rFavorites()});
+    db.ref('playlists/'+U.name).on('value',s=>{myPL=[];s.forEach(x=>myPL.push({id:x.key,sid:x.val()}));rPlaylist()});
+    db.ref('liveChat').orderByChild('ts').limitToLast(100).on('value',s=>rLiveChat(s));
+    db.ref('support/'+U.name).orderByChild('ts').on('value',s=>rSupportChat(s));
+    db.ref('contacts/'+U.name).on('value',s=>{myContacts=s.val()||{};rContacts(s)});
+    db.ref('dmNotify/'+U.name).on('value',s=>{let h=false;const d=s.val();if(d){for(let k in d)if(d[k].unread){h=true;break}}document.getElementById('chat-nav-badge').style.display=h?'block':'none'});
+
+    db.ref('appSettings/qris').on('value',s=>{
+        qrisSettings=s.val()||{};
+        updatePremiumUI();
+        updateQrisAdmin();
     });
 
-    db.ref('users').on('value', s => {
-        users = s.val() || {};
-        rAdminUsers(); rAdminBan(); loadStats();
-    });
-
-    db.ref('favorites/' + U.name).on('value', s => {
-        favs = [];
-        s.forEach(x => { favs.push(x.val()); });
-        rFavorites();
-    });
-
-    db.ref('playlists/' + U.name).on('value', s => {
-        myPL = [];
-        s.forEach(x => { myPL.push({ id: x.key, sid: x.val() }); });
-        rPlaylist();
-    });
-
-    db.ref('liveChat').orderByChild('ts').limitToLast(100).on('value', s => { rLiveChat(s); });
-    db.ref('support/' + U.name).orderByChild('ts').on('value', s => { rSupportChat(s); });
-    db.ref('contacts/' + U.name).on('value', s => { myContacts = s.val() || {}; rContacts(s); });
-
-    db.ref('dmNotify/' + U.name).on('value', s => {
-        const data = s.val();
-        let hasUnread = false;
-        if (data) { for (let sender in data) { if (data[sender].unread) { hasUnread = true; break; } } }
-        document.getElementById('chat-nav-badge').style.display = hasUnread ? 'block' : 'none';
-    });
-
-    if (hasAdminAccess(U.name)) {
-        db.ref('support').on('value', s => { rAdminSupport(s); });
-        db.ref('paymentRequests').on('value', s => { rAdminPayments(s); });
+    if(hasAdmin(U.name)){
+        db.ref('support').on('value',s=>rAdminSupport(s));
+        db.ref('paymentRequests').on('value',s=>rAdminPayments(s));
     }
 
-    // Force logout listener
-    db.ref('users/' + U.name + '/forceLogout').on('value', s => {
-        if (s.val() && !isDev(U.name)) {
-            db.ref('users/' + U.name + '/forceLogout').remove();
+    db.ref('users/'+U.name+'/forceLogout').on('value',s=>{
+        if(s.val()&&!isDev(U.name)){
+            db.ref('users/'+U.name+'/forceLogout').remove();
             localStorage.removeItem('uv15');
-            // Don't reload - show auth screen
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById('bot-nav').style.display = 'none';
-            document.getElementById('auth').style.display = 'flex';
+            document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+            document.getElementById('bot-nav').style.display='none';
+            document.getElementById('mini-p').style.display='none';
+            document.getElementById('p-toggle').style.display='none';
+            document.getElementById('auth').style.display='flex';
             document.getElementById('auth').classList.add('active');
-            U = null;
-            toast("Anda telah di-logout oleh Admin. Silakan login kembali.");
+            U=null;toast("Di-logout oleh Admin",true);
         }
     });
 
-    checkAndResetLiveChat();
-    setInterval(checkAndResetLiveChat, 30000);
+    setInterval(()=>{const n=new Date();const k=n.getFullYear()+'-'+(n.getMonth()+1)+'-'+n.getDate();db.ref('liveChatMeta/lastReset').once('value',s=>{if(s.val()!==k&&n.getHours()>=0&&n.getHours()<1){db.ref('liveChat').remove();db.ref('liveChatMeta/lastReset').set(k)}})},30000);
 
-    setTimeout(() => {
-        const loader = document.getElementById('loader-ov');
-        loader.style.opacity = '0';
-        setTimeout(() => loader.style.display = 'none', 500);
-    }, 1500);
+    setTimeout(()=>{const l=document.getElementById('loader-ov');l.style.opacity='0';setTimeout(()=>l.style.display='none',500)},1200);
 }
 
-function checkAndResetLiveChat() {
-    const now = new Date();
-    const todayKey = now.getFullYear() + '-' + (now.getMonth()+1) + '-' + now.getDate();
-    db.ref('liveChatMeta/lastReset').once('value', s => {
-        if (s.val() !== todayKey && now.getHours() >= 0 && now.getHours() < 1) {
-            db.ref('liveChat').remove();
-            db.ref('liveChatMeta/lastReset').set(todayKey);
-        }
-    });
+function nav(id,el){
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    const t=document.getElementById(id);if(t)t.classList.add('active');
+    if(el){document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));el.classList.add('active')}
+    if(id==='search-page')renderRecentSearches();
+    if(id==='chat-list')db.ref('dmNotify/'+U.name).once('value',s=>{const d=s.val();if(d){const u={};for(let k in d)u[k+'/unread']=false;db.ref('dmNotify/'+U.name).update(u)}});
+    if(id==='upload')updateUploadLimit();
 }
 
-// ===== NAV =====
-function nav(id, el) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    const target = document.getElementById(id);
-    if (target) target.classList.add('active');
-    if (el) { document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active')); el.classList.add('active'); }
-    if (id === 'search-page') renderRecentSearches();
-    if (id === 'chat-list') {
-        db.ref('dmNotify/' + U.name).once('value', s => {
-            const data = s.val();
-            if (data) { const upd = {}; for (let k in data) { upd[k + '/unread'] = false; } db.ref('dmNotify/' + U.name).update(upd); }
-        });
-    }
+function rHome(){
+    const hr=new Date().getHours();
+    document.getElementById('greet-txt').innerText=hr<11?"Selamat Pagi ☀️":hr<15?"Selamat Siang ⛅":hr<19?"Selamat Sore 🌤️":"Selamat Malam 🌙";
+    const wd=document.getElementById('warn-display');
+    if(U&&U.warnings>0)wd.innerHTML=`<div class="warn-bar">⚠️ Teguran: ${U.warnings}/5 - Hindari kata kasar!</div>`;else wd.innerHTML='';
+    const l=document.getElementById('h-list');l.innerHTML='';
+    if(!songs.length){l.innerHTML='<div class="empty-state"><i class="fas fa-music"></i><p>Belum ada lagu</p></div>';return}
+    songs.slice().reverse().forEach(s=>l.appendChild(mkRow(s)));
 }
 
-// ===== HOME =====
-function rHome() {
-    const hr = new Date().getHours();
-    let text = hr < 11 ? "Selamat Pagi ☀️" : hr < 15 ? "Selamat Siang ⛅" : hr < 19 ? "Selamat Sore 🌤️" : "Selamat Malam 🌙";
-    document.getElementById('greet-txt').innerText = text;
-    const l = document.getElementById('h-list');
-    l.innerHTML = '';
-    if (songs.length === 0) { l.innerHTML = '<div class="empty-state"><i class="fas fa-music"></i><p>Belum ada lagu.</p></div>'; return; }
-    songs.slice().reverse().forEach(s => {
-        l.appendChild(makeSongRow(s));
-    });
+function mkRow(s){const r=document.createElement('div');r.className='track-row';r.onclick=()=>playSong(s.id);r.innerHTML=`<img src="${esc(s.cover)}" onerror="this.src='${DC}'" alt=""><div style="min-width:0"><b style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(s.title)}</b><small style="color:var(--gray)">${esc(s.artist)}</small></div>`;return r}
+
+function doSearch(){const q=document.getElementById('s-inp').value.trim().toLowerCase(),r=document.getElementById('s-results'),e=document.getElementById('s-empty'),rc=document.getElementById('s-recent');r.innerHTML='';if(!q){e.style.display='block';rc.style.display='block';renderRecentSearches();return}e.style.display='none';rc.style.display='none';const f=songs.filter(s=>s.title.toLowerCase().includes(q)||s.artist.toLowerCase().includes(q));if(!f.length){r.innerHTML='<div class="empty-state"><i class="fas fa-search"></i><p>Tidak ditemukan</p></div>';return}f.forEach(s=>{const row=document.createElement('div');row.className='track-row';row.onclick=()=>{addSH(s);playSong(s.id)};row.innerHTML=`<img src="${esc(s.cover)}" onerror="this.src='${DC}'" alt=""><div style="min-width:0"><b style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(s.title)}</b><small style="color:var(--gray)">${esc(s.artist)}</small></div>`;r.appendChild(row)})}
+
+function addSH(s){searchHistory=searchHistory.filter(h=>h.id!==s.id);searchHistory.unshift({id:s.id,title:s.title,artist:s.artist,cover:s.cover});if(searchHistory.length>15)searchHistory=searchHistory.slice(0,15);localStorage.setItem('sh_'+U.name,JSON.stringify(searchHistory))}
+function cleanSH(){const ids=songs.map(s=>s.id);searchHistory=searchHistory.filter(h=>ids.includes(h.id));localStorage.setItem('sh_'+U.name,JSON.stringify(searchHistory))}
+function renderRecentSearches(){const c=document.getElementById('s-recent');if(!c)return;c.innerHTML='';cleanSH();if(!searchHistory.length)return;c.innerHTML=`<div class="recent-search-header"><h3>Terakhir Dicari</h3><span onclick="clearSH()">Hapus Semua</span></div>`;searchHistory.forEach(s=>{if(!songs.find(x=>x.id===s.id))return;const r=document.createElement('div');r.className='track-row';r.onclick=()=>playSong(s.id);r.innerHTML=`<img src="${esc(s.cover)}" onerror="this.src='${DC}'" alt=""><div style="min-width:0;flex:1"><b style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(s.title)}</b><small style="color:var(--gray)">${esc(s.artist)}</small></div><i class="fas fa-clock" style="color:var(--gray);opacity:.3;font-size:.8rem"></i>`;c.appendChild(r)})}
+function clearSH(){searchHistory=[];localStorage.setItem('sh_'+U.name,'[]');renderRecentSearches();toast("Riwayat dihapus")}
+
+function playSong(id){const s=songs.find(x=>x.id===id);if(!s){toast("Lagu dihapus",true);return}currentSongId=id;aud.src=s.url;aud.play();document.getElementById('p-ti').innerText=s.title;document.getElementById('p-ar').innerText=s.artist;const pi=document.getElementById('p-img');pi.src=s.cover;pi.onerror=function(){this.src=DC};document.getElementById('mini-p').style.display='flex';document.getElementById('p-toggle').style.display='flex';document.getElementById('p-ic').className='fas fa-pause';document.body.classList.add('player-active');playerCollapsed=false;document.getElementById('mini-p').classList.remove('collapsed');document.getElementById('p-toggle-icon').className='fas fa-chevron-down';updateFavBtn();updatePlBtn();db.ref('songs/'+id+'/plays').transaction(v=>(v||0)+1)}
+
+function togP(){if(aud.paused){aud.play();document.getElementById('p-ic').className='fas fa-pause'}else{aud.pause();document.getElementById('p-ic').className='fas fa-play'}}
+aud.addEventListener('ended',()=>nextSong());
+function nextSong(){if(!songs.length)return;let i=songs.findIndex(x=>x.id===currentSongId);i=(i+1)%songs.length;playSong(songs[i].id)}
+
+function togglePlayerBar(){
+    playerCollapsed=!playerCollapsed;
+    const bar=document.getElementById('mini-p'),icon=document.getElementById('p-toggle-icon');
+    if(playerCollapsed){bar.classList.add('collapsed');icon.className='fas fa-chevron-up';document.body.classList.remove('player-active')}
+    else{bar.classList.remove('collapsed');icon.className='fas fa-chevron-down';document.body.classList.add('player-active')}
 }
 
-function makeSongRow(s) {
-    const row = document.createElement('div');
-    row.className = 'track-row';
-    row.onclick = () => playSong(s.id);
-    row.innerHTML = `<img src="${esc(s.cover)}" onerror="this.src='${DEFAULT_COVER}'" alt="cover"><div style="min-width:0;"><b style="display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${esc(s.title)}</b><small style="color:var(--gray)">${esc(s.artist)}</small></div>`;
-    return row;
+function addCurrentToPlaylist(){if(!currentSongId)return;if(myPL.find(p=>p.sid===currentSongId)){toast("Sudah di playlist!");return}db.ref('playlists/'+U.name).push(currentSongId).then(()=>{toast("✅ Ke Playlist!");updatePlBtn()})}
+function updatePlBtn(){const b=document.getElementById('p-pl-btn');if(myPL.find(p=>p.sid===currentSongId)){b.className='fas fa-check-circle';b.style.color='var(--green)'}else{b.className='fas fa-plus-circle';b.style.color='var(--green)'}}
+function toggleFavCurrent(){if(!currentSongId||!U)return;if(favs.includes(currentSongId)){db.ref('favorites/'+U.name).orderByValue().equalTo(currentSongId).once('value',s=>{s.forEach(c=>c.ref.remove())});toast("Dihapus dari Favorit")}else{db.ref('favorites/'+U.name).push(currentSongId);toast("❤️ Favorit!")}}
+function updateFavBtn(){document.getElementById('p-fav-btn').className=favs.includes(currentSongId)?'fas fa-heart':'far fa-heart'}
+
+function rFavorites(){updateFavBtn();const l=document.getElementById('fav-list'),e=document.getElementById('fav-empty');if(!l)return;l.innerHTML='';const v=favs.filter(f=>songs.find(x=>x.id===f));if(!v.length){e.style.display='block';return}e.style.display='none';v.forEach(f=>{const s=songs.find(x=>x.id===f);if(s)l.appendChild(mkRow(s))})}
+
+function rPlaylist(){updatePlBtn();const l=document.getElementById('pl-list'),e=document.getElementById('pl-empty');if(!l)return;l.innerHTML='';const v=myPL.filter(i=>songs.find(x=>x.id===i.sid));if(!v.length){e.style.display='block';return}e.style.display='none';v.forEach(item=>{const s=songs.find(x=>x.id===item.sid);if(!s)return;const r=document.createElement('div');r.className='track-row';r.style.justifyContent='space-between';r.innerHTML=`<div style="display:flex;align-items:center;min-width:0;flex:1;cursor:pointer" onclick="playSong('${esc(s.id)}')"><img src="${esc(s.cover)}" onerror="this.src='${DC}'" alt=""><div style="min-width:0"><b style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(s.title)}</b><small style="color:var(--gray)">${esc(s.artist)}</small></div></div><i class="fas fa-trash" style="color:var(--red);cursor:pointer;padding:10px" onclick="event.stopPropagation();db.ref('playlists/${esc(U.name)}/${esc(item.id)}').remove()"></i>`;l.appendChild(r)})}
+
+// LIVE CHAT with clickable profiles
+function rLiveChat(snap){
+    const c=document.getElementById('live-msgs');c.innerHTML='';let cnt=0;
+    snap.forEach(x=>{const m=x.val();cnt++;const mine=m.user===U.name;const b=document.createElement('div');b.className='chat-bubble '+(mine?'mine':'other');const t=new Date(m.ts).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});const ri=isDev(m.user)?' 👑':m.role==='admin'?' 🛡️':m.role==='elite'?' 💎':m.role==='creator'?' ⭐':'';
+    b.innerHTML=`<div class="chat-name" onclick="viewUserFromLive('${esc(m.user)}')">${esc(m.user)}${ri}</div>${esc(m.text)}<div class="chat-time">${t}</div>`;c.appendChild(b)});
+    document.getElementById('live-count').innerText=cnt+' pesan';c.scrollTop=c.scrollHeight;
 }
 
-// ===== SEARCH =====
-function doSearch() {
-    const q = document.getElementById('s-inp').value.trim().toLowerCase();
-    const r = document.getElementById('s-results');
-    const empty = document.getElementById('s-empty');
-    const recent = document.getElementById('s-recent');
-    r.innerHTML = '';
-    if (!q) { empty.style.display = 'block'; recent.style.display = 'block'; renderRecentSearches(); return; }
-    empty.style.display = 'none';
-    recent.style.display = 'none';
-    const found = songs.filter(s => s.title.toLowerCase().includes(q) || s.artist.toLowerCase().includes(q));
-    if (found.length === 0) { r.innerHTML = '<div class="empty-state"><i class="fas fa-search"></i><p>Tidak ditemukan</p></div>'; return; }
-    found.forEach(s => {
-        const row = document.createElement('div');
-        row.className = 'track-row';
-        row.onclick = () => { addToSearchHistory(s); playSong(s.id); };
-        row.innerHTML = `<img src="${esc(s.cover)}" onerror="this.src='${DEFAULT_COVER}'" alt="cover"><div style="min-width:0;"><b style="display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${esc(s.title)}</b><small style="color:var(--gray)">${esc(s.artist)}</small></div>`;
-        r.appendChild(row);
-    });
-}
-
-function addToSearchHistory(song) {
-    searchHistory = searchHistory.filter(h => h.id !== song.id);
-    searchHistory.unshift({ id: song.id, title: song.title, artist: song.artist, cover: song.cover });
-    if (searchHistory.length > 15) searchHistory = searchHistory.slice(0, 15);
-    localStorage.setItem('sh_' + U.name, JSON.stringify(searchHistory));
-}
-
-function cleanSearchHistory() {
-    const songIds = songs.map(s => s.id);
-    searchHistory = searchHistory.filter(h => songIds.includes(h.id));
-    localStorage.setItem('sh_' + U.name, JSON.stringify(searchHistory));
-}
-
-function renderRecentSearches() {
-    const c = document.getElementById('s-recent');
-    if (!c) return;
-    c.innerHTML = '';
-    cleanSearchHistory();
-    if (searchHistory.length === 0) return;
-    c.innerHTML = `<div class="recent-search-header"><h3>Pencarian Terakhir</h3><span onclick="clearSearchHistory()">Hapus Semua</span></div>`;
-    searchHistory.forEach(s => {
-        const exists = songs.find(x => x.id === s.id);
-        if (!exists) return;
-        const row = document.createElement('div');
-        row.className = 'track-row';
-        row.onclick = () => playSong(s.id);
-        row.innerHTML = `<img src="${esc(s.cover)}" onerror="this.src='${DEFAULT_COVER}'" alt="cover"><div style="min-width:0; flex:1;"><b style="display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${esc(s.title)}</b><small style="color:var(--gray)">${esc(s.artist)}</small></div><i class="fas fa-clock" style="color:var(--gray); opacity:0.3; font-size:0.8rem;"></i>`;
-        c.appendChild(row);
-    });
-}
-
-function clearSearchHistory() {
-    searchHistory = [];
-    localStorage.setItem('sh_' + U.name, JSON.stringify(searchHistory));
-    renderRecentSearches();
-    toast("Riwayat pencarian dihapus");
-}
-
-// ===== PLAYER =====
-function playSong(id) {
-    const s = songs.find(x => x.id === id);
-    if (!s) { toast("Lagu tidak ditemukan / sudah dihapus"); return; }
-    currentSongId = id;
-    aud.src = s.url;
-    aud.play();
-    document.getElementById('p-ti').innerText = s.title;
-    document.getElementById('p-ar').innerText = s.artist;
-    const pimg = document.getElementById('p-img');
-    pimg.src = s.cover;
-    pimg.onerror = function() { this.src = DEFAULT_COVER; };
-    document.getElementById('mini-p').style.display = 'flex';
-    document.getElementById('p-ic').className = 'fas fa-pause';
-    document.body.classList.add('player-active');
-    updateFavBtn();
-    updatePlBtn();
-    db.ref('songs/' + id + '/plays').transaction(v => (v || 0) + 1);
-}
-
-function togP() {
-    if (aud.paused) { aud.play(); document.getElementById('p-ic').className = 'fas fa-pause'; }
-    else { aud.pause(); document.getElementById('p-ic').className = 'fas fa-play'; }
-}
-
-aud.addEventListener('ended', () => nextSong());
-aud.addEventListener('pause', () => { document.getElementById('p-ic').className = 'fas fa-play'; });
-aud.addEventListener('play', () => { document.getElementById('p-ic').className = 'fas fa-pause'; });
-
-function nextSong() {
-    if (songs.length === 0) return;
-    let idx = songs.findIndex(x => x.id === currentSongId);
-    idx = (idx + 1) % songs.length;
-    playSong(songs[idx].id);
-}
-
-// ===== ADD CURRENT TO PLAYLIST (+ button on player) =====
-function addCurrentToPlaylist() {
-    if (!currentSongId) return;
-    const already = myPL.find(p => p.sid === currentSongId);
-    if (already) { toast("Sudah ada di playlist!"); return; }
-    db.ref('playlists/' + U.name).push(currentSongId).then(() => {
-        toast("✅ Ditambahkan ke Playlist!");
-        updatePlBtn();
-    });
-}
-
-function updatePlBtn() {
-    const btn = document.getElementById('p-pl-btn');
-    const inPl = myPL.find(p => p.sid === currentSongId);
-    if (inPl) {
-        btn.className = 'fas fa-check-circle';
-        btn.style.color = 'var(--green)';
-    } else {
-        btn.className = 'fas fa-plus-circle';
-        btn.style.color = 'var(--green)';
-    }
-}
-
-// ===== FAVORITES =====
-function toggleFavCurrent() {
-    if (!currentSongId || !U) return;
-    if (favs.includes(currentSongId)) {
-        db.ref('favorites/' + U.name).orderByValue().equalTo(currentSongId).once('value', s => { s.forEach(c => c.ref.remove()); });
-        toast("Dihapus dari Favorit");
-    } else {
-        db.ref('favorites/' + U.name).push(currentSongId);
-        toast("❤️ Ditambahkan ke Favorit!");
-    }
-}
-
-function updateFavBtn() {
-    const btn = document.getElementById('p-fav-btn');
-    btn.className = favs.includes(currentSongId) ? 'fas fa-heart' : 'far fa-heart';
-}
-
-function rFavorites() {
-    updateFavBtn();
-    const l = document.getElementById('fav-list');
-    const empty = document.getElementById('fav-empty');
-    if (!l) return;
-    l.innerHTML = '';
-    const validFavs = favs.filter(fid => songs.find(x => x.id === fid));
-    if (validFavs.length === 0) { empty.style.display = 'block'; return; }
-    empty.style.display = 'none';
-    validFavs.forEach(fid => {
-        const s = songs.find(x => x.id === fid);
-        if (!s) return;
-        l.appendChild(makeSongRow(s));
-    });
-}
-
-// ===== PLAYLIST =====
-function rPlaylist() {
-    updatePlBtn();
-    const l = document.getElementById('pl-list');
-    const empty = document.getElementById('pl-empty');
-    if (!l) return;
-    l.innerHTML = '';
-    const validPL = myPL.filter(item => songs.find(x => x.id === item.sid));
-    if (validPL.length === 0) { empty.style.display = 'block'; return; }
-    empty.style.display = 'none';
-    validPL.forEach(item => {
-        const s = songs.find(x => x.id === item.sid);
-        if (!s) return;
-        const row = document.createElement('div');
-        row.className = 'track-row';
-        row.style.justifyContent = 'space-between';
-        row.innerHTML = `<div style="display:flex; align-items:center; min-width:0; flex:1; cursor:pointer;" onclick="playSong('${esc(s.id)}')"><img src="${esc(s.cover)}" onerror="this.src='${DEFAULT_COVER}'" alt="cover"><div style="min-width:0;"><b style="display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${esc(s.title)}</b><small style="color:var(--gray)">${esc(s.artist)}</small></div></div><i class="fas fa-trash" style="color:var(--red); cursor:pointer; padding:10px;" onclick="event.stopPropagation(); removeFromPlaylist('${esc(item.id)}')"></i>`;
-        l.appendChild(row);
-    });
-}
-
-function removeFromPlaylist(key) {
-    db.ref('playlists/' + U.name + '/' + key).remove();
-    toast("Dihapus dari Playlist");
-}
-
-// ===== LIVE CHAT =====
-function rLiveChat(snap) {
-    const c = document.getElementById('live-msgs');
-    c.innerHTML = '';
-    let count = 0;
-    snap.forEach(x => {
-        const m = x.val(); count++;
-        const mine = m.user === U.name;
-        const bubble = document.createElement('div');
-        bubble.className = 'chat-bubble ' + (mine ? 'mine' : 'other');
-        const time = new Date(m.ts).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-        const roleIcon = isDev(m.user) ? ' 👑' : m.role === 'admin' ? ' 🛡️' : m.role === 'elite' ? ' 💎' : m.role === 'creator' ? ' ⭐' : '';
-        bubble.innerHTML = `<div class="chat-name">${esc(m.user)}${roleIcon}</div>${esc(m.text)}<div class="chat-time">${time}</div>`;
-        c.appendChild(bubble);
-    });
-    document.getElementById('live-count').innerText = count + ' pesan';
-    c.scrollTop = c.scrollHeight;
-}
-
-function sendLive() {
-    const inp = document.getElementById('live-in');
-    const text = inp.value.trim();
-    if (!text) return;
-    db.ref('liveChat').push({ user: U.name, role: U.role, text: text, ts: firebase.database.ServerValue.TIMESTAMP });
-    inp.value = '';
-}
-
-// ===== SUPPORT =====
-function rSupportChat(snap) {
-    const c = document.getElementById('sup-msgs');
-    c.innerHTML = '';
-    snap.forEach(x => {
-        const m = x.val();
-        const mine = m.from === U.name;
-        const bubble = document.createElement('div');
-        bubble.className = 'chat-bubble ' + (mine ? 'mine' : 'other');
-        const time = new Date(m.ts).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-        bubble.innerHTML = `<div class="chat-name">${mine ? 'Kamu' : 'Admin 👑'}</div>${esc(m.text)}<div class="chat-time">${time}</div>`;
-        c.appendChild(bubble);
-    });
-    c.scrollTop = c.scrollHeight;
-}
-
-function sendSupport() {
-    const inp = document.getElementById('sup-in');
-    const text = inp.value.trim();
-    if (!text) return;
-    db.ref('support/' + U.name).push({ from: U.name, text: text, ts: firebase.database.ServerValue.TIMESTAMP });
-    inp.value = '';
-}
-
-// ===== DM / CONTACTS =====
-function addContactModal() {
-    showModal("Tambah Kontak", `
-        <p style="margin-bottom:10px; font-size:0.8rem; color:var(--gray);">Masukkan Nomor Regal untuk mencari kontak</p>
-        <input type="text" id="new-ct-phone" placeholder="Nomor Regal (contoh: 62xxx...)">
-        <input type="text" id="new-ct-label" placeholder="Nama kontak (opsional)">
-    `, () => {
-        const phone = document.getElementById('new-ct-phone').value.trim();
-        const label = document.getElementById('new-ct-label').value.trim();
-        if (!phone) { alert("Masukkan nomor Regal!"); return; }
-        db.ref('users').once('value', s => {
-            let foundUser = null;
-            s.forEach(child => { if (child.val().phone === phone) foundUser = child.key; });
-            if (!foundUser) { alert("Nomor Regal tidak ditemukan!"); return; }
-            if (foundUser === U.name) { alert("Tidak bisa chat dengan diri sendiri!"); return; }
-            db.ref('contacts/' + U.name + '/' + foundUser).set({
-                ts: firebase.database.ServerValue.TIMESTAMP, saved: true, label: label || foundUser, phone: phone
-            });
-            db.ref('contacts/' + foundUser + '/' + U.name).update({ ts: firebase.database.ServerValue.TIMESTAMP });
-            closeModal();
-            openChatWith(foundUser);
-        });
-    });
-}
-
-function rContacts(snap) {
-    const l = document.getElementById('ct-list');
-    const empty = document.getElementById('ct-empty');
-    l.innerHTML = '';
-    let count = 0;
-    snap.forEach(x => {
-        count++;
-        const name = x.key;
-        const data = x.val() || {};
-        const isSaved = data.saved === true;
-        const displayName = data.label || name;
-        const userData = users[name] || {};
-        const pfp = userData.pfp || '';
-        const item = document.createElement('div');
-        item.className = 'contact-item';
-        item.onclick = () => openChatWith(name);
-        let avatarHTML = pfp
-            ? `<div class="contact-avatar"><img src="${esc(pfp)}" onerror="this.parentElement.innerHTML='${esc(name.charAt(0).toUpperCase())}'"></div>`
-            : `<div class="contact-avatar">${esc(name.charAt(0).toUpperCase())}</div>`;
-        let unsavedBadge = !isSaved ? `<span class="unsaved-badge">Belum disimpan</span>` : '';
-        item.innerHTML = `${avatarHTML}<div style="flex:1; min-width:0;"><b>${esc(displayName)}</b>${unsavedBadge}${!isSaved ? '<br><small style="color:var(--gray); font-size:0.7rem;">@' + esc(name) + '</small>' : ''}<br><small style="color:var(--gray)">Tap untuk chat</small></div>`;
-        // unread dot async
-        db.ref('dmNotify/' + U.name + '/' + name + '/unread').once('value', ns => {
-            if (ns.val() === true) { const dot = document.createElement('div'); dot.className = 'unread-dot'; item.appendChild(dot); }
-        });
-        l.appendChild(item);
-    });
-    empty.style.display = count === 0 ? 'block' : 'none';
-}
-
-function openChatWith(name) {
-    currentDMUser = name;
-    const contactData = myContacts[name] || {};
-    const displayName = contactData.label || name;
-    document.getElementById('cr-name').innerText = displayName;
-    document.getElementById('cr-sub').innerText = '@' + name;
-    const userData = users[name] || {};
-    const avEl = document.getElementById('cr-avatar');
-    avEl.innerHTML = userData.pfp
-        ? `<img src="${esc(userData.pfp)}" onerror="this.parentElement.innerHTML='${esc(name.charAt(0).toUpperCase())}'"/>`
-        : name.charAt(0).toUpperCase();
-    nav('chat-room');
-    db.ref('dmNotify/' + U.name + '/' + name + '/unread').set(false);
-    const key = getDMKey(U.name, name);
-    db.ref('dms/' + key).off();
-    db.ref('dms/' + key).orderByChild('ts').on('value', s => {
-        const c = document.getElementById('cr-msgs');
-        c.innerHTML = '';
-        s.forEach(x => {
-            const m = x.val();
-            const mine = m.from === U.name;
-            const bubble = document.createElement('div');
-            bubble.className = 'chat-bubble ' + (mine ? 'mine' : 'other');
-            const time = new Date(m.ts).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-            bubble.innerHTML = `<div class="chat-name">${mine ? 'Kamu' : esc(displayName)}</div>${esc(m.text)}<div class="chat-time">${time}</div>`;
-            c.appendChild(bubble);
-        });
-        c.scrollTop = c.scrollHeight;
-    });
-}
-
-function closeChatRoom() {
-    if (currentDMUser) { db.ref('dms/' + getDMKey(U.name, currentDMUser)).off(); }
-    nav('chat-list');
-}
-
-function getDMKey(a, b) { return [a, b].sort().join('_'); }
-
-function sendDM() {
-    if (!currentDMUser) return;
-    const inp = document.getElementById('cr-in');
-    const text = inp.value.trim();
-    if (!text) return;
-    db.ref('dms/' + getDMKey(U.name, currentDMUser)).push({ from: U.name, text: text, ts: firebase.database.ServerValue.TIMESTAMP });
-    db.ref('dmNotify/' + currentDMUser + '/' + U.name).set({ unread: true, ts: firebase.database.ServerValue.TIMESTAMP });
-    db.ref('contacts/' + currentDMUser + '/' + U.name).once('value', s => {
-        if (!s.exists()) {
-            db.ref('contacts/' + currentDMUser + '/' + U.name).set({ ts: firebase.database.ServerValue.TIMESTAMP, saved: false, label: U.name });
-        }
-    });
-    inp.value = '';
-}
-
-function renameContactModal() {
-    if (!currentDMUser) return;
-    const currentLabel = (myContacts[currentDMUser] || {}).label || currentDMUser;
-    showModal("Ubah Nama Kontak", `<input type="text" id="rename-ct" placeholder="Nama baru..." value="${esc(currentLabel)}">`, () => {
-        const newName = document.getElementById('rename-ct').value.trim();
-        if (!newName) return;
-        db.ref('contacts/' + U.name + '/' + currentDMUser).update({ label: newName, saved: true });
-        document.getElementById('cr-name').innerText = newName;
-        closeModal();
-        toast("Nama kontak diubah!");
-    });
-}
-
-function viewUserProfile(username) {
-    if (!username) return;
-    db.ref('users/' + username).once('value', s => {
-        const d = s.val();
-        if (!d) return;
-        const avEl = document.getElementById('vp-avatar');
-        avEl.innerHTML = d.pfp
-            ? `<img src="${esc(d.pfp)}" onerror="this.parentElement.innerHTML='${esc(username.charAt(0).toUpperCase())}'"/>`
-            : username.charAt(0).toUpperCase();
-        const contactData = myContacts[username] || {};
-        document.getElementById('vp-name').innerText = contactData.label || username;
-        const role = isDev(username) ? 'DEVELOPER' : (d.role || 'viewer').toUpperCase();
-        document.getElementById('vp-role').innerText = role;
-        document.getElementById('vp-bio').innerText = d.bio || 'Regal User';
-        document.getElementById('vp-phone').innerText = '+' + (d.phone || '62---');
-        document.getElementById('vp-role2').innerText = role;
+function viewUserFromLive(username){
+    if(username===U.name)return;
+    viewingUser=username;viewProfileFrom='live-chat';
+    db.ref('users/'+username).once('value',s=>{
+        const d=s.val();if(!d)return;
+        setViewProfile(username,d);
+        const isSaved=myContacts[username]&&myContacts[username].saved;
+        document.getElementById('vp-save-btn').style.display=isSaved?'none':'block';
+        document.getElementById('vp-rename-btn').style.display=isSaved?'block':'none';
+        document.getElementById('vp-back-btn').onclick=()=>nav(viewProfileFrom);
         nav('view-profile');
     });
 }
 
-// ===== UPLOAD =====
-async function doUpload() {
-    if (!['owner', 'elite', 'creator', 'admin'].includes(U.role)) { alert("Hanya Creator/Elite/Admin yang bisa upload!"); return; }
-    const title = document.getElementById('up-title').value.trim();
-    const artist = document.getElementById('up-artist').value.trim();
-    if (!title || !artist) { alert("Isi judul dan artis!"); return; }
-    if (!uploadAudioFile) { alert("Pilih file audio MP3!"); return; }
-    const btn = document.getElementById('upload-btn');
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> UPLOADING...';
-    try {
-        const ts = Date.now();
-        const audioUrl = await uploadFileToStorage(uploadAudioFile, 'songs/' + U.name + '/' + ts + '_' + uploadAudioFile.name, document.getElementById('upload-progress'), document.getElementById('upload-progress-fill'));
-        let coverUrl = DEFAULT_COVER;
-        if (uploadCoverFile) {
-            coverUrl = await uploadFileToStorage(uploadCoverFile, 'covers/' + U.name + '/' + ts + '_' + uploadCoverFile.name, null, null);
-        }
-        await db.ref('songs').push({ title, artist, url: audioUrl, cover: coverUrl, uploader: U.name, plays: 0, ts: firebase.database.ServerValue.TIMESTAMP });
-        toast("Lagu berhasil diupload! 🎵");
-        document.getElementById('up-title').value = '';
-        document.getElementById('up-artist').value = '';
-        uploadAudioFile = null; uploadCoverFile = null;
-        document.getElementById('audio-file-name').innerText = '';
-        document.getElementById('cover-file-name').innerText = '';
-        document.getElementById('cover-preview').style.display = 'none';
-        nav('home');
-    } catch (err) { alert("Upload gagal: " + err.message); }
-    finally { btn.disabled = false; btn.innerHTML = '<i class="fas fa-cloud-arrow-up"></i> UPLOAD'; }
+async function sendLive(){
+    const inp=document.getElementById('live-in'),text=inp.value.trim();if(!text)return;
+    if(await checkAndWarn(text)){inp.value='';return}
+    db.ref('liveChat').push({user:U.name,role:U.role,text,ts:firebase.database.ServerValue.TIMESTAMP});inp.value='';
 }
 
-// ===== PREMIUM =====
-function openQRIS(tier, price) {
-    document.getElementById('q-title').innerText = 'Pembayaran ' + tier;
-    document.getElementById('q-price').innerText = 'Rp ' + price.toLocaleString('id-ID');
-    nav('qris-page');
-    window._purchaseTier = tier;
-    window._purchasePrice = price;
+function rSupportChat(snap){const c=document.getElementById('sup-msgs');c.innerHTML='';snap.forEach(x=>{const m=x.val(),mine=m.from===U.name;const b=document.createElement('div');b.className='chat-bubble '+(mine?'mine':'other');const t=new Date(m.ts).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});b.innerHTML=`<div class="chat-name">${mine?'Kamu':'Admin 👑'}</div>${esc(m.text)}<div class="chat-time">${t}</div>`;c.appendChild(b)});c.scrollTop=c.scrollHeight}
+function sendSupport(){const inp=document.getElementById('sup-in'),text=inp.value.trim();if(!text)return;db.ref('support/'+U.name).push({from:U.name,text,ts:firebase.database.ServerValue.TIMESTAMP});inp.value=''}
+
+function addContactModal(){showModal("Tambah Kontak",`<p style="margin-bottom:10px;font-size:.8rem;color:var(--gray)">Masukkan Nomor Regal</p><input type="text" id="new-ct-phone" placeholder="Nomor Regal..."><input type="text" id="new-ct-label" placeholder="Nama kontak (opsional)">`,()=>{const ph=document.getElementById('new-ct-phone').value.trim(),lb=document.getElementById('new-ct-label').value.trim();if(!ph){alert("Masukkan nomor!");return}db.ref('users').once('value',s=>{let found=null;s.forEach(c=>{if(c.val().phone===ph)found=c.key});if(!found){alert("Nomor tidak ditemukan!");return}if(found===U.name){alert("Tidak bisa sendiri!");return}db.ref('contacts/'+U.name+'/'+found).set({ts:firebase.database.ServerValue.TIMESTAMP,saved:true,label:lb||found,phone:ph});db.ref('contacts/'+found+'/'+U.name).update({ts:firebase.database.ServerValue.TIMESTAMP});closeModal();openChatWith(found)})})}
+
+function rContacts(snap){const l=document.getElementById('ct-list'),e=document.getElementById('ct-empty');l.innerHTML='';let cnt=0;snap.forEach(x=>{cnt++;const n=x.key,d=x.val()||{},saved=d.saved===true,dn=d.label||n,ud=users[n]||{},pfp=ud.pfp||'';const item=document.createElement('div');item.className='contact-item';item.onclick=()=>openChatWith(n);item.innerHTML=`${pfp?`<div class="contact-avatar"><img src="${esc(pfp)}" onerror="this.parentElement.innerHTML='${esc(n.charAt(0).toUpperCase())}'"></div>`:`<div class="contact-avatar">${esc(n.charAt(0).toUpperCase())}</div>`}<div style="flex:1;min-width:0"><b>${esc(dn)}</b>${!saved?'<span class="unsaved-badge">Belum disimpan</span>':''}${!saved?'<br><small style="color:var(--gray);font-size:.7rem">@'+esc(n)+'</small>':''}<br><small style="color:var(--gray)">Tap untuk chat</small></div>`;db.ref('dmNotify/'+U.name+'/'+n+'/unread').once('value',ns=>{if(ns.val()===true){const dot=document.createElement('div');dot.className='unread-dot';item.appendChild(dot)}});l.appendChild(item)});e.style.display=cnt===0?'block':'none'}
+
+function openChatWith(name){currentDMUser=name;const cd=myContacts[name]||{},dn=cd.label||name;document.getElementById('cr-name').innerText=dn;document.getElementById('cr-sub').innerText='@'+name;const ud=users[name]||{},av=document.getElementById('cr-avatar');av.innerHTML=ud.pfp?`<img src="${esc(ud.pfp)}" onerror="this.parentElement.innerHTML='${esc(name.charAt(0).toUpperCase())}'"/>`
+:name.charAt(0).toUpperCase();nav('chat-room');db.ref('dmNotify/'+U.name+'/'+name+'/unread').set(false);const key=getDMKey(U.name,name);db.ref('dms/'+key).off();db.ref('dms/'+key).orderByChild('ts').on('value',s=>{const c=document.getElementById('cr-msgs');c.innerHTML='';s.forEach(x=>{const m=x.val(),mine=m.from===U.name;const b=document.createElement('div');b.className='chat-bubble '+(mine?'mine':'other');const t=new Date(m.ts).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});b.innerHTML=`<div class="chat-name">${mine?'Kamu':esc(dn)}</div>${esc(m.text)}<div class="chat-time">${t}</div>`;c.appendChild(b)});c.scrollTop=c.scrollHeight})}
+function closeChatRoom(){if(currentDMUser)db.ref('dms/'+getDMKey(U.name,currentDMUser)).off();nav('chat-list')}
+function getDMKey(a,b){return[a,b].sort().join('_')}
+
+async function sendDM(){if(!currentDMUser)return;const inp=document.getElementById('cr-in'),text=inp.value.trim();if(!text)return;
+    if(await checkAndWarn(text)){inp.value='';return}
+    db.ref('dms/'+getDMKey(U.name,currentDMUser)).push({from:U.name,text,ts:firebase.database.ServerValue.TIMESTAMP});db.ref('dmNotify/'+currentDMUser+'/'+U.name).set({unread:true,ts:firebase.database.ServerValue.TIMESTAMP});db.ref('contacts/'+currentDMUser+'/'+U.name).once('value',s=>{if(!s.exists())db.ref('contacts/'+currentDMUser+'/'+U.name).set({ts:firebase.database.ServerValue.TIMESTAMP,saved:false,label:U.name})});inp.value=''}
+
+function renameContactModal(){if(!currentDMUser&&!viewingUser)return;const target=viewingUser||currentDMUser;const cl=(myContacts[target]||{}).label||target;showModal("Ubah Nama",`<input type="text" id="rename-ct" placeholder="Nama baru..." value="${esc(cl)}">`,()=>{const n=document.getElementById('rename-ct').value.trim();if(!n)return;db.ref('contacts/'+U.name+'/'+target).update({label:n,saved:true});if(target===currentDMUser)document.getElementById('cr-name').innerText=n;closeModal();toast("Nama diubah!")})}
+
+function setViewProfile(username,d){
+    const av=document.getElementById('vp-avatar');
+    av.innerHTML=d.pfp?`<img src="${esc(d.pfp)}" onerror="this.parentElement.innerHTML='${esc(username.charAt(0).toUpperCase())}'"/>`
+    :username.charAt(0).toUpperCase();
+    const cd=myContacts[username]||{};
+    document.getElementById('vp-name').innerText=cd.label||username;
+    const role=isDev(username)?'DEVELOPER':(d.role||'viewer').toUpperCase();
+    document.getElementById('vp-role').innerText=role;
+    document.getElementById('vp-bio').innerText=d.bio||'Regal User';
+    document.getElementById('vp-phone').innerText='+'+(d.phone||'62---');
+    document.getElementById('vp-role2').innerText=role;
 }
 
-function submitPaymentRequest() {
-    if (!window._purchaseTier) return;
-    db.ref('paymentRequests').push({ user: U.name, tier: window._purchaseTier, price: window._purchasePrice, status: 'pending', ts: firebase.database.ServerValue.TIMESTAMP }).then(() => {
-        showModal("Terkirim!", "<p>Permintaan pembayaran dikirim ke Admin. Tunggu verifikasi.</p>", () => { closeModal(); nav('home'); });
+function viewUserProfile(username){
+    if(!username)return;viewingUser=username;viewProfileFrom='chat-room';
+    db.ref('users/'+username).once('value',s=>{
+        const d=s.val();if(!d)return;
+        setViewProfile(username,d);
+        const isSaved=myContacts[username]&&myContacts[username].saved;
+        document.getElementById('vp-save-btn').style.display=isSaved?'none':'block';
+        document.getElementById('vp-rename-btn').style.display='block';
+        document.getElementById('vp-back-btn').onclick=()=>nav(viewProfileFrom);
+        nav('view-profile');
     });
 }
 
-// ===== PROFILE =====
-function updateProfileUI() {
-    if (!U) return;
-    document.getElementById('p-un').innerText = U.name;
-    document.getElementById('p-phone').innerText = "+" + (U.phone || '62---');
-    document.getElementById('p-bio').innerText = U.bio || 'Regal User';
-    const roleLabel = isDev(U.name) ? "DEV" : (U.role || 'viewer').toUpperCase();
-    document.getElementById('p-role-txt').innerText = roleLabel + (isDev(U.name) ? " (DEVELOPER)" : " MEMBER");
-    document.getElementById('p-av-init').innerText = U.name.charAt(0).toUpperCase();
-    const b = document.getElementById('p-badge-container');
-    b.innerHTML = '';
-    if (isDev(U.name)) b.innerHTML = '<div class="badge-dev">V</div>';
-    else if (U.role === 'admin') b.innerHTML = '<div class="badge-a"><i class="fas fa-shield"></i></div>';
-    else if (U.role === 'elite') b.innerHTML = '<div class="badge-e"><i class="fas fa-gem"></i></div>';
-    else if (U.role === 'creator') b.innerHTML = '<div class="badge-c"><i class="fas fa-circle"></i></div>';
-    if (U.pfp) {
-        document.getElementById('p-av-img').src = U.pfp;
-        document.getElementById('p-av-img').style.display = 'block';
-        document.getElementById('p-av-init').style.display = 'none';
+function saveContactFromProfile(){
+    if(!viewingUser)return;
+    const ud=users[viewingUser]||{};
+    const phone=ud.phone||'';
+    showModal("Simpan Kontak",`<input type="text" id="save-ct-label" placeholder="Nama kontak..." value="${esc(viewingUser)}">`,()=>{
+        const label=document.getElementById('save-ct-label').value.trim()||viewingUser;
+        db.ref('contacts/'+U.name+'/'+viewingUser).set({ts:firebase.database.ServerValue.TIMESTAMP,saved:true,label:label,phone:phone});
+        db.ref('contacts/'+viewingUser+'/'+U.name).update({ts:firebase.database.ServerValue.TIMESTAMP});
+        closeModal();toast("Kontak disimpan!");
+        document.getElementById('vp-save-btn').style.display='none';
+        openChatWith(viewingUser);
+    });
+}
+
+// UPLOAD with creator limit
+function updateUploadLimit(){
+    if(!U)return;
+    const info=document.getElementById('upload-limit-info');
+    if(U.role==='creator'){
+        const today=new Date().toISOString().split('T')[0];
+        db.ref('uploadCount/'+U.name+'/'+today).once('value',s=>{
+            const cnt=s.val()||0;
+            info.innerHTML=`⚡ Creator: ${cnt}/3 upload hari ini`;
+        });
+    } else if(U.role==='elite'||isDev(U.name)||U.role==='admin'){
+        info.innerHTML='♾️ Unlimited upload';
     } else {
-        document.getElementById('p-av-img').style.display = 'none';
-        document.getElementById('p-av-init').style.display = 'block';
+        info.innerHTML='';
     }
 }
 
-async function saveProfile() {
-    const bio = document.getElementById('edit-bio-in').value.trim();
-    const updates = {};
-    const btn = document.getElementById('save-profile-btn');
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
-    try {
-        if (editPfpFile) {
-            const pfpUrl = await uploadFileToStorage(editPfpFile, 'avatars/' + U.name + '/' + Date.now() + '_' + editPfpFile.name, document.getElementById('pfp-progress'), document.getElementById('pfp-progress-fill'));
-            updates.pfp = pfpUrl;
+async function doUpload(){
+    if(!['owner','elite','creator','admin'].includes(U.role)){alert("Perlu Creator/Elite!");return}
+    const title=document.getElementById('up-title').value.trim(),artist=document.getElementById('up-artist').value.trim();
+    if(!title||!artist){alert("Isi judul & artis!");return}
+    if(!uploadAudioFile){alert("Pilih file MP3!");return}
+
+    // Creator 3/day limit
+    if(U.role==='creator'){
+        const today=new Date().toISOString().split('T')[0];
+        const snap=await db.ref('uploadCount/'+U.name+'/'+today).once('value');
+        const cnt=snap.val()||0;
+        if(cnt>=3){toast("Limit 3 upload/hari tercapai!",true);return}
+    }
+
+    const btn=document.getElementById('upload-btn');
+    btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> UPLOADING...';
+    try{
+        const ts=Date.now();
+        const audioUrl=await uploadFile(uploadAudioFile,'songs/'+U.name+'/'+ts+'_audio',document.getElementById('upload-progress'),document.getElementById('upload-progress-fill'));
+        let coverUrl=DC;
+        if(uploadCoverFile)coverUrl=await uploadFile(uploadCoverFile,'covers/'+U.name+'/'+ts+'_cover',null,null);
+        await db.ref('songs').push({title,artist,url:audioUrl,cover:coverUrl,uploader:U.name,plays:0,ts:firebase.database.ServerValue.TIMESTAMP});
+
+        // Increment upload count
+        if(U.role==='creator'){
+            const today=new Date().toISOString().split('T')[0];
+            db.ref('uploadCount/'+U.name+'/'+today).transaction(v=>(v||0)+1);
         }
-        if (bio) updates.bio = bio;
-        if (Object.keys(updates).length === 0) { alert("Isi minimal satu field!"); return; }
-        await db.ref('users/' + U.name).update(updates);
-        toast("Profil diperbarui! ✅");
-        editPfpFile = null;
-        document.getElementById('pfp-file-name').innerText = '';
-        document.getElementById('pfp-preview').style.display = 'none';
-        nav('profile');
-    } catch (err) { alert("Gagal: " + err.message); }
-    finally { btn.disabled = false; btn.innerHTML = 'Simpan'; }
+
+        toast("🎵 Upload berhasil!");
+        document.getElementById('up-title').value='';document.getElementById('up-artist').value='';
+        uploadAudioFile=null;uploadCoverFile=null;
+        document.getElementById('audio-file-name').innerText='';document.getElementById('cover-file-name').innerText='';document.getElementById('cover-preview').style.display='none';
+        nav('home');
+    }catch(err){alert("Upload gagal: "+err.message)}
+    finally{btn.disabled=false;btn.innerHTML='<i class="fas fa-cloud-arrow-up"></i> UPLOAD'}
 }
 
-function showBadgeInfo() {
-    if (isDev(U.name)) showModal("Badge Info", "<p>👑 <b>Developer</b></p>", closeModal);
-    else if (U.role === 'admin') showModal("Badge Info", "<p>🛡️ <b>Admin</b> - Staff administrator</p>", closeModal);
-    else if (U.role === 'elite') showModal("Badge Info", "<p>💎 <b>Elite Producer</b></p>", closeModal);
-    else if (U.role === 'creator') showModal("Badge Info", "<p>⭐ <b>Creator</b></p>", closeModal);
-    else showModal("Badge Info", "<p>Belum ada badge</p>", closeModal);
+// PREMIUM
+function updatePremiumUI(){
+    if(!U)return;
+    const cp=qrisSettings.creatorPrice||10000,ep=qrisSettings.elitePrice||45000;
+    document.getElementById('creator-price-display').innerHTML='Rp '+cp.toLocaleString('id-ID')+' <small style="color:var(--gray)">/ bulan</small>';
+    document.getElementById('elite-price-display').innerHTML='Rp '+ep.toLocaleString('id-ID')+' <small style="color:var(--gray)">/ bulan</small>';
+    document.getElementById('creator-active-badge').style.display=U.role==='creator'?'block':'none';
+    document.getElementById('elite-active-badge').style.display=U.role==='elite'?'block':'none';
+    document.getElementById('btn-buy-creator').style.display=U.role==='creator'||U.role==='elite'?'none':'block';
+    document.getElementById('btn-buy-elite').style.display=U.role==='elite'?'none':'block';
 }
 
-// ===== AUTH =====
-function togAM() {
-    am = am === 'login' ? 'register' : 'login';
-    document.getElementById('auth-btn').innerText = am === 'login' ? 'MASUK' : 'DAFTAR';
-    document.getElementById('atog').innerHTML = am === 'login'
-        ? 'Belum punya akun? <span style="color:var(--accent)">Daftar</span>'
-        : 'Sudah punya akun? <span style="color:var(--accent)">Masuk</span>';
+function openQRIS(tier){
+    const price=tier==='Creator'?(qrisSettings.creatorPrice||10000):(qrisSettings.elitePrice||45000);
+    document.getElementById('q-title').innerText='Pembayaran '+tier;
+    document.getElementById('q-price').innerText='Rp '+price.toLocaleString('id-ID');
+    const img=document.getElementById('qris-dynamic-img'),ph=document.getElementById('qris-placeholder');
+    if(qrisSettings.imageUrl){img.src=qrisSettings.imageUrl;img.style.display='block';ph.style.display='none'}
+    else{img.style.display='none';ph.style.display='block'}
+    window._pt=tier;window._pp=price;nav('qris-page');
 }
 
-function doAuth() {
-    const u = document.getElementById('l-u').value.trim();
-    const p = document.getElementById('l-p').value.trim();
-    if (!u || !p) { alert("Isi username dan password!"); return; }
-    if (u.length < 2) { alert("Username minimal 2 karakter!"); return; }
-    if (p.length < 3) { alert("Password minimal 3 karakter!"); return; }
+function submitPaymentRequest(){if(!window._pt)return;db.ref('paymentRequests').push({user:U.name,tier:window._pt,price:window._pp,status:'pending',ts:firebase.database.ServerValue.TIMESTAMP}).then(()=>{showModal("Terkirim!","<p>Tunggu verifikasi Admin.</p>",()=>{closeModal();nav('home')})})}
 
-    db.ref('users/' + u).once('value', s => {
-        if (am === 'login') {
-            if (!s.exists()) { alert("Akun tidak ditemukan!"); return; }
-            if (s.val().pass !== p) { alert("Password salah!"); return; }
-            if (s.val().banned && !isDev(u)) {
-                alert("Akun Anda telah di-banned!");
-                return;
+// QRIS Admin
+function updateQrisAdmin(){
+    if(!document.getElementById('aq-url'))return;
+    document.getElementById('aq-url').value=qrisSettings.imageUrl||'';
+    document.getElementById('aq-creator-price').value=qrisSettings.creatorPrice||10000;
+    document.getElementById('aq-elite-price').value=qrisSettings.elitePrice||45000;
+    if(qrisSettings.imageUrl){document.getElementById('aq-preview').src=qrisSettings.imageUrl;document.getElementById('aq-preview').style.display='block';document.getElementById('aq-no-preview').style.display='none'}
+    else{document.getElementById('aq-preview').style.display='none';document.getElementById('aq-no-preview').style.display='block'}
+}
+
+function saveQrisSettings(){
+    const url=document.getElementById('aq-url').value.trim();
+    const cp=parseInt(document.getElementById('aq-creator-price').value)||10000;
+    const ep=parseInt(document.getElementById('aq-elite-price').value)||45000;
+    db.ref('appSettings/qris').set({imageUrl:url,creatorPrice:cp,elitePrice:ep}).then(()=>toast("QRIS disimpan!"));
+}
+
+// PROFILE
+function updateProfileUI(){
+    if(!U)return;
+    document.getElementById('p-un').innerText=U.name;
+    document.getElementById('p-phone').innerText='+'+(U.phone||'62---');
+    document.getElementById('p-bio').innerText=U.bio||'Regal User';
+    document.getElementById('p-role-txt').innerText=(isDev(U.name)?'DEV':(U.role||'viewer').toUpperCase())+(isDev(U.name)?' (DEVELOPER)':' MEMBER');
+    document.getElementById('p-av-init').innerText=U.name.charAt(0).toUpperCase();
+    document.getElementById('p-warns').innerText=(U.warnings||0)+' / 5';
+    const b=document.getElementById('p-badge-container');b.innerHTML='';
+    if(isDev(U.name))b.innerHTML='<div class="badge-dev">V</div>';
+    else if(U.role==='admin')b.innerHTML='<div class="badge-a"><i class="fas fa-shield"></i></div>';
+    else if(U.role==='elite')b.innerHTML='<div class="badge-e"><i class="fas fa-gem"></i></div>';
+    else if(U.role==='creator')b.innerHTML='<div class="badge-c"><i class="fas fa-circle"></i></div>';
+    if(U.pfp){document.getElementById('p-av-img').src=U.pfp;document.getElementById('p-av-img').style.display='block';document.getElementById('p-av-init').style.display='none'}
+    else{document.getElementById('p-av-img').style.display='none';document.getElementById('p-av-init').style.display='block'}
+}
+
+async function saveProfile(){
+    const bio=document.getElementById('edit-bio-in').value.trim(),updates={};
+    const btn=document.getElementById('save-profile-btn');btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> ...';
+    try{
+        if(editPfpFile){const url=await uploadFile(editPfpFile,'avatars/'+U.name+'/'+Date.now(),document.getElementById('pfp-progress'),document.getElementById('pfp-progress-fill'));updates.pfp=url}
+        if(bio)updates.bio=bio;
+        if(!Object.keys(updates).length){alert("Isi minimal 1 field!");return}
+        await db.ref('users/'+U.name).update(updates);toast("Profil diperbarui!");editPfpFile=null;document.getElementById('pfp-file-name').innerText='';document.getElementById('pfp-preview').style.display='none';nav('profile');
+    }catch(err){alert("Gagal: "+err.message)}finally{btn.disabled=false;btn.innerHTML='Simpan'}
+}
+
+function showBadgeInfo(){
+    if(isDev(U.name))showModal("Badge","<p>👑 Developer</p>",closeModal);
+    else if(U.role==='admin')showModal("Badge","<p>🛡️ Admin</p>",closeModal);
+    else if(U.role==='elite')showModal("Badge","<p>💎 Elite</p>",closeModal);
+    else if(U.role==='creator')showModal("Badge","<p>⭐ Creator</p>",closeModal);
+    else showModal("Badge","<p>Belum ada badge</p>",closeModal);
+}
+
+// AUTH
+function togAM(){am=am==='login'?'register':'login';document.getElementById('auth-btn').innerText=am==='login'?'MASUK':'DAFTAR';document.getElementById('atog').innerHTML=am==='login'?'Belum punya akun? <span style="color:var(--accent)">Daftar</span>':'Sudah punya? <span style="color:var(--accent)">Masuk</span>'}
+
+function doAuth(){
+    const u=document.getElementById('l-u').value.trim(),p=document.getElementById('l-p').value.trim();
+    if(!u||!p){alert("Isi semua!");return}if(u.length<2||p.length<3){alert("Username min 2, password min 3!");return}
+    db.ref('users/'+u).once('value',s=>{
+        if(am==='login'){
+            if(!s.exists()){alert("Akun tidak ada!");return}
+            if(s.val().pass!==p){alert("Password salah!");return}
+            if(s.val().banned&&!isDev(u)){
+                if(s.val().banUntil&&Date.now()>s.val().banUntil){
+                    db.ref('users/'+u+'/banned').remove();
+                    db.ref('users/'+u+'/banUntil').remove();
+                } else {alert("Akun di-banned!");return}
             }
-            db.ref('users/' + u + '/forceLogout').remove();
-            U = { name: u, role: s.val().role || 'viewer' };
-            localStorage.setItem('uv15', JSON.stringify(U));
-            location.reload();
+            db.ref('users/'+u+'/forceLogout').remove();
+            U={name:u,role:s.val().role||'viewer'};localStorage.setItem('uv15',JSON.stringify(U));location.reload();
         } else {
-            if (s.exists()) { alert("Username sudah dipakai!"); return; }
-            const role = isDev(u) ? 'owner' : 'viewer';
-            const phone = isDev(u) ? KING_PHONE : ("62" + Math.floor(100000000000 + Math.random() * 900000000000));
-            db.ref('users/' + u).set({
-                pass: p, role: role, phone: phone,
-                bio: 'Halo! Saya pengguna Regal 🎵',
-                joined: firebase.database.ServerValue.TIMESTAMP
-            }).then(() => {
-                U = { name: u, role: role };
-                localStorage.setItem('uv15', JSON.stringify(U));
-                location.reload();
-            });
+            if(s.exists()){alert("Username sudah ada!");return}
+            const role=isDev(u)?'owner':'viewer';
+            let phone;
+            if(u===KING)phone=KING_PHONE;
+            else if(u===DEV2)phone=DEV2_PHONE;
+            else phone="62"+Math.floor(100000000000+Math.random()*900000000000);
+            db.ref('users/'+u).set({pass:p,role,phone,bio:'Halo! Saya pengguna Regal 🎵',joined:firebase.database.ServerValue.TIMESTAMP}).then(()=>{U={name:u,role};localStorage.setItem('uv15',JSON.stringify(U));location.reload()});
         }
     });
 }
 
-// ===== ADMIN =====
-function loadStats() {
-    let cr = 0, el = 0;
-    for (let n in users) { if (users[n].role === 'creator') cr++; if (users[n].role === 'elite') el++; }
-    document.getElementById('st-u').innerText = Object.keys(users).length;
-    document.getElementById('st-s').innerText = songs.length;
-    document.getElementById('st-cr').innerText = cr;
-    document.getElementById('st-el').innerText = el;
-}
+// ADMIN
+function loadStats(){let cr=0,el=0;for(let n in users){if(users[n].role==='creator')cr++;if(users[n].role==='elite')el++}document.getElementById('st-u').innerText=Object.keys(users).length;document.getElementById('st-s').innerText=songs.length;document.getElementById('st-cr').innerText=cr;document.getElementById('st-el').innerText=el}
 
-function rAdminUsers() {
-    const b = document.getElementById('au-list');
-    if (!b) return;
-    b.innerHTML = '';
-    for (let n in users) {
-        const u = users[n];
-        const row = document.createElement('div');
-        row.className = 'track-row';
-        row.style.justifyContent = 'space-between';
-        row.innerHTML = `
-            <div>
-                <b>${esc(n)}</b> ${isDev(n) ? '👑' : u.role === 'admin' ? '🛡️' : ''}
-                <br><small style="color:var(--gray)">${esc(u.phone || 'N/A')}</small>
-            </div>
-            <div onclick="editRoleModal('${esc(n)}')" style="background:var(--card); padding:5px 10px; border-radius:5px; border:1px solid var(--border); font-size:0.6rem; font-weight:800; cursor:pointer;">${esc((u.role || 'viewer').toUpperCase())}</div>`;
-        b.appendChild(row);
-    }
-}
+function rAdminUsers(){const b=document.getElementById('au-list');if(!b)return;b.innerHTML='';for(let n in users){const u=users[n],r=document.createElement('div');r.className='track-row';r.style.justifyContent='space-between';r.innerHTML=`<div><b>${esc(n)}</b> ${isDev(n)?'👑':u.role==='admin'?'🛡️':''}<br><small style="color:var(--gray)">${esc(u.phone||'N/A')}</small></div><div onclick="editRoleModal('${esc(n)}')" style="background:var(--card);padding:5px 10px;border-radius:5px;border:1px solid var(--border);font-size:.6rem;font-weight:800;cursor:pointer">${esc((u.role||'viewer').toUpperCase())}</div>`;b.appendChild(r)}}
 
-function editRoleModal(un) {
-    if (isDev(un) && !isDev(U.name)) { alert("Tidak bisa ubah role Developer!"); return; }
-    showModal("Ubah Role", `<p style="margin-bottom:10px;">Ubah role <b style="color:var(--elite)">${esc(un)}</b></p><select id="new-role" style="width:100%; padding:12px; background:rgba(255,255,255,0.08); border:1px solid var(--border); border-radius:10px; color:#fff; font-family:inherit;"><option value="viewer">Viewer</option><option value="creator">Creator</option><option value="elite">Elite</option><option value="admin">Admin</option></select>`, () => {
-        const newRole = document.getElementById('new-role').value;
-        db.ref('users/' + un + '/role').set(newRole).then(() => {
-            toast(un + " → " + newRole.toUpperCase());
-            closeModal();
-        });
-    });
-}
+function editRoleModal(un){if(isDev(un)&&!isDev(U.name)){alert("Tidak bisa ubah Developer!");return}showModal("Ubah Role",`<p style="margin-bottom:10px">Role <b style="color:var(--elite)">${esc(un)}</b></p><select id="new-role" style="width:100%;padding:12px;background:rgba(255,255,255,.08);border:1px solid var(--border);border-radius:10px;color:#fff;font-family:inherit"><option value="viewer">Viewer</option><option value="creator">Creator</option><option value="elite">Elite</option><option value="admin">Admin</option></select>`,()=>{const nr=document.getElementById('new-role').value;db.ref('users/'+un+'/role').set(nr).then(()=>{toast(un+" → "+nr.toUpperCase());closeModal()})})}
 
-function rAdminBan() {
-    const b = document.getElementById('ab-list');
-    if (!b) return;
-    b.innerHTML = '';
-    for (let n in users) {
-        if (isDev(n)) continue;
-        const u = users[n];
-        const isBanned = u.banned === true;
-        const row = document.createElement('div');
-        row.className = 'track-row';
-        row.style.justifyContent = 'space-between';
-        row.innerHTML = `
-            <div><b>${esc(n)}</b><br><small style="color:${isBanned ? 'var(--red)' : 'var(--green)'};">${isBanned ? '🚫 BANNED' : '✅ AKTIF'}</small></div>
-            <button onclick="toggleBan('${esc(n)}', ${!isBanned})" style="padding:8px 15px; border:none; border-radius:8px; font-weight:800; font-size:0.7rem; cursor:pointer; background:${isBanned ? 'var(--green)' : 'var(--red)'}; color:#fff;">${isBanned ? 'UNBAN' : 'BAN'}</button>`;
-        b.appendChild(row);
-    }
-}
+function rAdminBan(){const b=document.getElementById('ab-list');if(!b)return;b.innerHTML='';for(let n in users){if(isDev(n))continue;const u=users[n],ib=u.banned===true;const r=document.createElement('div');r.className='track-row';r.style.justifyContent='space-between';r.innerHTML=`<div><b>${esc(n)}</b><br><small style="color:${ib?'var(--red)':'var(--green)'}">${ib?'🚫 BANNED':'✅ AKTIF'}</small>${u.banUntil?'<br><small style="color:var(--gray);font-size:.6rem">Sampai: '+new Date(u.banUntil).toLocaleString('id-ID')+'</small>':''}</div><button onclick="toggleBan('${esc(n)}',${!ib})" style="padding:8px 15px;border:none;border-radius:8px;font-weight:800;font-size:.7rem;cursor:pointer;background:${ib?'var(--green)':'var(--red)'};color:#fff">${ib?'UNBAN':'BAN'}</button>`;b.appendChild(r)}}
 
-function toggleBan(un, ban) {
-    const action = ban ? 'ban' : 'unban';
-    showModal(action.toUpperCase() + " User", `<p>Yakin ingin <b style="color:var(--red)">${action}</b> user <b>${esc(un)}</b>?</p>`, () => {
-        if (ban) {
-            db.ref('users/' + un + '/banned').set(true);
-        } else {
-            // UNBAN: remove banned flag completely
-            db.ref('users/' + un + '/banned').remove();
-        }
-        toast(un + " telah di-" + action + "!");
-        closeModal();
-    });
-}
+function toggleBan(un,ban){showModal((ban?'BAN':'UNBAN')+" User",`<p>Yakin <b style="color:var(--red)">${ban?'ban':'unban'}</b> <b>${esc(un)}</b>?</p>`,()=>{if(ban){db.ref('users/'+un+'/banned').set(true)}else{db.ref('users/'+un+'/banned').remove();db.ref('users/'+un+'/banUntil').remove()}toast(un+(ban?' di-ban':' di-unban'));closeModal()})}
 
-function rAdminSongs() {
-    const b = document.getElementById('as-list');
-    if (!b) return;
-    b.innerHTML = '';
-    songs.forEach(s => {
-        const row = document.createElement('div');
-        row.className = 'track-row';
-        row.style.justifyContent = 'space-between';
-        row.innerHTML = `
-            <div style="display:flex; align-items:center; min-width:0; flex:1;">
-                <img src="${esc(s.cover)}" onerror="this.src='${DEFAULT_COVER}'" alt="cover">
-                <div style="min-width:0;"><b style="display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${esc(s.title)}</b><small style="color:var(--gray)">${esc(s.artist)} • ${esc(s.uploader || '?')}</small></div>
-            </div>
-            <i class="fas fa-trash" style="color:var(--red); cursor:pointer; padding:10px;" onclick="deleteSong('${esc(s.id)}')"></i>`;
-        b.appendChild(row);
-    });
-}
+function rAdminSongs(){const b=document.getElementById('as-list');if(!b)return;b.innerHTML='';songs.forEach(s=>{const r=document.createElement('div');r.className='track-row';r.style.justifyContent='space-between';r.innerHTML=`<div style="display:flex;align-items:center;min-width:0;flex:1"><img src="${esc(s.cover)}" onerror="this.src='${DC}'" alt=""><div style="min-width:0"><b style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(s.title)}</b><small style="color:var(--gray)">${esc(s.artist)}</small></div></div><i class="fas fa-trash" style="color:var(--red);cursor:pointer;padding:10px" onclick="deleteSong('${esc(s.id)}')"></i>`;b.appendChild(r)})}
+function deleteSong(id){const s=songs.find(x=>x.id===id);showModal("Hapus",`<p>Hapus <b>${esc(s?s.title:id)}</b>?</p>`,()=>{db.ref('songs/'+id).remove().then(()=>{toast("Dihapus!");closeModal()})})}
 
-function deleteSong(id) {
-    const s = songs.find(x => x.id === id);
-    showModal("Hapus Lagu", `<p>Hapus <b>${esc(s ? s.title : id)}</b>?</p>`, () => {
-        db.ref('songs/' + id).remove().then(() => { toast("Lagu dihapus!"); closeModal(); });
-    });
-}
+function rAdminSupport(snap){const b=document.getElementById('asup-list'),e=document.getElementById('asup-empty');if(!b)return;b.innerHTML='';let c=0;snap.forEach(us=>{c++;const un=us.key;let lm='';us.forEach(m=>{lm=m.val().text});const i=document.createElement('div');i.className='contact-item';i.onclick=()=>openAdmSup(un);i.innerHTML=`<div class="contact-avatar">${esc(un.charAt(0).toUpperCase())}</div><div><b>${esc(un)}</b><br><small style="color:var(--gray);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;max-width:200px">${esc(lm)}</small></div>`;b.appendChild(i)});e.style.display=c===0?'block':'none'}
+function openAdmSup(un){showModal("Reply "+un,'<textarea id="adm-reply" placeholder="Balasan..." style="width:100%;min-height:80px;padding:12px;background:rgba(255,255,255,.08);border:1px solid var(--border);border-radius:10px;color:#fff;font-family:inherit"></textarea>',()=>{const r=document.getElementById('adm-reply').value.trim();if(!r)return;db.ref('support/'+un).push({from:U.name,text:r,ts:firebase.database.ServerValue.TIMESTAMP}).then(()=>{toast("Terkirim!");closeModal()})})}
 
-function rAdminSupport(snap) {
-    const b = document.getElementById('asup-list');
-    const empty = document.getElementById('asup-empty');
-    if (!b) return;
-    b.innerHTML = '';
-    let count = 0;
-    snap.forEach(userSnap => {
-        count++;
-        const un = userSnap.key;
-        let lastMsg = '';
-        userSnap.forEach(m => { lastMsg = m.val().text; });
-        const item = document.createElement('div');
-        item.className = 'contact-item';
-        item.onclick = () => openAdminSupportChat(un);
-        item.innerHTML = `<div class="contact-avatar">${esc(un.charAt(0).toUpperCase())}</div><div><b>${esc(un)}</b><br><small style="color:var(--gray); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:block; max-width:200px;">${esc(lastMsg)}</small></div>`;
-        b.appendChild(item);
-    });
-    empty.style.display = count === 0 ? 'block' : 'none';
-}
+function rAdminPayments(snap){const b=document.getElementById('arq-list'),e=document.getElementById('arq-empty');if(!b)return;b.innerHTML='';let c=0;snap.forEach(x=>{const r=x.val();c++;const row=document.createElement('div');row.className='track-row';row.style.justifyContent='space-between';const sc=r.status==='approved'?'var(--green)':r.status==='rejected'?'var(--red)':'var(--accent)';row.innerHTML=`<div><b>${esc(r.user)}</b><br><small style="color:var(--accent)">${esc(r.tier)} - Rp ${(r.price||0).toLocaleString('id-ID')}</small><br><small style="color:${sc};font-weight:800">${esc((r.status||'pending').toUpperCase())}</small></div><div style="display:flex;gap:8px">${r.status==='pending'?`<button onclick="approvePay('${x.key}','${esc(r.user)}','${esc(r.tier)}')" style="padding:8px 12px;background:var(--green);border:none;border-radius:8px;font-weight:800;font-size:.7rem;cursor:pointer">✓</button><button onclick="rejectPay('${x.key}')" style="padding:8px 12px;background:var(--red);border:none;border-radius:8px;font-weight:800;font-size:.7rem;cursor:pointer;color:#fff">✗</button>`:''}</div>`;b.appendChild(row)});e.style.display=c===0?'block':'none'}
+function approvePay(id,un,tier){db.ref('users/'+un+'/role').set(tier==='Elite'?'elite':'creator');db.ref('paymentRequests/'+id+'/status').set('approved');toast(un+" upgraded!")}
+function rejectPay(id){db.ref('paymentRequests/'+id+'/status').set('rejected')}
 
-function openAdminSupportChat(un) {
-    showModal("Reply ke " + un, '<textarea id="adm-reply" placeholder="Balasan admin..." style="width:100%; min-height:80px; padding:12px; background:rgba(255,255,255,0.08); border:1px solid var(--border); border-radius:10px; color:#fff; font-family:inherit;"></textarea>', () => {
-        const reply = document.getElementById('adm-reply').value.trim();
-        if (!reply) return;
-        db.ref('support/' + un).push({ from: U.name, text: reply, ts: firebase.database.ServerValue.TIMESTAMP }).then(() => { toast("Balasan terkirim ke " + un); closeModal(); });
-    });
-}
+function logoutAllConfirm(){showModal("LOGOUT ALL","<b style='color:var(--red)'>⚠️</b><p style='margin-top:10px'>Semua user di-logout & semua ban dihapus. Mereka tetap bisa login. Lanjut?</p>",()=>{db.ref('users').once('value',s=>{const u={};s.forEach(c=>{if(!isDev(c.key)){u[c.key+'/forceLogout']=Date.now();if(c.val().banned){u[c.key+'/banned']=null;u[c.key+'/banUntil']=null}}});db.ref('users').update(u).then(()=>{toast("Semua di-logout & unban!");closeModal()})})})}
 
-function rAdminPayments(snap) {
-    const b = document.getElementById('arq-list');
-    const empty = document.getElementById('arq-empty');
-    if (!b) return;
-    b.innerHTML = '';
-    let count = 0;
-    snap.forEach(x => {
-        const r = x.val(); count++;
-        const row = document.createElement('div');
-        row.className = 'track-row';
-        row.style.justifyContent = 'space-between';
-        const sc = r.status === 'approved' ? 'var(--green)' : r.status === 'rejected' ? 'var(--red)' : 'var(--accent)';
-        row.innerHTML = `
-            <div><b>${esc(r.user)}</b><br><small style="color:var(--accent);">${esc(r.tier)} - Rp ${(r.price || 0).toLocaleString('id-ID')}</small><br><small style="color:${sc}; font-weight:800;">${esc((r.status || 'pending').toUpperCase())}</small></div>
-            <div style="display:flex; gap:8px;">
-                ${r.status === 'pending' ? `
-                    <button onclick="approvePayment('${x.key}','${esc(r.user)}','${esc(r.tier)}')" style="padding:8px 12px; background:var(--green); border:none; border-radius:8px; font-weight:800; font-size:0.7rem; cursor:pointer;">✓</button>
-                    <button onclick="rejectPayment('${x.key}')" style="padding:8px 12px; background:var(--red); border:none; border-radius:8px; font-weight:800; font-size:0.7rem; cursor:pointer; color:#fff;">✗</button>
-                ` : ''}
-            </div>`;
-        b.appendChild(row);
-    });
-    empty.style.display = count === 0 ? 'block' : 'none';
-}
+function showModal(t,body,okFn){document.getElementById('m-title').innerText=t;document.getElementById('m-body').innerHTML=body;document.getElementById('m-ok').onclick=okFn||closeModal;document.getElementById('modal-ov').style.display='flex'}
+function closeModal(){document.getElementById('modal-ov').style.display='none'}
 
-function approvePayment(reqId, un, tier) {
-    const role = tier === 'Elite' ? 'elite' : 'creator';
-    db.ref('users/' + un + '/role').set(role);
-    db.ref('paymentRequests/' + reqId + '/status').set('approved');
-    toast(un + " → " + role.toUpperCase());
-}
-
-function rejectPayment(reqId) {
-    db.ref('paymentRequests/' + reqId + '/status').set('rejected');
-}
-
-function logoutAllConfirm() {
-    showModal("LOGOUT MASSAL", "<b style='color:var(--red)'>⚠️ PERINGATAN!</b><p style='margin-top:10px;'>Semua user (kecuali Developer) akan di-logout. Mereka tetap bisa login kembali dengan akun mereka. Lanjutkan?</p>", () => {
-        db.ref('users').once('value', s => {
-            const updates = {};
-            s.forEach(child => {
-                if (!isDev(child.key)) {
-                    updates[child.key + '/forceLogout'] = Date.now();
-                    // Also unban everyone during mass logout
-                    if (child.val().banned) {
-                        updates[child.key + '/banned'] = null;
-                    }
-                }
-            });
-            db.ref('users').update(updates).then(() => {
-                toast("Semua user telah di-logout & unban!");
-                closeModal();
-            });
-        });
-    });
-}
-
-// ===== MODAL =====
-function showModal(t, body, okFn) {
-    document.getElementById('m-title').innerText = t;
-    document.getElementById('m-body').innerHTML = body;
-    document.getElementById('m-ok').onclick = okFn || closeModal;
-    document.getElementById('modal-ov').style.display = 'flex';
-}
-
-function closeModal() { document.getElementById('modal-ov').style.display = 'none'; }
-
-// ===== LOGOUT =====
-function logOut() {
-    if (U && U.name) {
-        db.ref('users/' + U.name).off();
-        db.ref('users/' + U.name + '/forceLogout').off();
-    }
-    localStorage.removeItem('uv15');
-    U = null;
-    location.reload();
-}
+function logOut(){if(U&&U.name){db.ref('users/'+U.name).off();db.ref('users/'+U.name+'/forceLogout').off()}localStorage.removeItem('uv15');U=null;location.reload()}
 
 init();
 </script>
