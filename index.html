@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Regal Music Sovereign v17.0</title>
+    <title>Regal Music Sovereign v18.0</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -18,44 +18,57 @@
         .page{display:none;position:absolute;inset:0;padding:20px 20px 160px;overflow-y:auto}
         .page.active{display:block;animation:sf .4s ease}
         @keyframes sf{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
         #loader-ov{position:fixed;inset:0;background:var(--bg);z-index:99999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:20px;transition:opacity .5s}
         .loader-spinner{width:50px;height:50px;border:4px solid rgba(255,255,255,.1);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
         @keyframes spin{to{transform:rotate(360deg)}}
+
         .greet-box{margin-top:40px;margin-bottom:20px}
         .greet-box h1{font-size:1.8rem;font-weight:800;background:linear-gradient(to right,#fff,var(--gray));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+
         input[type="text"],input[type="password"],input[type="url"],input[type="number"],textarea,select{width:100%;padding:15px 20px;background:rgba(255,255,255,.08);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:inherit;font-size:.9rem;margin-bottom:12px;transition:border .3s}
         input::placeholder,textarea::placeholder{color:var(--gray)}
         input:focus,textarea:focus,select:focus{border-color:var(--accent)}
         textarea{min-height:100px;resize:vertical}
         select{appearance:none;cursor:pointer}
+
         .search-pill{width:100%;padding:16px 20px 16px 55px;background:#fff;border:none;border-radius:50px;color:#000;font-weight:700;font-size:.9rem;margin-top:10px}
         .search-pill:focus{border-color:transparent}
         .search-wrap{position:relative;margin-bottom:25px}
         .search-wrap i{position:absolute;left:20px;top:50%;transform:translateY(-50%);color:#555;z-index:10;font-size:1.2rem}
+
         .bottom-nav-scroll{position:fixed;bottom:0;width:100%;height:70px;background:rgba(0,0,0,.95);border-top:1px solid var(--border);z-index:10000;display:flex;align-items:center;overflow-x:auto;padding:0 5px;backdrop-filter:blur(20px)}
         .nav-item{min-width:65px;display:flex;flex-direction:column;align-items:center;color:var(--gray);cursor:pointer;transition:color .2s;position:relative}
         .nav-item.active{color:#fff}
         .nav-item i{font-size:1.1rem;margin-bottom:4px}
         .nav-item span{font-size:.55rem;font-weight:700}
         .nav-badge{position:absolute;top:0;right:12px;width:8px;height:8px;background:var(--red);border-radius:50%;display:none}
+
         .chat-footer{position:fixed;bottom:70px;width:100%;left:0;padding:10px 15px;background:rgba(0,0,0,.98);display:flex;gap:10px;border-top:1px solid var(--border);z-index:9500}
         .chat-footer input{flex:1;margin-bottom:0;border-radius:20px;padding:12px 18px}
         body.player-active .chat-footer{bottom:155px}
-        .chat-bubble{max-width:80%;padding:10px 15px;border-radius:18px;font-size:.85rem;line-height:1.4;word-wrap:break-word}
+
+        .chat-bubble{max-width:80%;padding:10px 15px;border-radius:18px;font-size:.85rem;line-height:1.4;word-wrap:break-word;position:relative}
         .chat-bubble.mine{align-self:flex-end;background:var(--green);color:#000;border-bottom-right-radius:4px}
         .chat-bubble.other{align-self:flex-start;background:rgba(255,255,255,.1);color:var(--text);border-bottom-left-radius:4px}
         .chat-bubble .chat-name{font-size:.65rem;font-weight:800;color:var(--accent);margin-bottom:3px;cursor:pointer}
         .chat-bubble.mine .chat-name{color:#064e26}
         .chat-bubble .chat-time{font-size:.55rem;opacity:.6;margin-top:4px;text-align:right}
+        .chat-bubble .report-btn{position:absolute;top:5px;right:8px;font-size:.6rem;color:var(--red);cursor:pointer;opacity:.5;transition:opacity .2s}
+        .chat-bubble .report-btn:hover{opacity:1}
+
         .adm-header-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:25px}
         .stat-card{background:var(--card);padding:15px 5px;border-radius:12px;border:1px solid var(--border);text-align:center}
         .stat-card b{color:var(--accent);font-size:1rem}
         .stat-card p{font-size:.5rem;font-weight:800;color:var(--gray)}
+
         .btn-gold{background:var(--accent);color:#000;padding:15px;border-radius:30px;border:none;font-weight:800;width:100%;cursor:pointer;font-size:.9rem;transition:transform .2s,opacity .2s}
         .btn-gold:active{transform:scale(.97);opacity:.9}
         .btn-gold:disabled{opacity:.5;cursor:not-allowed}
+
         #modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:50000;display:none;align-items:center;justify-content:center;padding:20px}
         .m-box{background:#121212;padding:30px;border-radius:25px;width:100%;max-width:350px;text-align:center;border:1px solid var(--border);max-height:80vh;overflow-y:auto}
+
         .player-bar{position:fixed;bottom:75px;left:8px;right:8px;background:rgba(20,30,40,.98);border-radius:12px;padding:10px 14px;display:none;align-items:center;gap:10px;z-index:9000;border:1px solid var(--border);backdrop-filter:blur(20px);transition:transform .3s ease}
         .player-bar.collapsed{transform:translateY(calc(100% + 10px))}
         .player-bar img{width:42px;height:42px;border-radius:6px;object-fit:cover;flex-shrink:0}
@@ -63,48 +76,59 @@
         .p-ctrls i{font-size:1rem;cursor:pointer;color:#fff;transition:color .2s}
         .p-ctrls i:active{color:var(--accent)}
         .p-ctrls .fa-heart{color:var(--red)}
-        .p-toggle-bar{position:fixed;bottom:75px;left:50%;transform:translateX(-50%);z-index:9001;width:50px;height:24px;background:rgba(20,30,40,.98);border-radius:12px 12px 0 0;display:none;align-items:center;justify-content:center;cursor:pointer;border:1px solid var(--border);border-bottom:none;transition:bottom .3s}
+
+        .p-toggle-bar{position:fixed;bottom:75px;left:50%;transform:translateX(-50%);z-index:9001;width:50px;height:24px;background:rgba(20,30,40,.98);border-radius:12px 12px 0 0;display:none;align-items:center;justify-content:center;cursor:pointer;border:1px solid var(--border);border-bottom:none}
         .p-toggle-bar i{font-size:.8rem;color:var(--gray)}
+
         .track-row{display:flex;align-items:center;padding:12px;background:var(--card);border-radius:12px;margin-bottom:10px;border:1px solid var(--border);cursor:pointer;transition:background .2s}
         .track-row:active{background:rgba(255,255,255,.05)}
         .track-row img{width:45px;height:45px;border-radius:5px;margin-right:15px;object-fit:cover;flex-shrink:0}
+
         .badge-fixed{position:absolute;top:-5px;right:-5px;z-index:5}
         .badge-dev{background:var(--red);color:var(--accent);padding:4px 10px;border-radius:6px;font-weight:900;border:1px solid var(--accent);font-size:10px}
         .badge-e{background:var(--elite);color:#000;padding:5px 8px;border-radius:50%;font-size:10px}
         .badge-c{background:var(--green);color:#000;padding:5px 8px;border-radius:50%;font-size:10px}
         .badge-a{background:#ff6600;color:#000;padding:5px 8px;border-radius:50%;font-size:10px}
+
         .contact-item{display:flex;align-items:center;padding:15px;background:var(--card);border-radius:12px;margin-bottom:10px;border:1px solid var(--border);cursor:pointer;gap:15px;position:relative}
         .contact-item:active{background:rgba(255,255,255,.05)}
         .contact-avatar{width:45px;height:45px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:800;color:#000;font-size:1.1rem;flex-shrink:0;overflow:hidden}
         .contact-avatar img{width:100%;height:100%;object-fit:cover}
         .unsaved-badge{background:var(--red);color:#fff;font-size:.55rem;padding:2px 8px;border-radius:10px;font-weight:800;margin-left:8px}
         .unread-dot{width:12px;height:12px;background:var(--red);border-radius:50%;position:absolute;right:15px;top:50%;transform:translateY(-50%)}
+
         .upload-section{background:var(--card);padding:25px;border-radius:20px;border:1px solid var(--border);margin-top:20px}
         .upload-section label{font-size:.75rem;font-weight:700;color:var(--gray);margin-bottom:5px;display:block}
-        .file-input-wrap{width:100%;padding:15px 20px;background:rgba(255,255,255,.08);border:2px dashed var(--border);border-radius:12px;color:var(--gray);font-size:.85rem;margin-bottom:12px;text-align:center;cursor:pointer;transition:border .3s;position:relative;overflow:hidden}
-        .file-input-wrap:hover{border-color:var(--accent)}
-        .file-input-wrap input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;padding:0;margin:0}
-        .file-input-wrap .file-label{display:flex;flex-direction:column;align-items:center;gap:5px}
+
+        .file-input-wrap{width:100%;padding:20px;background:rgba(255,255,255,.08);border:2px dashed var(--border);border-radius:12px;color:var(--gray);font-size:.85rem;margin-bottom:12px;text-align:center;cursor:pointer;transition:border .3s;position:relative;overflow:hidden}
+        .file-input-wrap:hover,.file-input-wrap.active{border-color:var(--accent)}
+        .file-input-wrap input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;padding:0;margin:0}
+        .file-input-wrap .file-label{display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none}
         .file-input-wrap .file-label i{font-size:1.5rem;color:var(--accent)}
-        .file-input-wrap .file-name{color:var(--green);font-weight:700;font-size:.75rem;margin-top:5px}
+        .file-input-wrap .file-name{color:var(--green);font-weight:700;font-size:.75rem;margin-top:5px;pointer-events:none}
+
         .premium-card{background:var(--card);padding:25px;border-radius:20px;margin-top:20px;position:relative;overflow:hidden}
         .premium-card ul{list-style:none;margin:15px 0}
         .premium-card ul li{padding:6px 0;font-size:.85rem;color:var(--gray)}
         .premium-card ul li i{color:var(--green);margin-right:8px}
         .active-badge-premium{position:absolute;top:15px;right:15px;background:var(--green);color:#000;padding:5px 12px;border-radius:20px;font-size:.65rem;font-weight:800}
+
         .section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
         .back-btn{cursor:pointer;padding:10px 0;margin-bottom:15px;font-size:.9rem;color:var(--gray);display:flex;align-items:center;gap:8px}
         .back-btn:hover{color:#fff}
         .empty-state{text-align:center;padding:60px 20px;color:var(--gray)}
         .empty-state i{font-size:3rem;margin-bottom:15px;opacity:.3}
         .empty-state p{font-size:.85rem}
+
         .recent-search-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
         .recent-search-header h3{font-size:.9rem;font-weight:700}
         .recent-search-header span{color:var(--accent);font-size:.75rem;font-weight:700;cursor:pointer}
+
         .ban-overlay{position:fixed;inset:0;background:rgba(0,0,0,.97);z-index:999999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:20px}
         .ban-overlay i{font-size:4rem;color:var(--red)}
         .ban-overlay h2{color:var(--red)}
         .ban-overlay p{color:var(--gray);text-align:center;padding:0 30px}
+
         .profile-view-page{text-align:center;padding-top:40px}
         .profile-view-avatar{width:120px;height:120px;border-radius:50%;margin:0 auto 20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:3rem;font-weight:800;color:#000;overflow:hidden;border:4px solid #1a1a1a}
         .profile-view-avatar img{width:100%;height:100%;object-fit:cover}
@@ -113,12 +137,22 @@
         .profile-info-card .info-row:last-child{border-bottom:none}
         .profile-info-card .info-row small{color:var(--gray);font-size:.7rem}
         .profile-info-card .info-row b{display:block;margin-top:3px;font-size:.9rem}
+
         .upload-progress-bar{width:100%;height:6px;background:rgba(255,255,255,.1);border-radius:3px;margin:10px 0;overflow:hidden;display:none}
-        .upload-progress-bar .fill{height:100%;background:var(--accent);border-radius:3px;transition:width .3s;width:0%}
+        .upload-progress-bar .fill{height:100%;background:var(--accent);border-radius:3px;transition:width .3s;width:0}
+
         .toast-msg{position:fixed;top:40px;left:50%;transform:translateX(-50%);background:var(--green);color:#000;padding:12px 25px;border-radius:30px;font-weight:800;font-size:.8rem;z-index:999999;animation:toastIn .3s ease;pointer-events:none;white-space:nowrap}
         .toast-msg.warn{background:var(--red);color:#fff}
         @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(-20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
-        .warn-bar{background:rgba(255,68,68,.15);border:1px solid var(--red);border-radius:10px;padding:10px 15px;margin-bottom:15px;font-size:.75rem;color:var(--red);text-align:center}
+
+        .report-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:15px;margin-bottom:10px}
+        .report-card .report-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+        .report-card .report-header b{font-size:.85rem}
+        .report-card .report-header small{color:var(--gray);font-size:.65rem}
+        .report-card .report-content{background:rgba(255,255,255,.05);padding:10px;border-radius:8px;font-size:.8rem;margin-bottom:8px}
+        .report-card .report-meta{font-size:.7rem;color:var(--gray)}
+        .report-card .report-actions{display:flex;gap:8px;margin-top:10px}
+        .report-card .report-actions button{flex:1;padding:8px;border:none;border-radius:8px;font-weight:800;font-size:.7rem;cursor:pointer}
     </style>
 </head>
 <body>
@@ -137,6 +171,7 @@
 <div id="ban-overlay" class="ban-overlay" style="display:none">
     <i class="fas fa-ban"></i><h2>AKUN DI-BANNED</h2>
     <p id="ban-msg">Akun Anda telah diblokir oleh Administrator.</p>
+    <p id="ban-timer" style="color:var(--accent);font-weight:800;font-size:1.2rem;margin-top:5px"></p>
     <button onclick="logOut()" style="padding:15px 40px;background:var(--red);color:#fff;border:none;border-radius:15px;font-weight:800;cursor:pointer;margin-top:10px">KELUAR</button>
 </div>
 
@@ -152,20 +187,22 @@
     <div class="nav-item" onclick="nav('profile',this)"><i class="fas fa-circle-user"></i><span>Profil</span></div>
 </div>
 
+<!-- AUTH -->
 <div id="auth" class="page active" style="display:flex;align-items:center;justify-content:center;z-index:20000">
     <div style="text-align:center;width:100%;max-width:320px">
         <h1 style="color:var(--accent);letter-spacing:10px;font-size:3.5rem;margin-bottom:10px">REGAL</h1>
         <p style="color:var(--gray);margin-bottom:40px;font-size:.8rem">Music Sovereign Platform</p>
+        <div id="auth-error" style="display:none;background:rgba(255,68,68,.15);border:1px solid var(--red);border-radius:10px;padding:10px;margin-bottom:12px;font-size:.8rem;color:var(--red)"></div>
         <input type="text" id="l-u" placeholder="Username" autocomplete="off">
-        <input type="password" id="l-p" placeholder="Password">
+        <input type="password" id="l-p" placeholder="Password" onkeydown="if(event.key==='Enter')doAuth()">
         <button onclick="doAuth()" class="btn-gold" id="auth-btn">MASUK</button>
         <p onclick="togAM()" id="atog" style="margin-top:25px;color:var(--gray);cursor:pointer">Belum punya akun? <span style="color:var(--accent)">Daftar</span></p>
     </div>
 </div>
 
+<!-- HOME -->
 <div id="home" class="page">
     <div class="greet-box"><h1 id="greet-txt">Selamat ...</h1></div>
-    <div id="warn-display"></div>
     <div style="display:flex;gap:10px;margin-bottom:30px">
         <div onclick="nav('fav-detail')" style="flex:1;background:var(--card);padding:15px;border-radius:10px;text-align:center;border:1px solid var(--border);cursor:pointer"><i class="fas fa-heart" style="color:var(--red);font-size:1.2rem"></i><br><small>Favorit</small></div>
         <div onclick="nav('pl-detail')" style="flex:1;background:var(--card);padding:15px;border-radius:10px;text-align:center;border:1px solid var(--border);cursor:pointer"><i class="fas fa-list" style="color:var(--green);font-size:1.2rem"></i><br><small>Playlist</small></div>
@@ -174,6 +211,7 @@
     <div id="h-list"></div>
 </div>
 
+<!-- SEARCH -->
 <div id="search-page" class="page">
     <h1 style="margin-top:40px;font-weight:800">Cari</h1>
     <div class="search-wrap"><i class="fas fa-search"></i><input type="text" id="s-inp" class="search-pill" placeholder="Lagu, artis..." oninput="doSearch()"></div>
@@ -182,18 +220,22 @@
     <div id="s-empty" class="empty-state"><i class="fas fa-music"></i><p>Ketik untuk mencari</p></div>
 </div>
 
+<!-- FAVORIT -->
 <div id="fav-detail" class="page">
     <div class="back-btn" onclick="nav('home')"><i class="fas fa-arrow-left"></i> Kembali</div>
     <h1 style="font-weight:800;margin-bottom:20px"><i class="fas fa-heart" style="color:var(--red)"></i> Favorit</h1>
     <div id="fav-list"></div><div id="fav-empty" class="empty-state"><i class="far fa-heart"></i><p>Belum ada favorit</p></div>
 </div>
 
+<!-- PLAYLIST -->
 <div id="pl-detail" class="page">
     <div class="back-btn" onclick="nav('home')"><i class="fas fa-arrow-left"></i> Kembali</div>
     <h1 style="font-weight:800;margin-bottom:20px"><i class="fas fa-list" style="color:var(--green)"></i> Playlist</h1>
-    <div id="pl-list"></div><div id="pl-empty" class="empty-state"><i class="fas fa-list"></i><p>Tekan + di player untuk tambah lagu</p></div>
+    <div id="pl-list"></div>
+    <div id="pl-empty" class="empty-state"><i class="fas fa-plus-circle" style="color:var(--green)"></i><p>Tekan tombol <b>+</b> di player untuk menambah lagu ke playlist</p></div>
 </div>
 
+<!-- CHAT LIST -->
 <div id="chat-list" class="page">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:40px;margin-bottom:20px">
         <h1 style="font-weight:800">Messages</h1>
@@ -202,6 +244,7 @@
     <div id="ct-list"></div><div id="ct-empty" class="empty-state"><i class="fas fa-comment-dots"></i><p>Tap + untuk mulai chat</p></div>
 </div>
 
+<!-- CHAT ROOM -->
 <div id="chat-room" class="page" style="padding:0">
     <div style="padding:15px 20px;background:#121212;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px">
         <i class="fas fa-arrow-left" onclick="closeChatRoom()" style="cursor:pointer;font-size:1.1rem"></i>
@@ -215,6 +258,7 @@
     </div>
 </div>
 
+<!-- VIEW PROFILE -->
 <div id="view-profile" class="page">
     <div class="back-btn" id="vp-back-btn" onclick="nav('chat-room')"><i class="fas fa-arrow-left"></i> Kembali</div>
     <div class="profile-view-page">
@@ -227,10 +271,11 @@
             <div class="info-row"><small>Role</small><b id="vp-role2">---</b></div>
         </div>
         <button id="vp-rename-btn" onclick="renameContactModal()" style="width:100%;padding:15px;margin-top:20px;border-radius:15px;border:1px solid #333;background:transparent;color:#fff;font-weight:800;cursor:pointer">UBAH NAMA KONTAK</button>
-        <button id="vp-save-btn" onclick="saveContactFromProfile()" style="width:100%;padding:15px;margin-top:10px;border-radius:15px;background:var(--green);color:#000;border:none;font-weight:800;cursor:pointer;display:none">💾 SIMPAN NOMOR INI & MULAI CHAT</button>
+        <button id="vp-save-btn" onclick="saveContactFromProfile()" style="width:100%;padding:15px;margin-top:10px;border-radius:15px;background:var(--green);color:#000;border:none;font-weight:800;cursor:pointer;display:none">💾 SIMPAN & MULAI CHAT</button>
     </div>
 </div>
 
+<!-- LIVE CHAT -->
 <div id="live-chat" class="page" style="padding:0">
     <div style="padding:15px 20px;background:#121212;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px">
         <i class="fas fa-tower-broadcast" style="color:var(--red)"></i><b>Live Chat</b>
@@ -244,35 +289,26 @@
     </div>
 </div>
 
+<!-- PREMIUM -->
 <div id="buy-role" class="page">
     <h1 style="margin-top:40px;font-weight:800">Premium</h1>
     <div class="premium-card" id="pc-creator" style="border:1px solid var(--accent)">
         <div id="creator-active-badge" class="active-badge-premium" style="display:none">✅ AKTIF</div>
         <b style="color:var(--accent)">CREATOR</b>
         <h2 style="margin:10px 0" id="creator-price-display">Rp 10.000 <small style="color:var(--gray)">/ bulan</small></h2>
-        <ul>
-            <li><i class="fas fa-check"></i> Upload lagu (max 3/hari)</li>
-            <li><i class="fas fa-check"></i> Badge Creator ⭐</li>
-            <li><i class="fas fa-check"></i> Profil eksklusif</li>
-        </ul>
+        <ul><li><i class="fas fa-check"></i> Upload lagu (max 3/hari)</li><li><i class="fas fa-check"></i> Badge Creator ⭐</li><li><i class="fas fa-check"></i> Profil eksklusif</li></ul>
         <button onclick="openQRIS('Creator')" class="btn-gold" id="btn-buy-creator">Beli Sekarang</button>
     </div>
     <div class="premium-card" id="pc-elite" style="border:1px solid var(--elite)">
         <div id="elite-active-badge" class="active-badge-premium" style="display:none">✅ AKTIF</div>
         <b style="color:var(--elite)">ELITE PRODUCER</b>
         <h2 style="margin:10px 0" id="elite-price-display">Rp 45.000 <small style="color:var(--gray)">/ bulan</small></h2>
-        <ul>
-            <li><i class="fas fa-check"></i> Semua fitur Creator</li>
-            <li><i class="fas fa-check"></i> Upload unlimited</li>
-            <li><i class="fas fa-check"></i> Badge Elite 💎</li>
-            <li><i class="fas fa-check"></i> Prioritas support</li>
-            <li><i class="fas fa-check"></i> Akses fitur eksklusif</li>
-            <li><i class="fas fa-check"></i> Nama berwarna di Live Chat</li>
-        </ul>
+        <ul><li><i class="fas fa-check"></i> Semua fitur Creator</li><li><i class="fas fa-check"></i> Upload unlimited</li><li><i class="fas fa-check"></i> Badge Elite 💎</li><li><i class="fas fa-check"></i> Prioritas support</li></ul>
         <button onclick="openQRIS('Elite')" class="btn-gold" style="background:var(--elite);color:#000" id="btn-buy-elite">Beli Sekarang</button>
     </div>
 </div>
 
+<!-- QRIS -->
 <div id="qris-page" class="page">
     <div class="back-btn" onclick="nav('buy-role')"><i class="fas fa-arrow-left"></i> Kembali</div>
     <div style="text-align:center">
@@ -288,24 +324,35 @@
     </div>
 </div>
 
+<!-- UPLOAD -->
 <div id="upload" class="page">
     <div class="back-btn" onclick="nav('home')"><i class="fas fa-arrow-left"></i> Kembali</div>
     <h1 style="font-weight:800;margin-bottom:5px">Upload Lagu</h1>
     <p style="color:var(--gray);font-size:.8rem;margin-bottom:5px">Bagikan musikmu</p>
     <div id="upload-limit-info" style="font-size:.7rem;color:var(--accent);margin-bottom:15px"></div>
     <div class="upload-section">
-        <label>Judul Lagu</label><input type="text" id="up-title" placeholder="Nama lagu...">
-        <label>Artis</label><input type="text" id="up-artist" placeholder="Nama artis...">
-        <label>File Audio (MP3)</label>
-        <div class="file-input-wrap"><input type="file" accept="audio/*" onchange="handleAudioFile(this)"><div class="file-label"><i class="fas fa-music"></i><span>Pilih file MP3</span></div><div class="file-name" id="audio-file-name"></div></div>
-        <label>Cover Art</label>
-        <div class="file-input-wrap"><input type="file" accept="image/*" onchange="handleCoverFile(this)"><div class="file-label"><i class="fas fa-image"></i><span>Pilih gambar</span></div><div class="file-name" id="cover-file-name"></div></div>
-        <img id="cover-preview" style="width:80px;height:80px;border-radius:10px;object-fit:cover;margin-bottom:12px;display:none">
+        <label>Judul Lagu *</label><input type="text" id="up-title" placeholder="Nama lagu...">
+        <label>Artis *</label><input type="text" id="up-artist" placeholder="Nama artis...">
+        <label>File Audio (MP3) *</label>
+        <div class="file-input-wrap" id="audio-wrap">
+            <input type="file" id="audio-file-input" accept="audio/mp3,audio/mpeg,audio/wav,audio/ogg,audio/*" onchange="handleAudioFile(this)">
+            <div class="file-label" id="audio-label"><i class="fas fa-music"></i><span>Tap untuk pilih file MP3</span></div>
+            <div class="file-name" id="audio-file-name"></div>
+        </div>
+        <label>Cover Art (Gambar)</label>
+        <div class="file-input-wrap" id="cover-wrap">
+            <input type="file" id="cover-file-input" accept="image/*" onchange="handleCoverFile(this)">
+            <div class="file-label" id="cover-label"><i class="fas fa-image"></i><span>Tap untuk pilih gambar</span></div>
+            <div class="file-name" id="cover-file-name"></div>
+        </div>
+        <img id="cover-preview" style="width:80px;height:80px;border-radius:10px;object-fit:cover;margin:0 auto 12px;display:none">
         <div class="upload-progress-bar" id="upload-progress"><div class="fill" id="upload-progress-fill"></div></div>
-        <button onclick="doUpload()" class="btn-gold" style="margin-top:10px" id="upload-btn"><i class="fas fa-cloud-arrow-up"></i> UPLOAD</button>
+        <div id="upload-status" style="text-align:center;font-size:.75rem;color:var(--accent);margin-bottom:10px;display:none"></div>
+        <button onclick="doUpload()" class="btn-gold" id="upload-btn"><i class="fas fa-cloud-arrow-up"></i> UPLOAD LAGU</button>
     </div>
 </div>
 
+<!-- SUPPORT -->
 <div id="support" class="page" style="padding:0">
     <div style="padding:15px 20px;background:#121212;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px"><i class="fas fa-headset" style="color:var(--accent)"></i><b>Support</b></div>
     <div id="sup-msgs" style="height:calc(100vh - 210px);overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:10px"></div>
@@ -315,6 +362,7 @@
     </div>
 </div>
 
+<!-- PROFILE -->
 <div id="profile" class="page">
     <div style="text-align:center;padding:40px 0">
         <div style="width:130px;height:130px;margin:0 auto 25px;position:relative">
@@ -329,13 +377,13 @@
         <div style="margin-top:35px;text-align:left;background:var(--card);padding:20px;border-radius:20px;border:1px solid var(--border)">
             <small style="color:var(--gray)">Bio</small><p id="p-bio" style="font-size:.9rem;margin-top:5px"></p>
             <small style="color:var(--gray);margin-top:15px;display:block">Nomor Regal</small><b id="p-phone" style="color:var(--accent);letter-spacing:2px">---</b>
-            <small style="color:var(--gray);margin-top:15px;display:block">Teguran</small><b id="p-warns" style="color:var(--red)">0 / 5</b>
         </div>
         <button onclick="nav('edit-profile')" style="width:100%;padding:15px;margin-top:25px;border-radius:15px;border:1px solid #333;background:transparent;color:#fff;font-weight:800;cursor:pointer">EDIT PROFIL</button>
         <button onclick="logOut()" style="width:100%;padding:15px;margin-top:10px;border-radius:15px;background:rgba(255,0,0,.1);color:red;border:none;font-weight:800;cursor:pointer">LOGOUT</button>
     </div>
 </div>
 
+<!-- ADMIN -->
 <div id="adm" class="page">
     <h1 style="margin-top:30px;font-weight:800;color:var(--accent)">Admin Panel</h1>
     <div class="adm-header-stats">
@@ -350,36 +398,55 @@
         <div onclick="nav('a-songs')" class="stat-card" style="padding:20px;cursor:pointer"><i class="fas fa-music" style="font-size:1.5rem;color:var(--green)"></i><br><small>Lagu</small></div>
         <div onclick="nav('a-req')" class="stat-card" style="padding:20px;cursor:pointer"><i class="fas fa-wallet" style="font-size:1.5rem;color:var(--accent)"></i><br><small>Payments</small></div>
         <div onclick="nav('a-sup')" class="stat-card" style="padding:20px;cursor:pointer"><i class="fas fa-headset" style="font-size:1.5rem;color:var(--accent)"></i><br><small>Support</small></div>
+        <div onclick="nav('a-reports')" class="stat-card" style="padding:20px;cursor:pointer;position:relative"><div class="nav-badge" id="report-admin-badge" style="top:8px;right:8px"></div><i class="fas fa-flag" style="font-size:1.5rem;color:var(--red)"></i><br><small>Laporan</small></div>
         <div onclick="nav('a-qris')" class="stat-card" style="padding:20px;cursor:pointer"><i class="fas fa-qrcode" style="font-size:1.5rem;color:var(--green)"></i><br><small>QRIS</small></div>
         <div onclick="logoutAllConfirm()" class="stat-card" style="padding:20px;cursor:pointer;color:var(--red)"><i class="fas fa-power-off" style="font-size:1.5rem"></i><br><small>Logout All</small></div>
     </div>
 </div>
 
+<!-- ADMIN SUB PAGES -->
 <div id="a-users" class="page"><div class="back-btn" onclick="nav('adm')"><i class="fas fa-arrow-left"></i> Users</div><div id="au-list"></div></div>
 <div id="a-ban" class="page"><div class="back-btn" onclick="nav('adm')"><i class="fas fa-arrow-left"></i> Ban</div><div id="ab-list"></div></div>
 <div id="a-songs" class="page"><div class="back-btn" onclick="nav('adm')"><i class="fas fa-arrow-left"></i> Songs</div><div id="as-list"></div></div>
 <div id="a-req" class="page"><div class="back-btn" onclick="nav('adm')"><i class="fas fa-arrow-left"></i> Payments</div><div id="arq-list"></div><div id="arq-empty" class="empty-state"><i class="fas fa-wallet"></i><p>Kosong</p></div></div>
 <div id="a-sup" class="page"><div class="back-btn" onclick="nav('adm')"><i class="fas fa-arrow-left"></i> Support</div><div id="asup-list"></div><div id="asup-empty" class="empty-state"><i class="fas fa-headset"></i><p>Kosong</p></div></div>
 
+<!-- ADMIN REPORTS -->
+<div id="a-reports" class="page">
+    <div class="back-btn" onclick="nav('adm')"><i class="fas fa-arrow-left"></i> Laporan Pengguna</div>
+    <h1 style="font-weight:800;margin-bottom:5px"><i class="fas fa-flag" style="color:var(--red)"></i> Laporan</h1>
+    <p style="color:var(--gray);font-size:.75rem;margin-bottom:20px">Pesan yang dilaporkan oleh pengguna</p>
+    <div id="reports-list"></div>
+    <div id="reports-empty" class="empty-state"><i class="fas fa-flag"></i><p>Tidak ada laporan</p></div>
+</div>
+
+<!-- ADMIN QRIS -->
 <div id="a-qris" class="page">
     <div class="back-btn" onclick="nav('adm')"><i class="fas fa-arrow-left"></i> QRIS Control</div>
     <h1 style="font-weight:800;margin-bottom:20px">QRIS Control</h1>
     <div class="upload-section">
-        <label>QRIS Image (URL gambar)</label>
-        <input type="url" id="aq-url" placeholder="https://example.com/qris.jpg">
+        <label>Upload Gambar QRIS</label>
+        <div class="file-input-wrap" id="qris-file-wrap">
+            <input type="file" id="qris-file-input" accept="image/*" onchange="handleQrisFile(this)">
+            <div class="file-label" id="qris-file-label"><i class="fas fa-qrcode"></i><span>Tap untuk pilih gambar QRIS</span></div>
+            <div class="file-name" id="qris-file-name"></div>
+        </div>
+        <img id="qris-upload-preview" style="width:150px;border-radius:10px;margin:0 auto 12px;display:none">
+        <div class="upload-progress-bar" id="qris-progress"><div class="fill" id="qris-progress-fill"></div></div>
         <label>Harga Creator (Rp)</label>
         <input type="number" id="aq-creator-price" placeholder="10000">
         <label>Harga Elite (Rp)</label>
         <input type="number" id="aq-elite-price" placeholder="45000">
-        <button onclick="saveQrisSettings()" class="btn-gold" style="margin-top:10px">SIMPAN PENGATURAN</button>
+        <button onclick="saveQrisSettings()" class="btn-gold" style="margin-top:10px" id="qris-save-btn">SIMPAN PENGATURAN</button>
     </div>
     <div style="margin-top:20px;text-align:center">
-        <p style="color:var(--gray);font-size:.75rem;margin-bottom:10px">Preview QRIS saat ini:</p>
+        <p style="color:var(--gray);font-size:.75rem;margin-bottom:10px">QRIS saat ini:</p>
         <img id="aq-preview" src="" style="max-width:200px;border-radius:15px;display:none">
         <p id="aq-no-preview" style="color:var(--gray);font-size:.8rem">Belum ada QRIS</p>
     </div>
 </div>
 
+<!-- EDIT PROFILE -->
 <div id="edit-profile" class="page">
     <div class="back-btn" onclick="nav('profile')"><i class="fas fa-arrow-left"></i> Edit Profil</div>
     <h1 style="margin-bottom:20px">Edit Profil</h1>
@@ -393,6 +460,7 @@
     </div>
 </div>
 
+<!-- PLAYER -->
 <div id="p-toggle" class="p-toggle-bar" onclick="togglePlayerBar()"><i class="fas fa-chevron-up" id="p-toggle-icon"></i></div>
 <div id="mini-p" class="player-bar">
     <img id="p-img" src="" alt="">
@@ -401,7 +469,7 @@
         <small id="p-ar" style="font-size:.65rem;color:var(--green)">Artis</small>
     </div>
     <div class="p-ctrls">
-        <i class="fas fa-plus-circle" id="p-pl-btn" onclick="addCurrentToPlaylist()" style="color:var(--green)"></i>
+        <i class="fas fa-plus-circle" id="p-pl-btn" onclick="addCurrentToPlaylist()" style="color:var(--green)" title="Tambah ke Playlist"></i>
         <i class="far fa-heart" id="p-fav-btn" onclick="toggleFavCurrent()"></i>
         <i id="p-ic" class="fas fa-play" onclick="togP()"></i>
         <i class="fas fa-step-forward" onclick="nextSong()"></i>
@@ -411,13 +479,17 @@
 
 <script>
 const KING="King",DEV2="REGAL-ADMIN-ZEONLY",KING_PHONE="999999999999",DEV2_PHONE="000000000001";
-const BAD_WORDS=["anjing","bangsat","kontol","memek","babi","tolol","goblok","bodoh","bajingan","keparat","asu","jancok","ngentot","setan","iblis","tai","brengsek","kampret","monyet","idiot","sialan","pelacur","sundal","laknat","ngewe"];
+const DEVICE_ID=(()=>{let id=localStorage.getItem('regal_device_id');if(!id){id='DEV_'+Date.now()+'_'+Math.random().toString(36).substr(2,9);localStorage.setItem('regal_device_id',id)}return id})();
 
 const config={apiKey:"AIzaSyBTb_DwvrKW35f15NvzNC5VTTbubZJD5JQ",authDomain:"developer-9640f.firebaseapp.com",databaseURL:"https://developer-9640f-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"developer-9640f",storageBucket:"developer-9640f.firebasestorage.app",messagingSenderId:"217471718457",appId:"1:217471718457:web:e157fccbddc9ff5213a9e8"};
 firebase.initializeApp(config);
 const db=firebase.database(),storage=firebase.storage();
 
-let U=JSON.parse(localStorage.getItem('uv15'))||null,am='login',songs=[],users={},favs=[],myPL=[],currentSongId=null,currentDMUser=null,myContacts={},searchHistory=[],uploadAudioFile=null,uploadCoverFile=null,editPfpFile=null,playerCollapsed=false,qrisSettings={},viewProfileFrom='chat-room',viewingUser=null;
+let U=JSON.parse(localStorage.getItem('uv18'))||null;
+let am='login',songs=[],users={},favs=[],myPL=[],currentSongId=null,currentDMUser=null,myContacts={},searchHistory=[];
+let uploadAudioFile=null,uploadCoverFile=null,editPfpFile=null,qrisUploadFile=null;
+let playerCollapsed=false,qrisSettings={},viewProfileFrom='chat-room',viewingUser=null;
+let banCheckInterval=null;
 const aud=document.getElementById('aud');
 const DC="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDUiIGhlaWdodD0iNDUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjQ1IiBoZWlnaHQ9IjQ1IiBmaWxsPSIjMWExYTFhIi8+PHRleHQgeD0iMjIuNSIgeT0iMjciIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNkNGFmMzciIGZvbnQtc2l6ZT0iMjAiPuKZqjwvdGV4dD48L3N2Zz4=";
 
@@ -425,81 +497,178 @@ function isDev(n){return n===KING||n===DEV2}
 function hasAdmin(n){return isDev(n)||(users[n]&&users[n].role==='admin')}
 function esc(s){if(!s)return'';const d=document.createElement('div');d.textContent=s;return d.innerHTML}
 function toast(m,w){const t=document.createElement('div');t.className='toast-msg'+(w?' warn':'');t.innerText=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2500)}
+function authErr(m){const e=document.getElementById('auth-error');e.innerText=m;e.style.display='block';setTimeout(()=>e.style.display='none',4000)}
 
-function containsBadWord(text){const lower=text.toLowerCase();return BAD_WORDS.some(w=>lower.includes(w))}
-
-async function checkAndWarn(text){
-    if(!containsBadWord(text))return false;
-    const snap=await db.ref('users/'+U.name+'/warnings').once('value');
-    let warns=(snap.val()||0)+1;
-    await db.ref('users/'+U.name+'/warnings').set(warns);
-    if(warns>=5){
-        const banUntil=Date.now()+(24*60*60*1000);
-        await db.ref('users/'+U.name+'/banned').set(true);
-        await db.ref('users/'+U.name+'/banUntil').set(banUntil);
-        await db.ref('users/'+U.name+'/warnings').set(0);
-        toast("⛔ 5 teguran! Banned 1 hari!",true);
-        showBanScreen();
-        return true;
+// ========== FILE HANDLERS ==========
+function handleAudioFile(i){
+    if(!i.files||!i.files[0])return;
+    const f=i.files[0];
+    const validTypes=['audio/mpeg','audio/mp3','audio/wav','audio/ogg','audio/x-m4a','audio/mp4','audio/aac','audio/webm'];
+    const ext=f.name.toLowerCase().split('.').pop();
+    const validExts=['mp3','wav','ogg','m4a','aac','webm','flac'];
+    if(!validTypes.includes(f.type)&&!validExts.includes(ext)){
+        toast("Format tidak didukung! Gunakan MP3/WAV/OGG",true);
+        i.value='';return;
     }
-    toast(`⚠️ Teguran ${warns}/5 - Kata kasar terdeteksi!`,true);
-    return true;
+    if(f.size>50*1024*1024){toast("File terlalu besar! Max 50MB",true);i.value='';return}
+    uploadAudioFile=f;
+    document.getElementById('audio-file-name').innerText='✅ '+f.name+' ('+Math.round(f.size/1024/1024*10)/10+'MB)';
+    document.getElementById('audio-wrap').classList.add('active');
 }
-
-function handleAudioFile(i){if(i.files&&i.files[0]){uploadAudioFile=i.files[0];document.getElementById('audio-file-name').innerText=uploadAudioFile.name}}
-function handleCoverFile(i){if(i.files&&i.files[0]){uploadCoverFile=i.files[0];document.getElementById('cover-file-name').innerText=uploadCoverFile.name;const r=new FileReader();r.onload=e=>{document.getElementById('cover-preview').src=e.target.result;document.getElementById('cover-preview').style.display='block'};r.readAsDataURL(uploadCoverFile)}}
-function handlePfpFile(i){if(i.files&&i.files[0]){editPfpFile=i.files[0];document.getElementById('pfp-file-name').innerText=editPfpFile.name;const r=new FileReader();r.onload=e=>{document.getElementById('pfp-preview').src=e.target.result;document.getElementById('pfp-preview').style.display='block'};r.readAsDataURL(editPfpFile)}}
+function handleCoverFile(i){
+    if(!i.files||!i.files[0])return;
+    const f=i.files[0];
+    if(!f.type.startsWith('image/')){toast("Pilih file gambar!",true);return}
+    if(f.size>5*1024*1024){toast("Gambar max 5MB!",true);return}
+    uploadCoverFile=f;
+    document.getElementById('cover-file-name').innerText='✅ '+f.name;
+    document.getElementById('cover-wrap').classList.add('active');
+    const r=new FileReader();r.onload=e=>{document.getElementById('cover-preview').src=e.target.result;document.getElementById('cover-preview').style.display='block'};r.readAsDataURL(f);
+}
+function handlePfpFile(i){
+    if(!i.files||!i.files[0])return;
+    const f=i.files[0];
+    if(!f.type.startsWith('image/')){toast("Pilih file gambar!",true);return}
+    editPfpFile=f;
+    document.getElementById('pfp-file-name').innerText='✅ '+f.name;
+    const r=new FileReader();r.onload=e=>{document.getElementById('pfp-preview').src=e.target.result;document.getElementById('pfp-preview').style.display='block'};r.readAsDataURL(f);
+}
+function handleQrisFile(i){
+    if(!i.files||!i.files[0])return;
+    const f=i.files[0];
+    if(!f.type.startsWith('image/')){toast("Pilih file gambar!",true);return}
+    qrisUploadFile=f;
+    document.getElementById('qris-file-name').innerText='✅ '+f.name;
+    document.getElementById('qris-file-wrap').classList.add('active');
+    const r=new FileReader();r.onload=e=>{document.getElementById('qris-upload-preview').src=e.target.result;document.getElementById('qris-upload-preview').style.display='block'};r.readAsDataURL(f);
+}
 
 function uploadFile(file,path,pBar,pFill){
     return new Promise((res,rej)=>{
         const ref=storage.ref(path),task=ref.put(file);
         if(pBar)pBar.style.display='block';
         task.on('state_changed',
-            s=>{if(pFill)pFill.style.width=(s.bytesTransferred/s.totalBytes*100)+'%'},
+            s=>{const pct=(s.bytesTransferred/s.totalBytes*100);if(pFill)pFill.style.width=pct+'%'},
             e=>{if(pBar)pBar.style.display='none';rej(e)},
-            ()=>{task.snapshot.ref.getDownloadURL().then(url=>{if(pBar)pBar.style.display='none';res(url)}).catch(rej)}
+            ()=>{task.snapshot.ref.getDownloadURL().then(url=>{if(pBar)pBar.style.display='none';if(pFill)pFill.style.width='0%';res(url)}).catch(rej)}
         );
     });
 }
 
+// ========== DEVICE BAN CHECK ==========
+function isDeviceBanned(){return localStorage.getItem('regal_device_banned')==='true'}
+function setDeviceBanned(val){if(val)localStorage.setItem('regal_device_banned','true');else localStorage.removeItem('regal_device_banned')}
+
+function startDeviceBanListener(){
+    db.ref('bannedDevices/'+DEVICE_ID).on('value',s=>{
+        if(s.val()===true){
+            setDeviceBanned(true);
+            showBanScreen("Perangkat ini telah di-banned oleh Administrator.");
+        } else {
+            if(isDeviceBanned()){
+                setDeviceBanned(false);
+                hideBanScreen();
+            }
+        }
+    });
+}
+
+function startUserBanListener(){
+    if(!U)return;
+    db.ref('users/'+U.name+'/banned').on('value',s=>{
+        if(s.val()===true&&!isDev(U.name)){
+            setDeviceBanned(true);
+            db.ref('bannedDevices/'+DEVICE_ID).set(true);
+            db.ref('users/'+U.name+'/bannedDevice').set(DEVICE_ID);
+            showBanScreen("Akun Anda telah diblokir oleh Administrator.");
+        } else if(s.val()!==true&&U){
+            // Unbanned - also unban device
+            db.ref('users/'+U.name+'/bannedDevice').once('value',ds=>{
+                const devId=ds.val();
+                if(devId){
+                    db.ref('bannedDevices/'+devId).remove();
+                    db.ref('users/'+U.name+'/bannedDevice').remove();
+                }
+            });
+            setDeviceBanned(false);
+            hideBanScreen();
+        }
+    });
+}
+
+function showBanScreen(msg){
+    document.getElementById('ban-msg').innerText=msg||'Akun Anda telah diblokir.';
+    document.getElementById('ban-overlay').style.display='flex';
+    document.getElementById('bot-nav').style.display='none';
+    document.getElementById('mini-p').style.display='none';
+    document.getElementById('p-toggle').style.display='none';
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+}
+
+function hideBanScreen(){
+    const bo=document.getElementById('ban-overlay');
+    if(bo.style.display==='flex'){
+        bo.style.display='none';
+        if(U){
+            document.getElementById('bot-nav').style.display='flex';
+            document.getElementById('home').classList.add('active');
+            toast("✅ Anda telah di-unban!");
+        }
+    }
+}
+
+// ========== INIT ==========
 function init(){
+    startDeviceBanListener();
+    if(isDeviceBanned()&&!U){
+        document.getElementById('loader-ov').style.display='none';
+        showBanScreen("Perangkat ini telah di-banned.");
+        return;
+    }
+    if(isDeviceBanned()&&U&&!isDev(U.name)){
+        document.getElementById('loader-ov').style.display='none';
+        document.getElementById('auth').style.display='none';
+        document.getElementById('auth').classList.remove('active');
+        showBanScreen("Perangkat ini telah di-banned.");
+        // Listen for unban
+        startUserBanListener();
+        return;
+    }
     if(!U){document.getElementById('loader-ov').style.display='none';return}
-    searchHistory=JSON.parse(localStorage.getItem('sh_'+U.name)||'[]');
+
     db.ref('users/'+U.name).once('value',s=>{
         const d=s.val();
         if(!d){logOut();return}
         if(d.banned&&!isDev(U.name)){
-            if(d.banUntil&&Date.now()>d.banUntil){
-                db.ref('users/'+U.name+'/banned').remove();
-                db.ref('users/'+U.name+'/banUntil').remove();
-                startApp();
-            } else {
-                document.getElementById('loader-ov').style.display='none';
-                document.getElementById('auth').style.display='none';
-                document.getElementById('auth').classList.remove('active');
-                showBanScreen();
-            }
+            setDeviceBanned(true);
+            db.ref('bannedDevices/'+DEVICE_ID).set(true);
+            db.ref('users/'+U.name+'/bannedDevice').set(DEVICE_ID);
+            document.getElementById('loader-ov').style.display='none';
+            document.getElementById('auth').style.display='none';
+            document.getElementById('auth').classList.remove('active');
+            showBanScreen("Akun Anda telah diblokir oleh Administrator.");
+            startUserBanListener();
             return;
         }
         startApp();
     });
 }
 
-function showBanScreen(){document.getElementById('ban-overlay').style.display='flex';document.getElementById('bot-nav').style.display='none'}
-
 function startApp(){
     document.getElementById('auth').style.display='none';
     document.getElementById('auth').classList.remove('active');
     document.getElementById('bot-nav').style.display='flex';
     document.getElementById('home').classList.add('active');
+    searchHistory=JSON.parse(localStorage.getItem('sh_'+U.name)||'[]');
     renderRecentSearches();
+
+    startUserBanListener();
 
     db.ref('users/'+U.name).on('value',s=>{
         let d=s.val();if(!d)return;
-        if(d.banned&&!isDev(U.name)){showBanScreen();document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));return}
         if(isDev(U.name))d.role="owner";
-        U.role=d.role||'viewer';U.phone=d.phone;U.bio=d.bio||"Regal User";U.pfp=d.pfp||'';U.warnings=d.warnings||0;
-        localStorage.setItem('uv15',JSON.stringify(U));
+        U.role=d.role||'viewer';U.phone=d.phone;U.bio=d.bio||"Regal User";U.pfp=d.pfp||'';
+        localStorage.setItem('uv18',JSON.stringify(U));
         document.getElementById('n-ad').style.display=hasAdmin(U.name)?'flex':'none';
         document.getElementById('n-up').style.display=['owner','elite','creator','admin'].includes(U.role)?'flex':'none';
         updateProfileUI();updatePremiumUI();
@@ -513,22 +682,18 @@ function startApp(){
     db.ref('support/'+U.name).orderByChild('ts').on('value',s=>rSupportChat(s));
     db.ref('contacts/'+U.name).on('value',s=>{myContacts=s.val()||{};rContacts(s)});
     db.ref('dmNotify/'+U.name).on('value',s=>{let h=false;const d=s.val();if(d){for(let k in d)if(d[k].unread){h=true;break}}document.getElementById('chat-nav-badge').style.display=h?'block':'none'});
-
-    db.ref('appSettings/qris').on('value',s=>{
-        qrisSettings=s.val()||{};
-        updatePremiumUI();
-        updateQrisAdmin();
-    });
+    db.ref('appSettings/qris').on('value',s=>{qrisSettings=s.val()||{};updatePremiumUI();updateQrisAdmin()});
 
     if(hasAdmin(U.name)){
         db.ref('support').on('value',s=>rAdminSupport(s));
         db.ref('paymentRequests').on('value',s=>rAdminPayments(s));
+        db.ref('reports').on('value',s=>rAdminReports(s));
     }
 
     db.ref('users/'+U.name+'/forceLogout').on('value',s=>{
         if(s.val()&&!isDev(U.name)){
             db.ref('users/'+U.name+'/forceLogout').remove();
-            localStorage.removeItem('uv15');
+            localStorage.removeItem('uv18');
             document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
             document.getElementById('bot-nav').style.display='none';
             document.getElementById('mini-p').style.display='none';
@@ -544,6 +709,7 @@ function startApp(){
     setTimeout(()=>{const l=document.getElementById('loader-ov');l.style.opacity='0';setTimeout(()=>l.style.display='none',500)},1200);
 }
 
+// ========== NAV ==========
 function nav(id,el){
     document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
     const t=document.getElementById(id);if(t)t.classList.add('active');
@@ -553,58 +719,125 @@ function nav(id,el){
     if(id==='upload')updateUploadLimit();
 }
 
+// ========== HOME ==========
 function rHome(){
     const hr=new Date().getHours();
     document.getElementById('greet-txt').innerText=hr<11?"Selamat Pagi ☀️":hr<15?"Selamat Siang ⛅":hr<19?"Selamat Sore 🌤️":"Selamat Malam 🌙";
-    const wd=document.getElementById('warn-display');
-    if(U&&U.warnings>0)wd.innerHTML=`<div class="warn-bar">⚠️ Teguran: ${U.warnings}/5 - Hindari kata kasar!</div>`;else wd.innerHTML='';
     const l=document.getElementById('h-list');l.innerHTML='';
     if(!songs.length){l.innerHTML='<div class="empty-state"><i class="fas fa-music"></i><p>Belum ada lagu</p></div>';return}
     songs.slice().reverse().forEach(s=>l.appendChild(mkRow(s)));
 }
-
 function mkRow(s){const r=document.createElement('div');r.className='track-row';r.onclick=()=>playSong(s.id);r.innerHTML=`<img src="${esc(s.cover)}" onerror="this.src='${DC}'" alt=""><div style="min-width:0"><b style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(s.title)}</b><small style="color:var(--gray)">${esc(s.artist)}</small></div>`;return r}
 
+// ========== SEARCH ==========
 function doSearch(){const q=document.getElementById('s-inp').value.trim().toLowerCase(),r=document.getElementById('s-results'),e=document.getElementById('s-empty'),rc=document.getElementById('s-recent');r.innerHTML='';if(!q){e.style.display='block';rc.style.display='block';renderRecentSearches();return}e.style.display='none';rc.style.display='none';const f=songs.filter(s=>s.title.toLowerCase().includes(q)||s.artist.toLowerCase().includes(q));if(!f.length){r.innerHTML='<div class="empty-state"><i class="fas fa-search"></i><p>Tidak ditemukan</p></div>';return}f.forEach(s=>{const row=document.createElement('div');row.className='track-row';row.onclick=()=>{addSH(s);playSong(s.id)};row.innerHTML=`<img src="${esc(s.cover)}" onerror="this.src='${DC}'" alt=""><div style="min-width:0"><b style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(s.title)}</b><small style="color:var(--gray)">${esc(s.artist)}</small></div>`;r.appendChild(row)})}
-
 function addSH(s){searchHistory=searchHistory.filter(h=>h.id!==s.id);searchHistory.unshift({id:s.id,title:s.title,artist:s.artist,cover:s.cover});if(searchHistory.length>15)searchHistory=searchHistory.slice(0,15);localStorage.setItem('sh_'+U.name,JSON.stringify(searchHistory))}
 function cleanSH(){const ids=songs.map(s=>s.id);searchHistory=searchHistory.filter(h=>ids.includes(h.id));localStorage.setItem('sh_'+U.name,JSON.stringify(searchHistory))}
 function renderRecentSearches(){const c=document.getElementById('s-recent');if(!c)return;c.innerHTML='';cleanSH();if(!searchHistory.length)return;c.innerHTML=`<div class="recent-search-header"><h3>Terakhir Dicari</h3><span onclick="clearSH()">Hapus Semua</span></div>`;searchHistory.forEach(s=>{if(!songs.find(x=>x.id===s.id))return;const r=document.createElement('div');r.className='track-row';r.onclick=()=>playSong(s.id);r.innerHTML=`<img src="${esc(s.cover)}" onerror="this.src='${DC}'" alt=""><div style="min-width:0;flex:1"><b style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(s.title)}</b><small style="color:var(--gray)">${esc(s.artist)}</small></div><i class="fas fa-clock" style="color:var(--gray);opacity:.3;font-size:.8rem"></i>`;c.appendChild(r)})}
 function clearSH(){searchHistory=[];localStorage.setItem('sh_'+U.name,'[]');renderRecentSearches();toast("Riwayat dihapus")}
 
-function playSong(id){const s=songs.find(x=>x.id===id);if(!s){toast("Lagu dihapus",true);return}currentSongId=id;aud.src=s.url;aud.play();document.getElementById('p-ti').innerText=s.title;document.getElementById('p-ar').innerText=s.artist;const pi=document.getElementById('p-img');pi.src=s.cover;pi.onerror=function(){this.src=DC};document.getElementById('mini-p').style.display='flex';document.getElementById('p-toggle').style.display='flex';document.getElementById('p-ic').className='fas fa-pause';document.body.classList.add('player-active');playerCollapsed=false;document.getElementById('mini-p').classList.remove('collapsed');document.getElementById('p-toggle-icon').className='fas fa-chevron-down';updateFavBtn();updatePlBtn();db.ref('songs/'+id+'/plays').transaction(v=>(v||0)+1)}
-
+// ========== PLAYER ==========
+function playSong(id){const s=songs.find(x=>x.id===id);if(!s){toast("Lagu tidak tersedia",true);return}currentSongId=id;aud.src=s.url;aud.play().catch(e=>{toast("Gagal memutar: "+e.message,true)});document.getElementById('p-ti').innerText=s.title;document.getElementById('p-ar').innerText=s.artist;const pi=document.getElementById('p-img');pi.src=s.cover;pi.onerror=function(){this.src=DC};document.getElementById('mini-p').style.display='flex';document.getElementById('p-toggle').style.display='flex';document.getElementById('p-ic').className='fas fa-pause';document.body.classList.add('player-active');playerCollapsed=false;document.getElementById('mini-p').classList.remove('collapsed');document.getElementById('p-toggle-icon').className='fas fa-chevron-down';updateFavBtn();updatePlBtn();db.ref('songs/'+id+'/plays').transaction(v=>(v||0)+1)}
 function togP(){if(aud.paused){aud.play();document.getElementById('p-ic').className='fas fa-pause'}else{aud.pause();document.getElementById('p-ic').className='fas fa-play'}}
 aud.addEventListener('ended',()=>nextSong());
 function nextSong(){if(!songs.length)return;let i=songs.findIndex(x=>x.id===currentSongId);i=(i+1)%songs.length;playSong(songs[i].id)}
+function togglePlayerBar(){playerCollapsed=!playerCollapsed;const bar=document.getElementById('mini-p'),icon=document.getElementById('p-toggle-icon');if(playerCollapsed){bar.classList.add('collapsed');icon.className='fas fa-chevron-up';document.body.classList.remove('player-active')}else{bar.classList.remove('collapsed');icon.className='fas fa-chevron-down';document.body.classList.add('player-active')}}
 
-function togglePlayerBar(){
-    playerCollapsed=!playerCollapsed;
-    const bar=document.getElementById('mini-p'),icon=document.getElementById('p-toggle-icon');
-    if(playerCollapsed){bar.classList.add('collapsed');icon.className='fas fa-chevron-up';document.body.classList.remove('player-active')}
-    else{bar.classList.remove('collapsed');icon.className='fas fa-chevron-down';document.body.classList.add('player-active')}
+// ========== PLAYLIST (from player + only) ==========
+function addCurrentToPlaylist(){
+    if(!currentSongId){toast("Tidak ada lagu diputar",true);return}
+    if(myPL.find(p=>p.sid===currentSongId)){toast("Sudah ada di playlist!");return}
+    db.ref('playlists/'+U.name).push(currentSongId).then(()=>{toast("✅ Ditambah ke Playlist!");updatePlBtn()});
 }
+function updatePlBtn(){const b=document.getElementById('p-pl-btn');if(!currentSongId)return;if(myPL.find(p=>p.sid===currentSongId)){b.className='fas fa-check-circle';b.style.color='var(--accent)'}else{b.className='fas fa-plus-circle';b.style.color='var(--green)'}}
 
-function addCurrentToPlaylist(){if(!currentSongId)return;if(myPL.find(p=>p.sid===currentSongId)){toast("Sudah di playlist!");return}db.ref('playlists/'+U.name).push(currentSongId).then(()=>{toast("✅ Ke Playlist!");updatePlBtn()})}
-function updatePlBtn(){const b=document.getElementById('p-pl-btn');if(myPL.find(p=>p.sid===currentSongId)){b.className='fas fa-check-circle';b.style.color='var(--green)'}else{b.className='fas fa-plus-circle';b.style.color='var(--green)'}}
 function toggleFavCurrent(){if(!currentSongId||!U)return;if(favs.includes(currentSongId)){db.ref('favorites/'+U.name).orderByValue().equalTo(currentSongId).once('value',s=>{s.forEach(c=>c.ref.remove())});toast("Dihapus dari Favorit")}else{db.ref('favorites/'+U.name).push(currentSongId);toast("❤️ Favorit!")}}
 function updateFavBtn(){document.getElementById('p-fav-btn').className=favs.includes(currentSongId)?'fas fa-heart':'far fa-heart'}
 
 function rFavorites(){updateFavBtn();const l=document.getElementById('fav-list'),e=document.getElementById('fav-empty');if(!l)return;l.innerHTML='';const v=favs.filter(f=>songs.find(x=>x.id===f));if(!v.length){e.style.display='block';return}e.style.display='none';v.forEach(f=>{const s=songs.find(x=>x.id===f);if(s)l.appendChild(mkRow(s))})}
 
-function rPlaylist(){updatePlBtn();const l=document.getElementById('pl-list'),e=document.getElementById('pl-empty');if(!l)return;l.innerHTML='';const v=myPL.filter(i=>songs.find(x=>x.id===i.sid));if(!v.length){e.style.display='block';return}e.style.display='none';v.forEach(item=>{const s=songs.find(x=>x.id===item.sid);if(!s)return;const r=document.createElement('div');r.className='track-row';r.style.justifyContent='space-between';r.innerHTML=`<div style="display:flex;align-items:center;min-width:0;flex:1;cursor:pointer" onclick="playSong('${esc(s.id)}')"><img src="${esc(s.cover)}" onerror="this.src='${DC}'" alt=""><div style="min-width:0"><b style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(s.title)}</b><small style="color:var(--gray)">${esc(s.artist)}</small></div></div><i class="fas fa-trash" style="color:var(--red);cursor:pointer;padding:10px" onclick="event.stopPropagation();db.ref('playlists/${esc(U.name)}/${esc(item.id)}').remove()"></i>`;l.appendChild(r)})}
+function rPlaylist(){
+    updatePlBtn();
+    const l=document.getElementById('pl-list'),e=document.getElementById('pl-empty');
+    if(!l)return;l.innerHTML='';
+    const v=myPL.filter(i=>songs.find(x=>x.id===i.sid));
+    if(!v.length){e.style.display='block';return}
+    e.style.display='none';
+    v.forEach(item=>{
+        const s=songs.find(x=>x.id===item.sid);if(!s)return;
+        const r=document.createElement('div');r.className='track-row';r.style.justifyContent='space-between';
+        r.innerHTML=`<div style="display:flex;align-items:center;min-width:0;flex:1;cursor:pointer" onclick="playSong('${esc(s.id)}')"><img src="${esc(s.cover)}" onerror="this.src='${DC}'" alt=""><div style="min-width:0"><b style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(s.title)}</b><small style="color:var(--gray)">${esc(s.artist)}</small></div></div><i class="fas fa-trash" style="color:var(--red);cursor:pointer;padding:10px" onclick="event.stopPropagation();removeFromPlaylist('${esc(item.id)}')"></i>`;
+        l.appendChild(r);
+    });
+}
 
-// LIVE CHAT with clickable profiles
+function removeFromPlaylist(plId){
+    db.ref('playlists/'+U.name+'/'+plId).remove().then(()=>toast("Dihapus dari playlist"));
+}
+
+// ========== LIVE CHAT + REPORT ==========
 function rLiveChat(snap){
     const c=document.getElementById('live-msgs');c.innerHTML='';let cnt=0;
-    snap.forEach(x=>{const m=x.val();cnt++;const mine=m.user===U.name;const b=document.createElement('div');b.className='chat-bubble '+(mine?'mine':'other');const t=new Date(m.ts).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});const ri=isDev(m.user)?' 👑':m.role==='admin'?' 🛡️':m.role==='elite'?' 💎':m.role==='creator'?' ⭐':'';
-    b.innerHTML=`<div class="chat-name" onclick="viewUserFromLive('${esc(m.user)}')">${esc(m.user)}${ri}</div>${esc(m.text)}<div class="chat-time">${t}</div>`;c.appendChild(b)});
+    snap.forEach(x=>{
+        const m=x.val(),mid=x.key;cnt++;
+        const mine=m.user===U.name;
+        const b=document.createElement('div');b.className='chat-bubble '+(mine?'mine':'other');
+        const t=new Date(m.ts).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+        const ri=isDev(m.user)?' 👑':m.role==='admin'?' 🛡️':m.role==='elite'?' 💎':m.role==='creator'?' ⭐':'';
+        let reportHtml='';
+        if(!mine)reportHtml=`<i class="fas fa-flag report-btn" onclick="event.stopPropagation();reportMessage('live','${esc(mid)}','${esc(m.user)}',this)" title="Laporkan"></i>`;
+        b.innerHTML=`${reportHtml}<div class="chat-name" onclick="viewUserFromChat('${esc(m.user)}','live-chat')">${esc(m.user)}${ri}</div>${esc(m.text)}<div class="chat-time">${t}</div>`;
+        c.appendChild(b);
+    });
     document.getElementById('live-count').innerText=cnt+' pesan';c.scrollTop=c.scrollHeight;
 }
 
-function viewUserFromLive(username){
+function sendLive(){
+    const inp=document.getElementById('live-in'),text=inp.value.trim();if(!text)return;
+    db.ref('liveChat').push({user:U.name,role:U.role,text,ts:firebase.database.ServerValue.TIMESTAMP});inp.value='';
+}
+
+// ========== REPORT SYSTEM ==========
+function reportMessage(chatType,msgId,msgUser,btnEl){
+    if(msgUser===U.name){toast("Tidak bisa lapor pesan sendiri",true);return}
+    // Get the message text
+    let msgText='';
+    const bubble=btnEl.closest('.chat-bubble');
+    if(bubble){
+        const nodes=bubble.childNodes;
+        for(let n of nodes){
+            if(n.nodeType===3&&n.textContent.trim()){msgText=n.textContent.trim();break}
+        }
+        if(!msgText){
+            // Try getting text content excluding name and time
+            const clone=bubble.cloneNode(true);
+            clone.querySelectorAll('.chat-name,.chat-time,.report-btn').forEach(e=>e.remove());
+            msgText=clone.textContent.trim();
+        }
+    }
+    showModal("Laporkan Pesan",
+        `<p style="font-size:.8rem;color:var(--gray);margin-bottom:10px">Pesan dari <b style="color:var(--elite)">${esc(msgUser)}</b>:</p>
+        <div style="background:rgba(255,255,255,.05);padding:10px;border-radius:8px;margin-bottom:15px;font-size:.85rem;text-align:left">"${esc(msgText)}"</div>
+        <textarea id="report-reason" placeholder="Alasan laporan (opsional)..." style="min-height:60px"></textarea>`,
+        ()=>{
+            const reason=document.getElementById('report-reason').value.trim();
+            db.ref('reports').push({
+                reporter:U.name,
+                reported:msgUser,
+                chatType,msgId,
+                msgText,
+                reason:reason||'Tidak ada alasan',
+                ts:firebase.database.ServerValue.TIMESTAMP
+            }).then(()=>{
+                toast("✅ Laporan terkirim!");closeModal();
+            });
+        }
+    );
+}
+
+function viewUserFromChat(username,fromPage){
     if(username===U.name)return;
-    viewingUser=username;viewProfileFrom='live-chat';
+    viewingUser=username;viewProfileFrom=fromPage||'live-chat';
     db.ref('users/'+username).once('value',s=>{
         const d=s.val();if(!d)return;
         setViewProfile(username,d);
@@ -616,126 +849,86 @@ function viewUserFromLive(username){
     });
 }
 
-async function sendLive(){
-    const inp=document.getElementById('live-in'),text=inp.value.trim();if(!text)return;
-    if(await checkAndWarn(text)){inp.value='';return}
-    db.ref('liveChat').push({user:U.name,role:U.role,text,ts:firebase.database.ServerValue.TIMESTAMP});inp.value='';
-}
-
+// ========== SUPPORT ==========
 function rSupportChat(snap){const c=document.getElementById('sup-msgs');c.innerHTML='';snap.forEach(x=>{const m=x.val(),mine=m.from===U.name;const b=document.createElement('div');b.className='chat-bubble '+(mine?'mine':'other');const t=new Date(m.ts).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});b.innerHTML=`<div class="chat-name">${mine?'Kamu':'Admin 👑'}</div>${esc(m.text)}<div class="chat-time">${t}</div>`;c.appendChild(b)});c.scrollTop=c.scrollHeight}
 function sendSupport(){const inp=document.getElementById('sup-in'),text=inp.value.trim();if(!text)return;db.ref('support/'+U.name).push({from:U.name,text,ts:firebase.database.ServerValue.TIMESTAMP});inp.value=''}
 
-function addContactModal(){showModal("Tambah Kontak",`<p style="margin-bottom:10px;font-size:.8rem;color:var(--gray)">Masukkan Nomor Regal</p><input type="text" id="new-ct-phone" placeholder="Nomor Regal..."><input type="text" id="new-ct-label" placeholder="Nama kontak (opsional)">`,()=>{const ph=document.getElementById('new-ct-phone').value.trim(),lb=document.getElementById('new-ct-label').value.trim();if(!ph){alert("Masukkan nomor!");return}db.ref('users').once('value',s=>{let found=null;s.forEach(c=>{if(c.val().phone===ph)found=c.key});if(!found){alert("Nomor tidak ditemukan!");return}if(found===U.name){alert("Tidak bisa sendiri!");return}db.ref('contacts/'+U.name+'/'+found).set({ts:firebase.database.ServerValue.TIMESTAMP,saved:true,label:lb||found,phone:ph});db.ref('contacts/'+found+'/'+U.name).update({ts:firebase.database.ServerValue.TIMESTAMP});closeModal();openChatWith(found)})})}
+// ========== DM / CONTACTS ==========
+function addContactModal(){showModal("Tambah Kontak",`<p style="margin-bottom:10px;font-size:.8rem;color:var(--gray)">Masukkan Nomor Regal</p><input type="text" id="new-ct-phone" placeholder="Nomor Regal..."><input type="text" id="new-ct-label" placeholder="Nama kontak (opsional)">`,()=>{const ph=document.getElementById('new-ct-phone').value.trim(),lb=document.getElementById('new-ct-label').value.trim();if(!ph){toast("Masukkan nomor!",true);return}db.ref('users').once('value',s=>{let found=null;s.forEach(c=>{if(c.val().phone===ph)found=c.key});if(!found){toast("Nomor tidak ditemukan!",true);return}if(found===U.name){toast("Tidak bisa sendiri!",true);return}db.ref('contacts/'+U.name+'/'+found).set({ts:firebase.database.ServerValue.TIMESTAMP,saved:true,label:lb||found,phone:ph});db.ref('contacts/'+found+'/'+U.name).update({ts:firebase.database.ServerValue.TIMESTAMP});closeModal();openChatWith(found)})})}
 
 function rContacts(snap){const l=document.getElementById('ct-list'),e=document.getElementById('ct-empty');l.innerHTML='';let cnt=0;snap.forEach(x=>{cnt++;const n=x.key,d=x.val()||{},saved=d.saved===true,dn=d.label||n,ud=users[n]||{},pfp=ud.pfp||'';const item=document.createElement('div');item.className='contact-item';item.onclick=()=>openChatWith(n);item.innerHTML=`${pfp?`<div class="contact-avatar"><img src="${esc(pfp)}" onerror="this.parentElement.innerHTML='${esc(n.charAt(0).toUpperCase())}'"></div>`:`<div class="contact-avatar">${esc(n.charAt(0).toUpperCase())}</div>`}<div style="flex:1;min-width:0"><b>${esc(dn)}</b>${!saved?'<span class="unsaved-badge">Belum disimpan</span>':''}${!saved?'<br><small style="color:var(--gray);font-size:.7rem">@'+esc(n)+'</small>':''}<br><small style="color:var(--gray)">Tap untuk chat</small></div>`;db.ref('dmNotify/'+U.name+'/'+n+'/unread').once('value',ns=>{if(ns.val()===true){const dot=document.createElement('div');dot.className='unread-dot';item.appendChild(dot)}});l.appendChild(item)});e.style.display=cnt===0?'block':'none'}
 
-function openChatWith(name){currentDMUser=name;const cd=myContacts[name]||{},dn=cd.label||name;document.getElementById('cr-name').innerText=dn;document.getElementById('cr-sub').innerText='@'+name;const ud=users[name]||{},av=document.getElementById('cr-avatar');av.innerHTML=ud.pfp?`<img src="${esc(ud.pfp)}" onerror="this.parentElement.innerHTML='${esc(name.charAt(0).toUpperCase())}'"/>`
-:name.charAt(0).toUpperCase();nav('chat-room');db.ref('dmNotify/'+U.name+'/'+name+'/unread').set(false);const key=getDMKey(U.name,name);db.ref('dms/'+key).off();db.ref('dms/'+key).orderByChild('ts').on('value',s=>{const c=document.getElementById('cr-msgs');c.innerHTML='';s.forEach(x=>{const m=x.val(),mine=m.from===U.name;const b=document.createElement('div');b.className='chat-bubble '+(mine?'mine':'other');const t=new Date(m.ts).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});b.innerHTML=`<div class="chat-name">${mine?'Kamu':esc(dn)}</div>${esc(m.text)}<div class="chat-time">${t}</div>`;c.appendChild(b)});c.scrollTop=c.scrollHeight})}
-function closeChatRoom(){if(currentDMUser)db.ref('dms/'+getDMKey(U.name,currentDMUser)).off();nav('chat-list')}
+function openChatWith(name){currentDMUser=name;const cd=myContacts[name]||{},dn=cd.label||name;document.getElementById('cr-name').innerText=dn;document.getElementById('cr-sub').innerText='@'+name;const ud=users[name]||{},av=document.getElementById('cr-avatar');av.innerHTML=ud.pfp?`<img src="${esc(ud.pfp)}" onerror="this.parentElement.innerHTML='${esc(name.charAt(0).toUpperCase())}'"/>`:name.charAt(0).toUpperCase();nav('chat-room');db.ref('dmNotify/'+U.name+'/'+name+'/unread').set(false);const key=getDMKey(U.name,name);db.ref('dms/'+key).off();db.ref('dms/'+key).orderByChild('ts').on('value',s=>{const c=document.getElementById('cr-msgs');c.innerHTML='';s.forEach(x=>{const m=x.val(),mid=x.key,mine=m.from===U.name;const b=document.createElement('div');b.className='chat-bubble '+(mine?'mine':'other');const t=new Date(m.ts).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});let reportHtml='';if(!mine)reportHtml=`<i class="fas fa-flag report-btn" onclick="event.stopPropagation();reportMessage('dm','${esc(mid)}','${esc(m.from)}',this)" title="Laporkan"></i>`;b.innerHTML=`${reportHtml}<div class="chat-name">${mine?'Kamu':esc(dn)}</div>${esc(m.text)}<div class="chat-time">${t}</div>`;c.appendChild(b)});c.scrollTop=c.scrollHeight})}
+function closeChatRoom(){if(currentDMUser)db.ref('dms/'+getDMKey(U.name,currentDMUser)).off();currentDMUser=null;nav('chat-list')}
 function getDMKey(a,b){return[a,b].sort().join('_')}
+function sendDM(){if(!currentDMUser)return;const inp=document.getElementById('cr-in'),text=inp.value.trim();if(!text)return;db.ref('dms/'+getDMKey(U.name,currentDMUser)).push({from:U.name,text,ts:firebase.database.ServerValue.TIMESTAMP});db.ref('dmNotify/'+currentDMUser+'/'+U.name).set({unread:true,ts:firebase.database.ServerValue.TIMESTAMP});db.ref('contacts/'+currentDMUser+'/'+U.name).once('value',s=>{if(!s.exists())db.ref('contacts/'+currentDMUser+'/'+U.name).set({ts:firebase.database.ServerValue.TIMESTAMP,saved:false,label:U.name})});inp.value=''}
 
-async function sendDM(){if(!currentDMUser)return;const inp=document.getElementById('cr-in'),text=inp.value.trim();if(!text)return;
-    if(await checkAndWarn(text)){inp.value='';return}
-    db.ref('dms/'+getDMKey(U.name,currentDMUser)).push({from:U.name,text,ts:firebase.database.ServerValue.TIMESTAMP});db.ref('dmNotify/'+currentDMUser+'/'+U.name).set({unread:true,ts:firebase.database.ServerValue.TIMESTAMP});db.ref('contacts/'+currentDMUser+'/'+U.name).once('value',s=>{if(!s.exists())db.ref('contacts/'+currentDMUser+'/'+U.name).set({ts:firebase.database.ServerValue.TIMESTAMP,saved:false,label:U.name})});inp.value=''}
+function renameContactModal(){const target=viewingUser||currentDMUser;if(!target)return;const cl=(myContacts[target]||{}).label||target;showModal("Ubah Nama",`<input type="text" id="rename-ct" placeholder="Nama baru..." value="${esc(cl)}">`,()=>{const n=document.getElementById('rename-ct').value.trim();if(!n)return;db.ref('contacts/'+U.name+'/'+target).update({label:n,saved:true});if(target===currentDMUser)document.getElementById('cr-name').innerText=n;closeModal();toast("Nama diubah!")})}
 
-function renameContactModal(){if(!currentDMUser&&!viewingUser)return;const target=viewingUser||currentDMUser;const cl=(myContacts[target]||{}).label||target;showModal("Ubah Nama",`<input type="text" id="rename-ct" placeholder="Nama baru..." value="${esc(cl)}">`,()=>{const n=document.getElementById('rename-ct').value.trim();if(!n)return;db.ref('contacts/'+U.name+'/'+target).update({label:n,saved:true});if(target===currentDMUser)document.getElementById('cr-name').innerText=n;closeModal();toast("Nama diubah!")})}
+function setViewProfile(username,d){const av=document.getElementById('vp-avatar');av.innerHTML=d.pfp?`<img src="${esc(d.pfp)}" onerror="this.parentElement.innerHTML='${esc(username.charAt(0).toUpperCase())}'"/>`:username.charAt(0).toUpperCase();const cd=myContacts[username]||{};document.getElementById('vp-name').innerText=cd.label||username;const role=isDev(username)?'DEVELOPER':(d.role||'viewer').toUpperCase();document.getElementById('vp-role').innerText=role;document.getElementById('vp-bio').innerText=d.bio||'Regal User';document.getElementById('vp-phone').innerText='+'+(d.phone||'62---');document.getElementById('vp-role2').innerText=role}
 
-function setViewProfile(username,d){
-    const av=document.getElementById('vp-avatar');
-    av.innerHTML=d.pfp?`<img src="${esc(d.pfp)}" onerror="this.parentElement.innerHTML='${esc(username.charAt(0).toUpperCase())}'"/>`
-    :username.charAt(0).toUpperCase();
-    const cd=myContacts[username]||{};
-    document.getElementById('vp-name').innerText=cd.label||username;
-    const role=isDev(username)?'DEVELOPER':(d.role||'viewer').toUpperCase();
-    document.getElementById('vp-role').innerText=role;
-    document.getElementById('vp-bio').innerText=d.bio||'Regal User';
-    document.getElementById('vp-phone').innerText='+'+(d.phone||'62---');
-    document.getElementById('vp-role2').innerText=role;
-}
+function viewUserProfile(username){if(!username)return;viewingUser=username;viewProfileFrom='chat-room';db.ref('users/'+username).once('value',s=>{const d=s.val();if(!d)return;setViewProfile(username,d);const isSaved=myContacts[username]&&myContacts[username].saved;document.getElementById('vp-save-btn').style.display=isSaved?'none':'block';document.getElementById('vp-rename-btn').style.display='block';document.getElementById('vp-back-btn').onclick=()=>nav(viewProfileFrom);nav('view-profile')})}
 
-function viewUserProfile(username){
-    if(!username)return;viewingUser=username;viewProfileFrom='chat-room';
-    db.ref('users/'+username).once('value',s=>{
-        const d=s.val();if(!d)return;
-        setViewProfile(username,d);
-        const isSaved=myContacts[username]&&myContacts[username].saved;
-        document.getElementById('vp-save-btn').style.display=isSaved?'none':'block';
-        document.getElementById('vp-rename-btn').style.display='block';
-        document.getElementById('vp-back-btn').onclick=()=>nav(viewProfileFrom);
-        nav('view-profile');
-    });
-}
+function saveContactFromProfile(){if(!viewingUser)return;const ud=users[viewingUser]||{},phone=ud.phone||'';showModal("Simpan Kontak",`<input type="text" id="save-ct-label" placeholder="Nama kontak..." value="${esc(viewingUser)}">`,()=>{const label=document.getElementById('save-ct-label').value.trim()||viewingUser;db.ref('contacts/'+U.name+'/'+viewingUser).set({ts:firebase.database.ServerValue.TIMESTAMP,saved:true,label,phone});db.ref('contacts/'+viewingUser+'/'+U.name).update({ts:firebase.database.ServerValue.TIMESTAMP});closeModal();toast("Kontak disimpan!");document.getElementById('vp-save-btn').style.display='none';openChatWith(viewingUser)})}
 
-function saveContactFromProfile(){
-    if(!viewingUser)return;
-    const ud=users[viewingUser]||{};
-    const phone=ud.phone||'';
-    showModal("Simpan Kontak",`<input type="text" id="save-ct-label" placeholder="Nama kontak..." value="${esc(viewingUser)}">`,()=>{
-        const label=document.getElementById('save-ct-label').value.trim()||viewingUser;
-        db.ref('contacts/'+U.name+'/'+viewingUser).set({ts:firebase.database.ServerValue.TIMESTAMP,saved:true,label:label,phone:phone});
-        db.ref('contacts/'+viewingUser+'/'+U.name).update({ts:firebase.database.ServerValue.TIMESTAMP});
-        closeModal();toast("Kontak disimpan!");
-        document.getElementById('vp-save-btn').style.display='none';
-        openChatWith(viewingUser);
-    });
-}
-
-// UPLOAD with creator limit
+// ========== UPLOAD ==========
 function updateUploadLimit(){
     if(!U)return;
     const info=document.getElementById('upload-limit-info');
     if(U.role==='creator'){
         const today=new Date().toISOString().split('T')[0];
-        db.ref('uploadCount/'+U.name+'/'+today).once('value',s=>{
-            const cnt=s.val()||0;
-            info.innerHTML=`⚡ Creator: ${cnt}/3 upload hari ini`;
-        });
+        db.ref('uploadCount/'+U.name+'/'+today).once('value',s=>{info.innerHTML=`⚡ Creator: ${s.val()||0}/3 upload hari ini`});
     } else if(U.role==='elite'||isDev(U.name)||U.role==='admin'){
         info.innerHTML='♾️ Unlimited upload';
-    } else {
-        info.innerHTML='';
-    }
+    } else info.innerHTML='';
 }
 
 async function doUpload(){
-    if(!['owner','elite','creator','admin'].includes(U.role)){alert("Perlu Creator/Elite!");return}
+    if(!['owner','elite','creator','admin'].includes(U.role)){toast("Perlu Creator/Elite!",true);return}
     const title=document.getElementById('up-title').value.trim(),artist=document.getElementById('up-artist').value.trim();
-    if(!title||!artist){alert("Isi judul & artis!");return}
-    if(!uploadAudioFile){alert("Pilih file MP3!");return}
+    if(!title||!artist){toast("Isi judul & artis!",true);return}
+    if(!uploadAudioFile){toast("Pilih file audio terlebih dahulu!",true);return}
 
-    // Creator 3/day limit
     if(U.role==='creator'){
         const today=new Date().toISOString().split('T')[0];
         const snap=await db.ref('uploadCount/'+U.name+'/'+today).once('value');
-        const cnt=snap.val()||0;
-        if(cnt>=3){toast("Limit 3 upload/hari tercapai!",true);return}
+        if((snap.val()||0)>=3){toast("Limit 3 upload/hari tercapai!",true);return}
     }
 
-    const btn=document.getElementById('upload-btn');
+    const btn=document.getElementById('upload-btn'),status=document.getElementById('upload-status');
     btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> UPLOADING...';
+    status.style.display='block';status.innerText='Mengupload audio...';
     try{
         const ts=Date.now();
-        const audioUrl=await uploadFile(uploadAudioFile,'songs/'+U.name+'/'+ts+'_audio',document.getElementById('upload-progress'),document.getElementById('upload-progress-fill'));
+        const ext=uploadAudioFile.name.split('.').pop()||'mp3';
+        const audioUrl=await uploadFile(uploadAudioFile,'songs/'+U.name+'/'+ts+'.'+ext,document.getElementById('upload-progress'),document.getElementById('upload-progress-fill'));
         let coverUrl=DC;
-        if(uploadCoverFile)coverUrl=await uploadFile(uploadCoverFile,'covers/'+U.name+'/'+ts+'_cover',null,null);
-        await db.ref('songs').push({title,artist,url:audioUrl,cover:coverUrl,uploader:U.name,plays:0,ts:firebase.database.ServerValue.TIMESTAMP});
-
-        // Increment upload count
-        if(U.role==='creator'){
-            const today=new Date().toISOString().split('T')[0];
-            db.ref('uploadCount/'+U.name+'/'+today).transaction(v=>(v||0)+1);
+        if(uploadCoverFile){
+            status.innerText='Mengupload cover...';
+            const cext=uploadCoverFile.name.split('.').pop()||'jpg';
+            coverUrl=await uploadFile(uploadCoverFile,'covers/'+U.name+'/'+ts+'.'+cext,null,null);
         }
-
+        status.innerText='Menyimpan data...';
+        await db.ref('songs').push({title,artist,url:audioUrl,cover:coverUrl,uploader:U.name,plays:0,ts:firebase.database.ServerValue.TIMESTAMP});
+        if(U.role==='creator'){const today=new Date().toISOString().split('T')[0];db.ref('uploadCount/'+U.name+'/'+today).transaction(v=>(v||0)+1)}
         toast("🎵 Upload berhasil!");
+        // Reset form
         document.getElementById('up-title').value='';document.getElementById('up-artist').value='';
         uploadAudioFile=null;uploadCoverFile=null;
-        document.getElementById('audio-file-name').innerText='';document.getElementById('cover-file-name').innerText='';document.getElementById('cover-preview').style.display='none';
+        document.getElementById('audio-file-name').innerText='';document.getElementById('cover-file-name').innerText='';
+        document.getElementById('cover-preview').style.display='none';
+        document.getElementById('audio-wrap').classList.remove('active');document.getElementById('cover-wrap').classList.remove('active');
+        document.getElementById('audio-file-input').value='';document.getElementById('cover-file-input').value='';
+        status.style.display='none';
         nav('home');
-    }catch(err){alert("Upload gagal: "+err.message)}
-    finally{btn.disabled=false;btn.innerHTML='<i class="fas fa-cloud-arrow-up"></i> UPLOAD'}
+    }catch(err){
+        console.error('Upload error:',err);
+        toast("Upload gagal: "+err.message,true);
+        status.innerText='Upload gagal!';status.style.color='var(--red)';
+    }finally{btn.disabled=false;btn.innerHTML='<i class="fas fa-cloud-arrow-up"></i> UPLOAD LAGU'}
 }
 
-// PREMIUM
+// ========== PREMIUM ==========
 function updatePremiumUI(){
     if(!U)return;
     const cp=qrisSettings.creatorPrice||10000,ep=qrisSettings.elitePrice||45000;
@@ -743,40 +936,43 @@ function updatePremiumUI(){
     document.getElementById('elite-price-display').innerHTML='Rp '+ep.toLocaleString('id-ID')+' <small style="color:var(--gray)">/ bulan</small>';
     document.getElementById('creator-active-badge').style.display=U.role==='creator'?'block':'none';
     document.getElementById('elite-active-badge').style.display=U.role==='elite'?'block':'none';
-    document.getElementById('btn-buy-creator').style.display=U.role==='creator'||U.role==='elite'?'none':'block';
+    document.getElementById('btn-buy-creator').style.display=(U.role==='creator'||U.role==='elite')?'none':'block';
     document.getElementById('btn-buy-elite').style.display=U.role==='elite'?'none':'block';
 }
+function openQRIS(tier){const price=tier==='Creator'?(qrisSettings.creatorPrice||10000):(qrisSettings.elitePrice||45000);document.getElementById('q-title').innerText='Pembayaran '+tier;document.getElementById('q-price').innerText='Rp '+price.toLocaleString('id-ID');const img=document.getElementById('qris-dynamic-img'),ph=document.getElementById('qris-placeholder');if(qrisSettings.imageUrl){img.src=qrisSettings.imageUrl;img.style.display='block';ph.style.display='none'}else{img.style.display='none';ph.style.display='block'}window._pt=tier;window._pp=price;nav('qris-page')}
+function submitPaymentRequest(){if(!window._pt)return;db.ref('paymentRequests').push({user:U.name,tier:window._pt,price:window._pp,status:'pending',ts:firebase.database.ServerValue.TIMESTAMP}).then(()=>{showModal("Terkirim!","<p>Permintaan pembayaran terkirim. Tunggu verifikasi Admin.</p>",()=>{closeModal();nav('home')})})}
 
-function openQRIS(tier){
-    const price=tier==='Creator'?(qrisSettings.creatorPrice||10000):(qrisSettings.elitePrice||45000);
-    document.getElementById('q-title').innerText='Pembayaran '+tier;
-    document.getElementById('q-price').innerText='Rp '+price.toLocaleString('id-ID');
-    const img=document.getElementById('qris-dynamic-img'),ph=document.getElementById('qris-placeholder');
-    if(qrisSettings.imageUrl){img.src=qrisSettings.imageUrl;img.style.display='block';ph.style.display='none'}
-    else{img.style.display='none';ph.style.display='block'}
-    window._pt=tier;window._pp=price;nav('qris-page');
-}
-
-function submitPaymentRequest(){if(!window._pt)return;db.ref('paymentRequests').push({user:U.name,tier:window._pt,price:window._pp,status:'pending',ts:firebase.database.ServerValue.TIMESTAMP}).then(()=>{showModal("Terkirim!","<p>Tunggu verifikasi Admin.</p>",()=>{closeModal();nav('home')})})}
-
-// QRIS Admin
+// ========== QRIS ADMIN (FILE UPLOAD) ==========
 function updateQrisAdmin(){
-    if(!document.getElementById('aq-url'))return;
-    document.getElementById('aq-url').value=qrisSettings.imageUrl||'';
+    if(!document.getElementById('aq-creator-price'))return;
     document.getElementById('aq-creator-price').value=qrisSettings.creatorPrice||10000;
     document.getElementById('aq-elite-price').value=qrisSettings.elitePrice||45000;
     if(qrisSettings.imageUrl){document.getElementById('aq-preview').src=qrisSettings.imageUrl;document.getElementById('aq-preview').style.display='block';document.getElementById('aq-no-preview').style.display='none'}
     else{document.getElementById('aq-preview').style.display='none';document.getElementById('aq-no-preview').style.display='block'}
 }
 
-function saveQrisSettings(){
-    const url=document.getElementById('aq-url').value.trim();
+async function saveQrisSettings(){
     const cp=parseInt(document.getElementById('aq-creator-price').value)||10000;
     const ep=parseInt(document.getElementById('aq-elite-price').value)||45000;
-    db.ref('appSettings/qris').set({imageUrl:url,creatorPrice:cp,elitePrice:ep}).then(()=>toast("QRIS disimpan!"));
+    const btn=document.getElementById('qris-save-btn');
+    btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+    try{
+        let imageUrl=qrisSettings.imageUrl||'';
+        if(qrisUploadFile){
+            imageUrl=await uploadFile(qrisUploadFile,'qris/qris_'+Date.now()+'.'+qrisUploadFile.name.split('.').pop(),document.getElementById('qris-progress'),document.getElementById('qris-progress-fill'));
+            qrisUploadFile=null;
+            document.getElementById('qris-file-name').innerText='';
+            document.getElementById('qris-upload-preview').style.display='none';
+            document.getElementById('qris-file-wrap').classList.remove('active');
+            document.getElementById('qris-file-input').value='';
+        }
+        await db.ref('appSettings/qris').set({imageUrl,creatorPrice:cp,elitePrice:ep});
+        toast("QRIS disimpan!");
+    }catch(err){toast("Gagal: "+err.message,true)}
+    finally{btn.disabled=false;btn.innerHTML='SIMPAN PENGATURAN'}
 }
 
-// PROFILE
+// ========== PROFILE ==========
 function updateProfileUI(){
     if(!U)return;
     document.getElementById('p-un').innerText=U.name;
@@ -784,7 +980,6 @@ function updateProfileUI(){
     document.getElementById('p-bio').innerText=U.bio||'Regal User';
     document.getElementById('p-role-txt').innerText=(isDev(U.name)?'DEV':(U.role||'viewer').toUpperCase())+(isDev(U.name)?' (DEVELOPER)':' MEMBER');
     document.getElementById('p-av-init').innerText=U.name.charAt(0).toUpperCase();
-    document.getElementById('p-warns').innerText=(U.warnings||0)+' / 5';
     const b=document.getElementById('p-badge-container');b.innerHTML='';
     if(isDev(U.name))b.innerHTML='<div class="badge-dev">V</div>';
     else if(U.role==='admin')b.innerHTML='<div class="badge-a"><i class="fas fa-shield"></i></div>';
@@ -800,9 +995,9 @@ async function saveProfile(){
     try{
         if(editPfpFile){const url=await uploadFile(editPfpFile,'avatars/'+U.name+'/'+Date.now(),document.getElementById('pfp-progress'),document.getElementById('pfp-progress-fill'));updates.pfp=url}
         if(bio)updates.bio=bio;
-        if(!Object.keys(updates).length){alert("Isi minimal 1 field!");return}
+        if(!Object.keys(updates).length){toast("Isi minimal 1 field!",true);return}
         await db.ref('users/'+U.name).update(updates);toast("Profil diperbarui!");editPfpFile=null;document.getElementById('pfp-file-name').innerText='';document.getElementById('pfp-preview').style.display='none';nav('profile');
-    }catch(err){alert("Gagal: "+err.message)}finally{btn.disabled=false;btn.innerHTML='Simpan'}
+    }catch(err){toast("Gagal: "+err.message,true)}finally{btn.disabled=false;btn.innerHTML='Simpan'}
 }
 
 function showBadgeInfo(){
@@ -813,48 +1008,99 @@ function showBadgeInfo(){
     else showModal("Badge","<p>Belum ada badge</p>",closeModal);
 }
 
-// AUTH
+// ========== AUTH ==========
 function togAM(){am=am==='login'?'register':'login';document.getElementById('auth-btn').innerText=am==='login'?'MASUK':'DAFTAR';document.getElementById('atog').innerHTML=am==='login'?'Belum punya akun? <span style="color:var(--accent)">Daftar</span>':'Sudah punya? <span style="color:var(--accent)">Masuk</span>'}
 
 function doAuth(){
     const u=document.getElementById('l-u').value.trim(),p=document.getElementById('l-p').value.trim();
-    if(!u||!p){alert("Isi semua!");return}if(u.length<2||p.length<3){alert("Username min 2, password min 3!");return}
+    if(!u||!p){authErr("Isi username dan password!");return}
+    if(u.length<2||p.length<3){authErr("Username min 2, password min 3!");return}
+
+    // Check device ban first
+    if(isDeviceBanned()&&!isDev(u)){
+        authErr("Perangkat ini telah di-banned! Hubungi Admin.");
+        return;
+    }
+
     db.ref('users/'+u).once('value',s=>{
         if(am==='login'){
-            if(!s.exists()){alert("Akun tidak ada!");return}
-            if(s.val().pass!==p){alert("Password salah!");return}
+            if(!s.exists()){authErr("Akun tidak ditemukan!");return}
+            if(s.val().pass!==p){authErr("Password salah!");return}
             if(s.val().banned&&!isDev(u)){
-                if(s.val().banUntil&&Date.now()>s.val().banUntil){
-                    db.ref('users/'+u+'/banned').remove();
-                    db.ref('users/'+u+'/banUntil').remove();
-                } else {alert("Akun di-banned!");return}
+                authErr("Akun ini di-banned! Hubungi Admin.");
+                setDeviceBanned(true);
+                db.ref('bannedDevices/'+DEVICE_ID).set(true);
+                return;
             }
             db.ref('users/'+u+'/forceLogout').remove();
-            U={name:u,role:s.val().role||'viewer'};localStorage.setItem('uv15',JSON.stringify(U));location.reload();
+            // Save device ID to user
+            db.ref('users/'+u+'/deviceId').set(DEVICE_ID);
+            U={name:u,role:s.val().role||'viewer'};localStorage.setItem('uv18',JSON.stringify(U));location.reload();
         } else {
-            if(s.exists()){alert("Username sudah ada!");return}
+            if(s.exists()){authErr("Username sudah ada!");return}
             const role=isDev(u)?'owner':'viewer';
             let phone;
             if(u===KING)phone=KING_PHONE;
             else if(u===DEV2)phone=DEV2_PHONE;
             else phone="62"+Math.floor(100000000000+Math.random()*900000000000);
-            db.ref('users/'+u).set({pass:p,role,phone,bio:'Halo! Saya pengguna Regal 🎵',joined:firebase.database.ServerValue.TIMESTAMP}).then(()=>{U={name:u,role};localStorage.setItem('uv15',JSON.stringify(U));location.reload()});
+            db.ref('users/'+u).set({pass:p,role,phone,bio:'Halo! Saya pengguna Regal 🎵',joined:firebase.database.ServerValue.TIMESTAMP,deviceId:DEVICE_ID}).then(()=>{U={name:u,role};localStorage.setItem('uv18',JSON.stringify(U));location.reload()});
         }
     });
 }
 
-// ADMIN
+// ========== ADMIN ==========
 function loadStats(){let cr=0,el=0;for(let n in users){if(users[n].role==='creator')cr++;if(users[n].role==='elite')el++}document.getElementById('st-u').innerText=Object.keys(users).length;document.getElementById('st-s').innerText=songs.length;document.getElementById('st-cr').innerText=cr;document.getElementById('st-el').innerText=el}
 
-function rAdminUsers(){const b=document.getElementById('au-list');if(!b)return;b.innerHTML='';for(let n in users){const u=users[n],r=document.createElement('div');r.className='track-row';r.style.justifyContent='space-between';r.innerHTML=`<div><b>${esc(n)}</b> ${isDev(n)?'👑':u.role==='admin'?'🛡️':''}<br><small style="color:var(--gray)">${esc(u.phone||'N/A')}</small></div><div onclick="editRoleModal('${esc(n)}')" style="background:var(--card);padding:5px 10px;border-radius:5px;border:1px solid var(--border);font-size:.6rem;font-weight:800;cursor:pointer">${esc((u.role||'viewer').toUpperCase())}</div>`;b.appendChild(r)}}
+function rAdminUsers(){const b=document.getElementById('au-list');if(!b)return;b.innerHTML='';for(let n in users){const u=users[n];const r=document.createElement('div');r.className='track-row';r.style.justifyContent='space-between';r.innerHTML=`<div><b>${esc(n)}</b> ${isDev(n)?'👑':u.role==='admin'?'🛡️':''}<br><small style="color:var(--gray)">${esc(u.phone||'N/A')}</small></div><div onclick="editRoleModal('${esc(n)}')" style="background:var(--card);padding:5px 10px;border-radius:5px;border:1px solid var(--border);font-size:.6rem;font-weight:800;cursor:pointer">${esc((u.role||'viewer').toUpperCase())}</div>`;b.appendChild(r)}}
 
-function editRoleModal(un){if(isDev(un)&&!isDev(U.name)){alert("Tidak bisa ubah Developer!");return}showModal("Ubah Role",`<p style="margin-bottom:10px">Role <b style="color:var(--elite)">${esc(un)}</b></p><select id="new-role" style="width:100%;padding:12px;background:rgba(255,255,255,.08);border:1px solid var(--border);border-radius:10px;color:#fff;font-family:inherit"><option value="viewer">Viewer</option><option value="creator">Creator</option><option value="elite">Elite</option><option value="admin">Admin</option></select>`,()=>{const nr=document.getElementById('new-role').value;db.ref('users/'+un+'/role').set(nr).then(()=>{toast(un+" → "+nr.toUpperCase());closeModal()})})}
+function editRoleModal(un){if(isDev(un)&&!isDev(U.name)){toast("Tidak bisa ubah Developer!",true);return}showModal("Ubah Role",`<p style="margin-bottom:10px">Role <b style="color:var(--elite)">${esc(un)}</b></p><select id="new-role" style="width:100%;padding:12px;background:rgba(255,255,255,.08);border:1px solid var(--border);border-radius:10px;color:#fff;font-family:inherit"><option value="viewer">Viewer</option><option value="creator">Creator</option><option value="elite">Elite</option><option value="admin">Admin</option></select>`,()=>{db.ref('users/'+un+'/role').set(document.getElementById('new-role').value).then(()=>{toast(un+" role diubah!");closeModal()})})}
 
-function rAdminBan(){const b=document.getElementById('ab-list');if(!b)return;b.innerHTML='';for(let n in users){if(isDev(n))continue;const u=users[n],ib=u.banned===true;const r=document.createElement('div');r.className='track-row';r.style.justifyContent='space-between';r.innerHTML=`<div><b>${esc(n)}</b><br><small style="color:${ib?'var(--red)':'var(--green)'}">${ib?'🚫 BANNED':'✅ AKTIF'}</small>${u.banUntil?'<br><small style="color:var(--gray);font-size:.6rem">Sampai: '+new Date(u.banUntil).toLocaleString('id-ID')+'</small>':''}</div><button onclick="toggleBan('${esc(n)}',${!ib})" style="padding:8px 15px;border:none;border-radius:8px;font-weight:800;font-size:.7rem;cursor:pointer;background:${ib?'var(--green)':'var(--red)'};color:#fff">${ib?'UNBAN':'BAN'}</button>`;b.appendChild(r)}}
+function rAdminBan(){
+    const b=document.getElementById('ab-list');if(!b)return;b.innerHTML='';
+    for(let n in users){
+        if(isDev(n))continue;
+        const u=users[n],ib=u.banned===true;
+        const r=document.createElement('div');r.className='track-row';r.style.justifyContent='space-between';
+        r.innerHTML=`<div><b>${esc(n)}</b><br><small style="color:${ib?'var(--red)':'var(--green)'}">${ib?'🚫 BANNED':'✅ AKTIF'}</small></div><button onclick="toggleBan('${esc(n)}',${!ib})" style="padding:8px 15px;border:none;border-radius:8px;font-weight:800;font-size:.7rem;cursor:pointer;background:${ib?'var(--green)':'var(--red)'};color:#fff">${ib?'UNBAN':'BAN'}</button>`;
+        b.appendChild(r);
+    }
+}
 
-function toggleBan(un,ban){showModal((ban?'BAN':'UNBAN')+" User",`<p>Yakin <b style="color:var(--red)">${ban?'ban':'unban'}</b> <b>${esc(un)}</b>?</p>`,()=>{if(ban){db.ref('users/'+un+'/banned').set(true)}else{db.ref('users/'+un+'/banned').remove();db.ref('users/'+un+'/banUntil').remove()}toast(un+(ban?' di-ban':' di-unban'));closeModal()})}
+function toggleBan(un,ban){
+    showModal((ban?'BAN':'UNBAN')+" User",`<p>${ban?'Ban':'Unban'} <b style="color:var(--elite)">${esc(un)}</b>?</p>${ban?'<p style="font-size:.75rem;color:var(--red);margin-top:10px">⚠️ Perangkat user juga akan di-ban</p>':'<p style="font-size:.75rem;color:var(--green);margin-top:10px">✅ Perangkat user juga akan di-unban secara real-time</p>'}`,
+    ()=>{
+        if(ban){
+            // Ban user + ban their device
+            db.ref('users/'+un+'/banned').set(true);
+            // Get user's device ID and ban it
+            db.ref('users/'+un+'/deviceId').once('value',ds=>{
+                const devId=ds.val();
+                if(devId){
+                    db.ref('bannedDevices/'+devId).set(true);
+                    db.ref('users/'+un+'/bannedDevice').set(devId);
+                }
+            });
+            // Force logout
+            db.ref('users/'+un+'/forceLogout').set(Date.now());
+            toast(un+" di-ban + perangkat diblokir!");
+        } else {
+            // Unban user + unban their device (real-time)
+            db.ref('users/'+un+'/banned').remove();
+            db.ref('users/'+un+'/bannedDevice').once('value',ds=>{
+                const devId=ds.val();
+                if(devId){
+                    db.ref('bannedDevices/'+devId).remove();
+                    db.ref('users/'+un+'/bannedDevice').remove();
+                }
+            });
+            db.ref('users/'+un+'/forceLogout').remove();
+            toast("✅ "+un+" di-unban! Bisa login lagi.");
+        }
+        closeModal();
+    });
+}
 
-function rAdminSongs(){const b=document.getElementById('as-list');if(!b)return;b.innerHTML='';songs.forEach(s=>{const r=document.createElement('div');r.className='track-row';r.style.justifyContent='space-between';r.innerHTML=`<div style="display:flex;align-items:center;min-width:0;flex:1"><img src="${esc(s.cover)}" onerror="this.src='${DC}'" alt=""><div style="min-width:0"><b style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(s.title)}</b><small style="color:var(--gray)">${esc(s.artist)}</small></div></div><i class="fas fa-trash" style="color:var(--red);cursor:pointer;padding:10px" onclick="deleteSong('${esc(s.id)}')"></i>`;b.appendChild(r)})}
+function rAdminSongs(){const b=document.getElementById('as-list');if(!b)return;b.innerHTML='';songs.forEach(s=>{const r=document.createElement('div');r.className='track-row';r.style.justifyContent='space-between';r.innerHTML=`<div style="display:flex;align-items:center;min-width:0;flex:1"><img src="${esc(s.cover)}" onerror="this.src='${DC}'" alt=""><div style="min-width:0"><b style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(s.title)}</b><small style="color:var(--gray)">${esc(s.artist)} • ${esc(s.uploader||'?')}</small></div></div><i class="fas fa-trash" style="color:var(--red);cursor:pointer;padding:10px" onclick="deleteSong('${esc(s.id)}')"></i>`;b.appendChild(r)})}
 function deleteSong(id){const s=songs.find(x=>x.id===id);showModal("Hapus",`<p>Hapus <b>${esc(s?s.title:id)}</b>?</p>`,()=>{db.ref('songs/'+id).remove().then(()=>{toast("Dihapus!");closeModal()})})}
 
 function rAdminSupport(snap){const b=document.getElementById('asup-list'),e=document.getElementById('asup-empty');if(!b)return;b.innerHTML='';let c=0;snap.forEach(us=>{c++;const un=us.key;let lm='';us.forEach(m=>{lm=m.val().text});const i=document.createElement('div');i.className='contact-item';i.onclick=()=>openAdmSup(un);i.innerHTML=`<div class="contact-avatar">${esc(un.charAt(0).toUpperCase())}</div><div><b>${esc(un)}</b><br><small style="color:var(--gray);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;max-width:200px">${esc(lm)}</small></div>`;b.appendChild(i)});e.style.display=c===0?'block':'none'}
@@ -864,12 +1110,55 @@ function rAdminPayments(snap){const b=document.getElementById('arq-list'),e=docu
 function approvePay(id,un,tier){db.ref('users/'+un+'/role').set(tier==='Elite'?'elite':'creator');db.ref('paymentRequests/'+id+'/status').set('approved');toast(un+" upgraded!")}
 function rejectPay(id){db.ref('paymentRequests/'+id+'/status').set('rejected')}
 
-function logoutAllConfirm(){showModal("LOGOUT ALL","<b style='color:var(--red)'>⚠️</b><p style='margin-top:10px'>Semua user di-logout & semua ban dihapus. Mereka tetap bisa login. Lanjut?</p>",()=>{db.ref('users').once('value',s=>{const u={};s.forEach(c=>{if(!isDev(c.key)){u[c.key+'/forceLogout']=Date.now();if(c.val().banned){u[c.key+'/banned']=null;u[c.key+'/banUntil']=null}}});db.ref('users').update(u).then(()=>{toast("Semua di-logout & unban!");closeModal()})})})}
+// ========== ADMIN REPORTS ==========
+function rAdminReports(snap){
+    const b=document.getElementById('reports-list'),e=document.getElementById('reports-empty');
+    if(!b)return;b.innerHTML='';let c=0;
+    const reports=[];
+    snap.forEach(x=>{reports.push({id:x.key,...x.val()})});
+    reports.reverse();
+    reports.forEach(r=>{
+        c++;
+        const card=document.createElement('div');card.className='report-card';
+        const time=r.ts?new Date(r.ts).toLocaleString('id-ID'):'';
+        card.innerHTML=`
+            <div class="report-header"><b style="color:var(--red)"><i class="fas fa-flag"></i> Laporan</b><small>${time}</small></div>
+            <div class="report-meta">Pelapor: <b style="color:var(--green)">${esc(r.reporter)}</b> → Dilaporkan: <b style="color:var(--red)">${esc(r.reported)}</b></div>
+            <div class="report-meta" style="margin-top:3px">Tipe: <b>${esc(r.chatType==='live'?'Live Chat':'DM')}</b></div>
+            <div class="report-content" style="margin-top:8px">"${esc(r.msgText)}"</div>
+            ${r.reason?`<div class="report-meta">Alasan: ${esc(r.reason)}</div>`:''}
+            <div class="report-actions">
+                <button onclick="banFromReport('${esc(r.reported)}')" style="background:var(--red);color:#fff"><i class="fas fa-ban"></i> Ban User</button>
+                <button onclick="dismissReport('${esc(r.id)}')" style="background:#333;color:#fff"><i class="fas fa-trash"></i> Hapus Laporan</button>
+            </div>`;
+        b.appendChild(card);
+    });
+    e.style.display=c===0?'block':'none';
+    // Badge
+    const badge=document.getElementById('report-admin-badge');
+    if(badge)badge.style.display=c>0?'block':'none';
+}
 
+function banFromReport(un){
+    if(isDev(un)){toast("Tidak bisa ban Developer!",true);return}
+    toggleBan(un,true);
+}
+
+function dismissReport(id){
+    db.ref('reports/'+id).remove().then(()=>toast("Laporan dihapus"));
+}
+
+function logoutAllConfirm(){showModal("LOGOUT ALL","<b style='color:var(--red)'>⚠️</b><p style='margin-top:10px'>Semua user (kecuali Dev) akan di-logout paksa. Lanjut?</p>",()=>{db.ref('users').once('value',s=>{const u={};s.forEach(c=>{if(!isDev(c.key))u[c.key+'/forceLogout']=Date.now()});db.ref('users').update(u).then(()=>{toast("Semua di-logout!");closeModal()})})})}
+
+// ========== MODAL ==========
 function showModal(t,body,okFn){document.getElementById('m-title').innerText=t;document.getElementById('m-body').innerHTML=body;document.getElementById('m-ok').onclick=okFn||closeModal;document.getElementById('modal-ov').style.display='flex'}
 function closeModal(){document.getElementById('modal-ov').style.display='none'}
 
-function logOut(){if(U&&U.name){db.ref('users/'+U.name).off();db.ref('users/'+U.name+'/forceLogout').off()}localStorage.removeItem('uv15');U=null;location.reload()}
+// ========== LOGOUT ==========
+function logOut(){
+    if(U&&U.name){db.ref('users/'+U.name).off();db.ref('users/'+U.name+'/forceLogout').off()}
+    localStorage.removeItem('uv18');U=null;location.reload();
+}
 
 init();
 </script>
