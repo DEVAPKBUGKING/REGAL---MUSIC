@@ -4,11 +4,27 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Regal Music Sovereign v19.0</title>
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+
+<!-- 🔔 OneSignal Push Notification -->
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "6be5a801-a711-4978-9743-d635cee119aa",
+    });
+
+    // paksa munculin popup izin notif
+    OneSignal.showSlidedownPrompt();
+  });
+</script>
 <style>
 :root{--accent:#d4af37;--bg:#050a0f;--card:rgba(15,25,35,0.9);--text:#fff;--gray:#b3b3b3;--elite:#00e5ff;--red:#ff4444;--green:#1db954;--border:rgba(255,255,255,0.1)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;outline:none;margin:0;padding:0}
