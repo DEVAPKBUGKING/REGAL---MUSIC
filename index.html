@@ -1330,6 +1330,10 @@ function toggleMaintenance(){
 // INIT
 // ============================================================
 function init(){
+  // 🔒 Sembunyikan navbar & side player sejak awal
+  document.getElementById('bot-nav').style.display = 'none';
+  document.getElementById('side-player').style.display = 'none';
+
   startDeviceBanListener();
   const saved=localStorage.getItem('uv18');
   if(saved){try{U=JSON.parse(saved)}catch(e){U=null}}
@@ -1339,6 +1343,16 @@ function init(){
     showBanScreen("Perangkat ini telah di-banned.");
     return;
   }
+
+  // Jika belum login, pastikan navbar tetap hilang
+  if(!U){
+    document.getElementById('loader-ov').style.display='none';
+    document.getElementById('bot-nav').style.display = 'none';
+    document.getElementById('side-player').style.display = 'none';
+    return;
+  }
+  
+  
   if(!U){document.getElementById('loader-ov').style.display='none';return}
 
   db.ref('users/'+U.name).once('value').then(s=>{
