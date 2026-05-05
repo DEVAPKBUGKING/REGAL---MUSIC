@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIlJlZ2FsIE11c2ljIiwKICAic2hvcnRfbmFtZSI6ICJSZWdhbCIsCiAgInN0YXJ0X3VybCI6ICIuIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMDUwYTBmIiwKICAidGhlbWVfY29sb3IiOiAiI2Q0YWYzNyIsCiAgImljb25zIjogWwogICAgewogICAgICAic3JjIjogImRhdGE6aW1hZ2Uvc3ZnK3htbDtiYXNlNjQsUEhOMlp5QjRiV3h1Y3...IiwKICAgICAgInNpemVzIjogIjE5MngxOTIiLAogICAgICAidHlwZSI6ICJpbWFnZS9wbmciCiAgICB9CiAgXQp9">
 <title>Regal Music Sovereign v19.0</title>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -58,13 +61,69 @@ select{appearance:none;cursor:pointer}
 .search-wrap{position:relative;margin-bottom:25px}
 .search-wrap i{position:absolute;left:20px;top:50%;transform:translateY(-50%);color:#555;z-index:10;font-size:1.2rem}
 
+
 /* NAV */
-.bottom-nav-scroll{position:fixed;bottom:0;width:100%;height:70px;background:rgba(0,0,0,.95);border-top:1px solid var(--border);z-index:10000;display:flex;align-items:center;overflow-x:auto;padding:0 5px;backdrop-filter:blur(20px)}
-.nav-item{min-width:65px;display:flex;flex-direction:column;align-items:center;color:var(--gray);cursor:pointer;transition:color .2s;position:relative}
-.nav-item.active{color:#fff}
-.nav-item i{font-size:1.1rem;margin-bottom:4px}
-.nav-item span{font-size:.55rem;font-weight:700}
-.nav-badge{position:absolute;top:0;right:12px;width:8px;height:8px;background:var(--red);border-radius:50%;display:none}
+.bottom-nav-scroll {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 32px);
+  max-width: 500px;
+  height: 64px;
+  background: rgba(20, 25, 35, 0.85);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-radius: 24px;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  justify-content: space-around;
+  padding: 0 8px;
+  overflow-x: auto;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  border: none;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.nav-item {
+  min-width: 56px;
+    flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--gray);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  padding: 6px 4px;
+  border-radius: 16px;
+  text-decoration: none;
+}
+
+.nav-item.active {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.nav-item i {
+  font-size: 1.3rem;
+  margin-bottom: 2px;
+  transition: transform 0.2s ease;
+}
+
+.nav-item.active i {
+  transform: scale(1.1);
+}
+
+.nav-item span {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
 
 /* CHAT */
 .chat-footer{position:fixed;bottom:70px;width:100%;left:0;padding:8px 10px;background:rgba(0,0,0,.98);display:flex;gap:8px;align-items:center;border-top:1px solid var(--border);z-index:9500}
@@ -424,7 +483,7 @@ select{appearance:none;cursor:pointer}
 </div>
 
 <!-- NAV -->
-<div class="bottom-nav-scroll" id="bot-nav" style="display:none">
+<div class="bottom-nav-scroll" id="bot-nav">
   <div class="nav-item active" onclick="nav('home',this)"><i class="fas fa-house"></i><span>Beranda</span></div>
   <div class="nav-item" onclick="nav('search-page',this)"><i class="fas fa-search"></i><span>Cari</span></div>
   <div class="nav-item" onclick="nav('chat-list',this)" id="n-chat"><div class="nav-badge" id="chat-nav-badge"></div><i class="fas fa-comment-dots"></i><span>Pesan</span></div>
@@ -592,7 +651,7 @@ select{appearance:none;cursor:pointer}
     <i class="fas fa-tower-broadcast" style="color:var(--red)"></i><b>Live Chat</b>
     <span id="live-count" style="margin-left:auto;font-size:.7rem;color:var(--gray)"></span>
   </div>
-  <div style="padding:6px 20px;background:rgba(255,0,0,.1);font-size:.6rem;color:var(--red);text-align:center"><i class="fas fa-clock"></i> Reset otomatis jam 00:00 WIB</div>
+  <div style="padding:6px 20px;background:rgba(255,0,0,.1);font-size:.6rem;color:var(--red);text-align:center"><i class="fas fa-clock"></i> RESET OTOMATIS JAM 21:00 WIB</div>
   <div id="live-msgs" style="height:calc(100vh - 250px);overflow-y:auto;padding:15px;display:flex;flex-direction:column;gap:8px"></div>
   <div class="chat-footer" id="live-footer">
     <button class="chat-extra-btn" onclick="toggleStickerPanel('live')"><i class="fas fa-face-smile"></i></button>
@@ -870,7 +929,7 @@ select{appearance:none;cursor:pointer}
   <i id="p-ic" class="fas fa-play sp-btn" onclick="togP()"></i>
   <i class="fas fa-step-forward sp-btn" onclick="nextSong()"></i>
 </div>
-<audio id="aud"></audio>
+<audio id="aud" playsinline webkit-playsinline x-webkit-airplay="allow" preload="auto"></audio>
 
 <script>
 const KING="King",DEV2="REGAL-ADMIN-ZEONLY",KING_PHONE="999999999999",DEV2_PHONE="000000000001";
@@ -892,8 +951,55 @@ let currentGroupId=null,myGroups={},replyData=null,activeStickerTarget=null;
 let aiConfig={},aiHistory=[];
 let onlineListeners={};
 const aud=document.getElementById('aud');
+
+// ⬇️ TAMBAHKAN DI SINI
+function formatTime(seconds) {
+  if (isNaN(seconds)) return '0:00';
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return mins + ':' + (secs < 10 ? '0' : '') + secs;
+}
+
 let isPlaying = false;
-function renderSongList() { /* tidak perlu aksi khusus */ }
+// == WAKE LOCK & BACKGROUND AUDIO ==
+let wakeLock = null;
+async function requestWakeLock() {
+  if ('wakeLock' in navigator) {
+    try {
+      wakeLock = await navigator.wakeLock.request('screen');
+      console.log('Wake Lock aktif');
+      wakeLock.addEventListener('release', () => {
+        console.log('Wake Lock dilepas');
+      });
+    } catch (err) {
+      console.error('Wake Lock error:', err);
+    }
+  }
+}
+
+// Mempertahankan audio tetap berjalan di background Android
+aud.addEventListener('play', () => {
+  requestWakeLock();
+  if ('mediaSession' in navigator) {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: document.getElementById('p-ti')?.innerText || 'Regal Music',
+      artist: document.getElementById('np-artist')?.innerText || '',
+      album: 'Regal Music',
+      artwork: [{ src: document.getElementById('p-img')?.src || '' }]
+    });
+    navigator.mediaSession.setActionHandler('play', () => aud.play());
+    navigator.mediaSession.setActionHandler('pause', () => aud.pause());
+    navigator.mediaSession.setActionHandler('previoustrack', () => prevSong());
+    navigator.mediaSession.setActionHandler('nexttrack', () => nextSong());
+  }
+});
+
+aud.addEventListener('pause', () => {
+  if (wakeLock) {
+    wakeLock.release().catch(() => {});
+    wakeLock = null;
+  }
+});
 
 // ---------- HAPUS CHAT ----------
 function loadDeleted() {
@@ -1001,14 +1107,18 @@ function openNowPlaying() {
   if (!currentSongId) return;
   updateNowPlayingUI();
   document.getElementById('side-player').style.display = 'none';
+  document.getElementById('bot-nav').style.display = 'none';
+  setTimeout(() => {
+    document.getElementById('bot-nav').style.display = 'none';
+  }, 100);
   nav('now-playing-page');
 }
-
-// Fungsi untuk menutup halaman Now Playing (tombol panah bawah)
 function closeNowPlaying() {
   if (currentSongId) document.getElementById('side-player').style.display = 'flex';
+  document.getElementById('bot-nav').style.display = 'flex';
   nav('home');
 }
+
 
 // Fungsi untuk memperbarui tampilan Now Playing
 function updateNowPlayingUI() {
@@ -1261,12 +1371,23 @@ function startApp(){
   checkMaintenance();
   startUserBanListener();
   setOnlineStatus(true);
-
-  // ✅ Loader PASTI hilang
+  
+    // ✅ Loader PASTI hilang
   setTimeout(()=>{
     var l=document.getElementById('loader-ov');
     if(l){l.style.opacity='0';setTimeout(()=>{if(l)l.style.display='none'},500)}
   },1000);
+  
+  
+  // Minta izin notifikasi (untuk kontrol background)
+if (Notification.permission === 'default') {
+  Notification.requestPermission().then(perm => {
+    if (perm === 'granted') {
+      console.log('Notifikasi diizinkan');
+    }
+  });
+}
+
 
   favs=JSON.parse(localStorage.getItem('regal_favs_'+U.name)||'[]');
   myPL=JSON.parse(localStorage.getItem('regal_pl_'+U.name)||'[]');
@@ -1353,12 +1474,12 @@ function listenOnline(username,dotEl){
 function nav(id, el) {
   hideStickerPanel();
   cancelReply();
-  
-  // Jangan tampilkan nav jika halaman Now Playing (biarkan fungsi open/close yang mengatur)
+
+  // Tampilkan nav hanya jika bukan halaman spesial
   if (id !== 'now-playing-page' && id !== 'lyrics-page') {
     document.getElementById('bot-nav').style.display = 'flex';
   }
-  
+
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   const t = document.getElementById(id);
   if (t) t.classList.add('active');
@@ -1367,7 +1488,19 @@ function nav(id, el) {
     el.classList.add('active');
   }
   if (id === 'search-page') renderRecentSearches();
-  // ... sisa kode nav seperti biasa
+  if (id === 'chat-list') {
+    db.ref('dmNotify/' + U.name).once('value', s => {
+      const d = s.val();
+      if (d) {
+        const u = {};
+        for (let k in d) u[k + '/unread'] = false;
+        db.ref('dmNotify/' + U.name).update(u);
+      }
+    });
+  }
+  if (id === 'upload') updateUploadLimit();
+  if (id === 'ai-chat') renderAIWelcome();
+  if (id === 'home') rHome();
 }
 
 
@@ -1380,40 +1513,122 @@ function detectLang(title,artist){
   if(latinOnly.test(combined))return'en';
   return'id';
 }
+function mkRow(s) {
+  const r = document.createElement('div');
+  r.className = 'track-row';
+  r.onclick = () => playSong(s.id);
+  r.innerHTML = `<img src="${esc(s.cover||DC)}" onerror="this.src='${DC}'" alt=""><div style="min-width:0;flex:1"><b style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(s.title)}</b><small style="color:var(--gray)">${esc(s.artist)}</small></div>`;
+  return r;
+}
 function rHome() {
   try {
+    const hr = new Date().getHours();
     const greetEl = document.getElementById('greet-txt');
     if (greetEl) {
-      const hr = new Date().getHours();
       const greet = hr < 12 ? "Good morning" : hr < 18 ? "Good afternoon" : "Good evening";
       greetEl.innerText = greet;
     }
 
+    // ========== GRID 4 LAGU SESUAI WAKTU ==========
     const grid = document.getElementById('spotify-grid');
+    let topPicks = []; // Pindahkan ke sini agar bisa diakses oleh rekomendasi
     if (grid) {
       grid.innerHTML = '';
-      if (!Array.isArray(songs) || songs.length === 0) {
-        grid.innerHTML = '<div class="empty-state" style="grid-column:span 2"><i class="fas fa-music"></i><p>Belum ada lagu</p></div>';
-      } else {
-        const recent = [...songs].slice(-6).reverse();
-        recent.forEach(s => {
-          if (!s || !s.id) return;
-          const card = document.createElement('div');
-          card.className = 'spotify-card';
-          card.onclick = () => playSong(s.id);
-          card.innerHTML = `<img src="${esc(s.cover || DC)}" onerror="this.src='${DC}'"><div class="card-info"><b>${esc(s.title || 'Tanpa Judul')}</b><small>${esc(s.artist || 'Unknown')}</small></div>`;
-          grid.appendChild(card);
-        });
+
+      // Ambil riwayat dari localStorage
+      const localHistory = JSON.parse(localStorage.getItem('regal_history_' + U.name) || '[]');
+
+      // Filter riwayat yang sesuai dengan jam sekarang
+      const relevantHistory = localHistory.filter(entry => {
+        const entryHour = new Date(entry.ts).getHours();
+        if (hr >= 5 && hr < 12) return entryHour >= 5 && entryHour < 12;
+        if (hr >= 12 && hr < 17) return entryHour >= 12 && entryHour < 17;
+        if (hr >= 17 && hr < 21) return entryHour >= 17 && entryHour < 21;
+        return entryHour >= 21 || entryHour < 5;
+      });
+
+      // Hitung frekuensi lagu
+      const frequency = {};
+      relevantHistory.forEach(entry => {
+        frequency[entry.id] = (frequency[entry.id] || 0) + 1;
+      });
+
+      // Urutkan dari yang paling sering
+      const sortedIds = Object.entries(frequency)
+        .sort((a, b) => b[1] - a[1])
+        .map(entry => entry[0]);
+
+      // Ambil maks 4 lagu
+      for (let id of sortedIds) {
+        const song = songs.find(s => s.id === id);
+        if (song) {
+          topPicks.push(song);
+          if (topPicks.length === 4) break;
+        }
+      }
+
+      // Kalau kurang, tambahin dari lagu terbaru
+      if (topPicks.length < 4) {
+        const recentSongs = [...songs].slice(-10).reverse();
+        for (let song of recentSongs) {
+          if (!topPicks.find(s => s.id === song.id)) {
+            topPicks.push(song);
+            if (topPicks.length === 4) break;
+          }
+        }
+      }
+
+      // Tampilkan grid
+      topPicks.forEach(s => {
+        const card = document.createElement('div');
+        card.className = 'spotify-card';
+        card.onclick = () => playSong(s.id);
+        card.innerHTML = `<img src="${esc(s.cover || DC)}" onerror="this.src='${DC}'"><div class="card-info"><b>${esc(s.title || 'Tanpa Judul')}</b><small>${esc(s.artist || 'Unknown')}</small></div>`;
+        grid.appendChild(card);
+      });
+
+      if (topPicks.length === 0) {
+        grid.innerHTML = '<div class="empty-state" style="grid-column:span 2"><i class="fas fa-music"></i><p>Mulai putar musik untuk rekomendasi personal</p></div>';
       }
     }
 
+    // ========== REKOMENDASI (MAKS 10, BERDASAR ARTIS & BAHASA) ==========
     const recSec = document.getElementById('spotify-recommend');
     if (recSec) {
       recSec.innerHTML = '';
-      if (Array.isArray(songs) && songs.length > 0) {
-        const sorted = [...songs].reverse().slice(0, 10);
-        sorted.forEach(s => {
-          if (!s || !s.id) return;
+      if (songs.length > 0) {
+        const localHistory = JSON.parse(localStorage.getItem('regal_history_' + U.name) || '[]');
+        const recentIds = localHistory.slice(-10).map(e => e.id);
+
+        const artistCount = {};
+        const langCount = {};
+        recentIds.forEach(id => {
+          const played = songs.find(s => s.id === id);
+          if (played) {
+            artistCount[played.artist] = (artistCount[played.artist] || 0) + 1;
+            const lang = detectLang(played.title, played.artist);
+            langCount[lang] = (langCount[lang] || 0) + 1;
+          }
+        });
+
+        const prefLang = (langCount['en'] || 0) > (langCount['id'] || 0) ? 'en' : 'id';
+        const gridIds = topPicks.map(s => s.id);
+        let recommendations = songs.filter(s => !gridIds.includes(s.id));
+
+        recommendations.sort((a, b) => {
+          const aScore = artistCount[a.artist] || 0;
+          const bScore = artistCount[b.artist] || 0;
+          if (aScore !== bScore) return bScore - aScore;
+          const aLang = detectLang(a.title, a.artist);
+          const bLang = detectLang(b.title, b.artist);
+          if (aLang === prefLang && bLang !== prefLang) return -1;
+          if (aLang !== prefLang && bLang === prefLang) return 1;
+          return 0;
+        });
+
+        recommendations = recommendations.sort(() => Math.random() - 0.5).slice(0, 10);
+
+        recommendations.forEach(s => {
           const card = document.createElement('div');
           card.className = 'spotify-card';
           card.onclick = () => playSong(s.id);
@@ -1423,14 +1638,19 @@ function rHome() {
       }
     }
 
+    // ========== TERAKHIR DIPUTAR (MAKS 5) ==========
     const hList = document.getElementById('h-list');
     if (hList) {
       hList.innerHTML = '';
-      if (!Array.isArray(songs) || songs.length === 0) {
-        hList.innerHTML = '<div class="empty-state"><i class="fas fa-music"></i><p>Belum ada lagu</p></div>';
+      const localHistory = JSON.parse(localStorage.getItem('regal_history_' + U.name) || '[]');
+      const lastPlayedIds = [...new Set(localHistory.reverse().map(e => e.id))].slice(0, 5);
+
+      if (lastPlayedIds.length === 0) {
+        hList.innerHTML = '<div class="empty-state"><i class="fas fa-history"></i><p>Mulai dengarkan musik untuk mengisi daftar ini</p></div>';
       } else {
-        [...songs].reverse().forEach(s => {
-          if (s && s.id) hList.appendChild(mkRow(s));
+        lastPlayedIds.forEach(id => {
+          const s = songs.find(song => song.id === id);
+          if (s) hList.appendChild(mkRow(s));
         });
       }
     }
@@ -1438,12 +1658,6 @@ function rHome() {
     console.error('rHome error:', e);
     toast("Tampilan Home error: " + e.message, true);
   }
-}
-function mkRow(s){
-  const r=document.createElement('div');r.className='track-row';
-  r.onclick=()=>playSong(s.id);
-  r.innerHTML=`<img src="${esc(s.cover||DC)}" onerror="this.src='${DC}'" alt=""><div style="min-width:0;flex:1"><b style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(s.title)}</b><small style="color:var(--gray)">${esc(s.artist)}</small></div>`;
-  return r;
 }
 
 // ============================================================
@@ -1498,16 +1712,17 @@ function playSong(id){
 
   const lang = detectLang(s.title, s.artist);
   db.ref('playHistory/' + U.name).push({ songId: id, lang, ts: firebase.database.ServerValue.TIMESTAMP });
+  
+  // ✅ Simpan riwayat ke localStorage untuk rekomendasi instan
+let localHistory = JSON.parse(localStorage.getItem('regal_history_' + U.name) || '[]');
+localHistory.push({ id: id, ts: Date.now() });
+if (localHistory.length > 100) localHistory = localHistory.slice(-100);
+localStorage.setItem('regal_history_' + U.name, JSON.stringify(localHistory));
+
   db.ref('songs/' + id + '/plays').transaction(v => (v || 0) + 1);
 }
 
 // ----- NOW PLAYING -----
-function openNowPlaying() {
-  if (!currentSongId) return;
-  updateNowPlayingUI();
-  document.getElementById('side-player').style.display = 'none';
-  nav('now-playing-page');
-}
 function openNowPlaying() {
   if (!currentSongId) return;
   updateNowPlayingUI();
@@ -1518,10 +1733,6 @@ function openNowPlaying() {
     document.getElementById('bot-nav').style.display = 'none';
   }, 100);
   nav('now-playing-page');
-}
-function closeNowPlaying() {
-  if (currentSongId) document.getElementById('side-player').style.display = 'flex';
-  nav('home');
 }
 function closeNowPlaying() {
   if (currentSongId) document.getElementById('side-player').style.display = 'flex';
@@ -1660,11 +1871,6 @@ function prevSong() {
   i = (i - 1 + songs.length) % songs.length;
   playSong(songs[i].id);
 }
-
-// Listener ended (hanya satu)
-aud.addEventListener('ended', () => {
-  nextSong();
-});
 
 // Progress bar + waktu (side player & now playing)
 // ========== LISTENER AUDIO (HANYA SATU SET) ==========
@@ -2461,9 +2667,6 @@ async function doUpload(){
       ts: firebase.database.ServerValue.TIMESTAMP
     };
     await newSongRef.set(newSongData);
-
-    // ✅ Tambahkan langsung ke array songs (memori)
-    songs.push({ id: newSongId, ...newSongData });
 
     if(U.role==='creator'){
       const today=new Date().toISOString().split('T')[0];
