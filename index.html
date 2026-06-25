@@ -29,6 +29,8 @@
   });
 </script>
 
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></script>
+
 <style>
 :root{--accent:#d4af37;--bg:#050a0f;--card:rgba(15,25,35,0.9);--text:#fff;--gray:#b3b3b3;--elite:#00e5ff;--red:#ff4444;--green:#1db954;--border:rgba(255,255,255,0.1)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;outline:none;margin:0;padding:0}
@@ -425,6 +427,95 @@ select{appearance:none;cursor:pointer}
   z-index: 1;
 }
 
+/* EMOJI PANEL */
+#emoji-panel {
+  display: none;
+  position: fixed;
+  bottom: 130px;
+  left: 0;
+  right: 0;
+  background: #1a1a1a;
+  border-top: 1px solid var(--border);
+  padding: 12px 15px;
+  z-index: 9600;
+  max-height: 200px;
+  overflow-y: auto;
+}
+#emoji-panel .emoji-item {
+  font-size: 1.8rem;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 6px;
+  transition: background .2s;
+}
+#emoji-panel .emoji-item:active {
+  background: rgba(255,255,255,.1);
+}
+
+/* ANIMASI NAIK ROLE */
+.role-upgrade-flash {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  animation: flashIn 2s ease forwards;
+}
+.role-upgrade-flash .ring {
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  border: 8px solid var(--accent);
+  animation: ringExpand 1.5s ease-out forwards;
+  box-shadow: 0 0 60px var(--accent), 0 0 120px rgba(212,175,55,0.3);
+}
+.role-upgrade-flash .badge-big {
+  position: absolute;
+  font-size: 8rem;
+  animation: badgePop 0.8s ease forwards;
+}
+@keyframes ringExpand {
+  0% { transform: scale(0.2); opacity: 1; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+@keyframes badgePop {
+  0% { transform: scale(0) rotate(-30deg); opacity: 0; }
+  60% { transform: scale(1.3) rotate(5deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+@keyframes flashIn {
+  0% { background: rgba(0,0,0,0); }
+  20% { background: rgba(0,0,0,0.6); }
+  80% { background: rgba(0,0,0,0.6); }
+  100% { background: rgba(0,0,0,0); }
+}
+
+/* HIGHLIGHT LAGU AKTIF */
+.track-row.active-song,
+.spotify-card.active-song {
+  border: 2px solid var(--accent) !important;
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.6), 0 0 40px rgba(212, 175, 55, 0.2) !important;
+  transform: scale(1.02);
+  transition: all 0.3s ease;
+  animation: glowPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+  0% { box-shadow: 0 0 10px rgba(212, 175, 55, 0.4); }
+  50% { box-shadow: 0 0 25px rgba(212, 175, 55, 0.8), 0 0 50px rgba(212, 175, 55, 0.3); }
+  100% { box-shadow: 0 0 10px rgba(212, 175, 55, 0.4); }
+}
+
+/* Versi lebih subtle kalo mau (ganti yang di atas pake ini) */
+.track-row.active-song,
+.spotify-card.active-song {
+  border: 2px solid var(--accent) !important;
+  background: rgba(212, 175, 55, 0.08) !important;
+  transition: all 0.3s ease;
+}
+
 
 </style>
 </head>
@@ -448,7 +539,15 @@ select{appearance:none;cursor:pointer}
 </div>
 
 <!-- IMAGE VIEWER -->
-<div id="img-viewer"><span class="close-iv" onclick="document.getElementById('img-viewer').style.display='none'"><i class="fas fa-times"></i></span><img id="iv-img" src="" alt=""></div>
+<div id="img-viewer" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:99999;align-items:center;justify-content:center;flex-direction:column;cursor:pointer">
+  <span class="close-iv" onclick="document.getElementById('img-viewer').style.display='none'" style="position:absolute;top:20px;right:20px;font-size:2rem;cursor:pointer;color:#fff;z-index:10">
+    <i class="fas fa-times"></i>
+  </span>
+  <img id="iv-img" src="" alt="" style="max-width:95%;max-height:85vh;border-radius:10px;object-fit:contain">
+  <button onclick="downloadImage()" style="position:absolute;bottom:40px;left:50%;transform:translateX(-50%);background:var(--accent);color:#000;border:none;border-radius:30px;padding:12px 30px;font-weight:800;cursor:pointer;z-index:10;font-size:.9rem;box-shadow:0 4px 20px rgba(0,0,0,0.5)">
+    <i class="fas fa-download"></i> Simpan Gambar
+  </button>
+</div>
 
 <!-- MODAL -->
 <div id="modal-ov"><div class="m-box">
@@ -474,6 +573,11 @@ select{appearance:none;cursor:pointer}
     <button onclick="switchStickerTab('gifs')" id="tab-gifs" style="flex:1;padding:8px;background:rgba(255,255,255,.1);color:#fff;border:none;border-radius:8px;font-weight:800;font-size:.75rem;cursor:pointer">GIF</button>
   </div>
   <div id="sticker-content"></div>
+</div>
+
+<!-- EMOJI PANEL (buat input chat) -->
+<div id="emoji-panel" style="display:none;position:fixed;bottom:130px;left:0;right:0;background:#1a1a1a;border-top:1px solid var(--border);padding:12px 15px;z-index:9600;max-height:200px;overflow-y:auto">
+  <div style="display:flex;gap:8px;flex-wrap:wrap" id="emoji-grid"></div>
 </div>
 
 <!-- REPLY PREVIEW BAR -->
@@ -579,9 +683,15 @@ select{appearance:none;cursor:pointer}
   <div id="cr-msgs" style="height:calc(100vh - 200px);overflow-y:auto;padding:15px;display:flex;flex-direction:column;gap:8px"></div>
   <div class="chat-footer" id="dm-footer">
     <button class="chat-extra-btn" onclick="toggleStickerPanel('dm')"><i class="fas fa-face-smile"></i></button>
+<button class="chat-extra-btn" onclick="toggleEmojiPanel()" style="font-size:1.3rem">
+  😂
+</button>
     <label class="chat-extra-btn"><i class="fas fa-image"></i><input type="file" accept="image/*" style="display:none" onchange="sendChatImage(this,'dm')"></label>
     <input type="text" id="cr-in" placeholder="Ketik pesan..." onkeydown="if(event.key==='Enter')sendDM()">
     <button onclick="sendDM()" style="width:45px;height:45px;background:var(--green);border:none;border-radius:15px;cursor:pointer;flex-shrink:0"><i class="fas fa-paper-plane" style="color:#000"></i></button>
+    <button class="chat-extra-btn" onclick="activeStickerTarget='dm'; sendCurrentSong();" title="Kirim Lagu">
+  <i class="fas fa-music"></i>
+</button>
   </div>
 </div>
 
@@ -605,9 +715,15 @@ select{appearance:none;cursor:pointer}
   <div id="gr-msgs" style="height:calc(100vh - 200px);overflow-y:auto;padding:15px;display:flex;flex-direction:column;gap:8px"></div>
   <div class="chat-footer" id="grp-footer">
     <button class="chat-extra-btn" onclick="toggleStickerPanel('grp')"><i class="fas fa-face-smile"></i></button>
+<button class="chat-extra-btn" onclick="toggleEmojiPanel()" style="font-size:1.3rem">
+  😂
+</button>
     <label class="chat-extra-btn"><i class="fas fa-image"></i><input type="file" accept="image/*" style="display:none" onchange="sendChatImage(this,'grp')"></label>
     <input type="text" id="gr-in" placeholder="Pesan grup..." onkeydown="if(event.key==='Enter')sendGroupMsg()">
     <button onclick="sendGroupMsg()" style="width:45px;height:45px;background:var(--green);border:none;border-radius:15px;cursor:pointer;flex-shrink:0"><i class="fas fa-paper-plane" style="color:#000"></i></button>
+    <button class="chat-extra-btn" onclick="activeStickerTarget='dm'; sendCurrentSong();" title="Kirim Lagu">
+  <i class="fas fa-music"></i>
+</button>
   </div>
 </div>
 
@@ -655,9 +771,15 @@ select{appearance:none;cursor:pointer}
   <div id="live-msgs" style="height:calc(100vh - 250px);overflow-y:auto;padding:15px;display:flex;flex-direction:column;gap:8px"></div>
   <div class="chat-footer" id="live-footer">
     <button class="chat-extra-btn" onclick="toggleStickerPanel('live')"><i class="fas fa-face-smile"></i></button>
+<button class="chat-extra-btn" onclick="toggleEmojiPanel()" style="font-size:1.3rem">
+  😂
+</button>
     <label class="chat-extra-btn"><i class="fas fa-image"></i><input type="file" accept="image/*" style="display:none" onchange="sendChatImage(this,'live')"></label>
     <input type="text" id="live-in" placeholder="Pesan global..." onkeydown="if(event.key==='Enter')sendLive()">
     <button onclick="sendLive()" style="width:45px;height:45px;background:var(--green);border:none;border-radius:15px;cursor:pointer;flex-shrink:0"><i class="fas fa-paper-plane" style="color:#000"></i></button>
+    <button class="chat-extra-btn" onclick="activeStickerTarget='dm'; sendCurrentSong();" title="Kirim Lagu">
+  <i class="fas fa-music"></i>
+</button>
   </div>
 </div>
 
@@ -676,36 +798,110 @@ select{appearance:none;cursor:pointer}
 
 <!-- PREMIUM -->
 <div id="buy-role" class="page">
-  <h1 style="margin-top:40px;font-weight:800">Premium</h1>
-  <div class="premium-card" style="border:1px solid var(--accent)">
-    <div id="creator-active-badge" class="active-badge-premium" style="display:none">✅ AKTIF</div>
-    <b style="color:var(--accent)">CREATOR</b>
-    <h2 style="margin:10px 0" id="creator-price-display">Rp 10.000 <small style="color:var(--gray)">/ bulan</small></h2>
-    <ul><li><i class="fas fa-check"></i> Upload lagu (max 3/hari)</li><li><i class="fas fa-check"></i> Badge Creator ⭐</li><li><i class="fas fa-check"></i> Buat Grup Chat</li><li><i class="fas fa-check"></i> AI Chat</li></ul>
-    <button onclick="openQRIS('Creator')" class="btn-gold" id="btn-buy-creator">Beli Sekarang</button>
-  </div>
-  <div class="premium-card" style="border:1px solid var(--elite)">
-    <div id="elite-active-badge" class="active-badge-premium" style="display:none">✅ AKTIF</div>
-    <b style="color:var(--elite)">ELITE PRODUCER</b>
-    <h2 style="margin:10px 0" id="elite-price-display">Rp 45.000 <small style="color:var(--gray)">/ bulan</small></h2>
-    <ul><li><i class="fas fa-check"></i> Semua fitur Creator</li><li><i class="fas fa-check"></i> Upload unlimited</li><li><i class="fas fa-check"></i> Badge Elite 💎</li><li><i class="fas fa-check"></i> Border profil eksklusif 💠</li><li><i class="fas fa-check"></i> Prioritas support</li></ul>
-    <button onclick="openQRIS('Elite')" class="btn-gold" style="background:var(--elite);color:#000" id="btn-buy-elite">Beli Sekarang</button>
-  </div>
-</div>
+  <h1 style="margin-top:40px;font-weight:800">👑 Role Regal</h1>
+  <p style="color:var(--gray);margin-bottom:10px;font-size:.8rem">Naik tier dengan aktivitas lo di Regal!</p>
 
-<!-- QRIS -->
-<div id="qris-page" class="page">
-  <div class="back-btn" onclick="nav('buy-role')"><i class="fas fa-arrow-left"></i> Kembali</div>
-  <div style="text-align:center">
-    <h2 id="q-title">Pembayaran</h2>
-    <p id="q-price" style="font-size:1.5rem;font-weight:800;color:var(--accent);margin:10px 0"></p>
-    <div id="qris-img-box" style="margin:20px auto;width:100%;max-width:280px;background:#fff;border-radius:20px;padding:20px;text-align:center">
-      <p style="color:#000;font-weight:800;font-size:.8rem">QRIS PAYMENT</p>
-      <img id="qris-dynamic-img" src="" style="width:100%;border-radius:10px;margin-top:10px;display:none">
-      <div id="qris-placeholder" style="padding:40px;color:#999;font-size:.8rem">QRIS belum diatur oleh Admin</div>
+  <!-- ROLE BADGE & PROGRESS -->
+  <div style="background:var(--card);border-radius:20px;border:1px solid var(--border);padding:20px;margin-bottom:20px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px">
+      <div>
+        <span style="font-size:.7rem;color:var(--gray)">Role Saat Ini</span>
+        <h2 id="rp-current-role" style="font-size:1.4rem;color:var(--accent)">Viewer</h2>
+      </div>
+      <div id="rp-badge-preview" style="font-size:2rem">👤</div>
     </div>
-    <p style="color:var(--gray);font-size:.8rem;margin-bottom:20px">Scan QRIS lalu konfirmasi</p>
-    <button onclick="submitPaymentRequest()" class="btn-gold">KONFIRMASI PEMBAYARAN</button>
+
+    <!-- BAR PROGRESS -->
+    <div style="margin:15px 0">
+      <div style="display:flex;justify-content:space-between;font-size:.65rem;color:var(--gray);margin-bottom:5px">
+        <span>Viewer</span>
+        <span id="rp-progress-text">0%</span>
+        <span>Elite</span>
+      </div>
+      <div style="height:8px;background:rgba(255,255,255,.1);border-radius:10px;overflow:hidden">
+        <div id="rp-progress-bar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--elite));border-radius:10px;transition:width .5s"></div>
+      </div>
+    </div>
+
+    <!-- NEXT TIER INFO -->
+    <div id="rp-next-tier" style="background:rgba(255,255,255,.05);border-radius:10px;padding:12px;text-align:center">
+      <small style="color:var(--gray)">🚀 Tier Berikutnya:</small>
+      <p id="rp-next-name" style="font-weight:800;color:var(--accent);margin-top:3px">Creator</p>
+      <p id="rp-next-condition" style="font-size:.7rem;color:var(--gray)">Upload 5 lagu atau Invite 3 temen</p>
+    </div>
+  </div>
+
+  <!-- BENEFIT VIEWER -->
+  <div class="premium-card" style="border:1px solid rgba(255,255,255,.1);margin-top:0">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <b>👤 Viewer</b>
+      <span style="font-size:.6rem;background:var(--green);color:#000;padding:2px 10px;border-radius:10px">AKTIF</span>
+    </div>
+    <ul style="margin-top:8px">
+      <li><i class="fas fa-check" style="color:var(--green)"></i> Dengarkan semua lagu</li>
+      <li><i class="fas fa-check" style="color:var(--green)"></i> Buat playlist & favorit</li>
+      <li><i class="fas fa-check" style="color:var(--green)"></i> Chat personal & grup</li>
+      <li><i class="fas fa-check" style="color:var(--green)"></i> Live Chat</li>
+    </ul>
+  </div>
+
+  <!-- BENEFIT CREATOR -->
+  <div class="premium-card" style="border:1px solid var(--accent);margin-top:10px">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <b style="color:var(--accent)">⭐ Creator</b>
+      <span id="rp-creator-badge" style="font-size:.6rem;background:#333;color:var(--gray);padding:2px 10px;border-radius:10px">🔒 Terkunci</span>
+    </div>
+    <ul style="margin-top:8px">
+      <li><i class="fas fa-check" style="color:var(--green)"></i> Upload lagu (max 3/hari)</li>
+      <li><i class="fas fa-check" style="color:var(--green)"></i> Badge Creator ⭐</li>
+      <li><i class="fas fa-check" style="color:var(--green)"></i> Buat Grup Chat</li>
+      <li><i class="fas fa-check" style="color:var(--green)"></i> AI Chat</li>
+    </ul>
+    <div style="background:rgba(255,255,255,.05);padding:10px;border-radius:8px;margin-top:8px;font-size:.7rem;color:var(--gray)">
+      Syarat: <b style="color:var(--accent)">Upload 5 lagu ATAU Invite 3 temen</b>
+    </div>
+  </div>
+
+  <!-- BENEFIT ELITE -->
+  <div class="premium-card" style="border:1px solid var(--elite);margin-top:10px">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <b style="color:var(--elite)">💎 Elite</b>
+      <span id="rp-elite-badge" style="font-size:.6rem;background:#333;color:var(--gray);padding:2px 10px;border-radius:10px">🔒 Terkunci</span>
+    </div>
+    <ul style="margin-top:8px">
+      <li><i class="fas fa-check" style="color:var(--green)"></i> Semua fitur Creator</li>
+      <li><i class="fas fa-check" style="color:var(--green)"></i> Upload unlimited</li>
+      <li><i class="fas fa-check" style="color:var(--green)"></i> Badge Elite 💎</li>
+      <li><i class="fas fa-check" style="color:var(--green)"></i> Border profil eksklusif 💠</li>
+    </ul>
+    <div style="background:rgba(255,255,255,.05);padding:10px;border-radius:8px;margin-top:8px;font-size:.7rem;color:var(--gray)">
+      Syarat: <b style="color:var(--elite)">Login 30 hari berturut-turut ATAU Upload 20 lagu</b>
+    </div>
+  </div>
+
+  <!-- TOMBOL UNDANGAN -->
+  <button onclick="generateInviteLink()" style="width:100%;padding:15px;margin-top:20px;border-radius:15px;background:var(--accent);color:#000;border:none;font-weight:800;cursor:pointer;font-size:.9rem">
+    🔗 Ajak Temen (Dapetin Role Creator!)
+  </button>
+
+  <!-- STATS USER -->
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-top:15px;text-align:center">
+    <div class="stat-card">
+      <b id="rp-upload-count">0</b>
+      <p>Upload</p>
+    </div>
+    <div class="stat-card">
+      <b id="rp-streak-count">0</b>
+      <p>Streak</p>
+    </div>
+    <div class="stat-card">
+      <b id="rp-invite-count">0</b>
+      <p>Invite</p>
+    </div>
+    <div class="stat-card" style="border-color:var(--red)">
+      <b id="rp-inactive-days" style="color:var(--red)">0</b>
+      <p style="color:var(--red)">Hari Tidak Aktif</p>
+    </div>
   </div>
 </div>
 
@@ -797,7 +993,6 @@ select{appearance:none;cursor:pointer}
     <div onclick="nav('a-req')" class="stat-card" style="padding:20px;cursor:pointer"><i class="fas fa-wallet" style="font-size:1.5rem;color:var(--accent)"></i><br><small>Payments</small></div>
     <div onclick="nav('a-sup')" class="stat-card" style="padding:20px;cursor:pointer"><i class="fas fa-headset" style="font-size:1.5rem;color:var(--accent)"></i><br><small>Support</small></div>
     <div onclick="nav('a-reports')" class="stat-card" style="padding:20px;cursor:pointer;position:relative"><div class="nav-badge" id="report-admin-badge" style="top:8px;right:8px"></div><i class="fas fa-flag" style="font-size:1.5rem;color:var(--red)"></i><br><small>Laporan</small></div>
-    <div onclick="nav('a-qris')" class="stat-card" style="padding:20px;cursor:pointer"><i class="fas fa-qrcode" style="font-size:1.5rem;color:var(--green)"></i><br><small>QRIS</small></div>
     <div onclick="nav('a-ai')" class="stat-card" style="padding:20px;cursor:pointer"><i class="fas fa-robot" style="font-size:1.5rem;color:var(--elite)"></i><br><small>AI Config</small></div>
     <div onclick="nav('a-groups')" class="stat-card" style="padding:20px;cursor:pointer"><i class="fas fa-people-group" style="font-size:1.5rem;color:var(--accent)"></i><br><small>Semua Grup</small></div>
     <div onclick="toggleMaintenance()" class="stat-card" style="padding:20px;cursor:pointer" id="maint-btn"><i class="fas fa-tools" style="font-size:1.5rem;color:var(--red)"></i><br><small id="maint-label">Maintenance</small></div>
@@ -903,6 +1098,7 @@ select{appearance:none;cursor:pointer}
     <i id="np-play-btn" class="fas fa-pause-circle" onclick="togP()" style="font-size:3.8rem; cursor:pointer; color:#fff; filter:drop-shadow(0 0 8px rgba(255,255,255,0.5));"></i>
     <i class="fas fa-step-forward" onclick="nextSong()" style="font-size:1.6rem; cursor:pointer; color:#fff;"></i>
     <i class="far fa-heart" id="np-fav-btn" onclick="toggleFavCurrent()" style="font-size:1.2rem; cursor:pointer; color:var(--gray);"></i>
+    <i class="fas fa-share-alt" onclick="shareSong(currentSongId)" style="font-size:1.2rem;cursor:pointer;color:var(--gray);"></i>
   </div>
 </div>
 
@@ -1386,6 +1582,11 @@ function startApp(){
   startUserBanListener();
   setOnlineStatus(true);
   
+  // Update login streak & role
+updateLoginStreak();
+setTimeout(() => updateRoleProgress(), 1000);
+checkInviteReferral();
+  
     // ✅ Loader PASTI hilang
   setTimeout(()=>{
     var l=document.getElementById('loader-ov');
@@ -1530,6 +1731,8 @@ function detectLang(title,artist){
 function mkRow(s) {
   const r = document.createElement('div');
   r.className = 'track-row';
+  r.dataset.songId = s.id;
+  if (s.id === currentSongId) r.classList.add('active-song');
   r.onclick = () => playSong(s.id);
   r.innerHTML = `<img src="${esc(s.cover||DC)}" onerror="this.src='${DC}'" alt=""><div style="min-width:0;flex:1"><b style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(s.title)}</b><small style="color:var(--gray)">${esc(s.artist)}</small></div>`;
   return r;
@@ -1545,7 +1748,7 @@ function rHome() {
 
     // ========== GRID 4 LAGU SESUAI WAKTU ==========
     const grid = document.getElementById('spotify-grid');
-    let topPicks = []; // Pindahkan ke sini agar bisa diakses oleh rekomendasi
+    let topPicks = [];
     if (grid) {
       grid.innerHTML = '';
 
@@ -1592,10 +1795,12 @@ function rHome() {
         }
       }
 
-      // Tampilkan grid
+      // Tampilkan grid DENGAN HIGHLIGHT
       topPicks.forEach(s => {
         const card = document.createElement('div');
         card.className = 'spotify-card';
+        card.dataset.songId = s.id;
+        if (s.id === currentSongId) card.classList.add('active-song');
         card.onclick = () => playSong(s.id);
         card.innerHTML = `<img src="${esc(s.cover || DC)}" onerror="this.src='${DC}'"><div class="card-info"><b>${esc(s.title || 'Tanpa Judul')}</b><small>${esc(s.artist || 'Unknown')}</small></div>`;
         grid.appendChild(card);
@@ -1642,9 +1847,12 @@ function rHome() {
 
         recommendations = recommendations.sort(() => Math.random() - 0.5).slice(0, 10);
 
+        // Tampilkan rekomendasi DENGAN HIGHLIGHT
         recommendations.forEach(s => {
           const card = document.createElement('div');
           card.className = 'spotify-card';
+          card.dataset.songId = s.id;
+          if (s.id === currentSongId) card.classList.add('active-song');
           card.onclick = () => playSong(s.id);
           card.innerHTML = `<img src="${esc(s.cover || DC)}" onerror="this.src='${DC}'"><div class="card-info"><b>${esc(s.title || 'Tanpa Judul')}</b><small>${esc(s.artist || 'Unknown')}</small></div>`;
           recSec.appendChild(card);
@@ -1668,6 +1876,10 @@ function rHome() {
         });
       }
     }
+
+    // ✅ UPDATE HIGHLIGHT SETELAH SEMUA RENDER
+    setTimeout(() => updateActiveSongHighlight(), 100);
+
   } catch (e) {
     console.error('rHome error:', e);
     toast("Tampilan Home error: " + e.message, true);
@@ -1734,6 +1946,10 @@ if (localHistory.length > 100) localHistory = localHistory.slice(-100);
 localStorage.setItem('regal_history_' + U.name, JSON.stringify(localHistory));
 
   db.ref('songs/' + id + '/plays').transaction(v => (v || 0) + 1);
+  
+  setTimeout(() => {
+    updateActiveSongHighlight();
+  }, 200);
 }
 
 // ----- NOW PLAYING -----
@@ -1884,6 +2100,7 @@ function prevSong() {
   let i = songs.findIndex(x => x.id === currentSongId);
   i = (i - 1 + songs.length) % songs.length;
   playSong(songs[i].id);
+  updateActiveSongHighlight();
 }
 
 // Progress bar + waktu (side player & now playing)
@@ -2113,6 +2330,18 @@ function mkBubble(m, mid, mine, displayName, chatType, chatId, onReply) {
     contentHtml = `<div class="chat-sticker" style="font-size:2.5rem">${esc(m.text)}</div>`;
   } else if (m.type === 'deleted') {
     contentHtml = `<i style="color:#888;font-style:italic;">Pesan telah dihapus</i>`;
+  } else if (m.type === 'song' && m.songId) {
+    // ✅ KIRIM LAGU — tampil sebagai card
+    contentHtml = `
+      <div onclick="event.stopPropagation();playSong('${esc(m.songId)}')" style="background:rgba(255,255,255,.05);border-radius:10px;padding:10px;cursor:pointer;display:flex;align-items:center;gap:10px">
+        <img src="${esc(m.cover || DC)}" style="width:40px;height:40px;border-radius:5px;object-fit:cover">
+        <div style="flex:1;min-width:0">
+          <b style="font-size:.85rem;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(m.title)}</b>
+          <small style="color:var(--gray)">${esc(m.artist)}</small>
+        </div>
+        <i class="fas fa-play" style="color:var(--green)"></i>
+      </div>
+    `;
   } else {
     contentHtml = esc(m.text || '');
   }
@@ -2130,6 +2359,7 @@ function mkBubble(m, mid, mine, displayName, chatType, chatId, onReply) {
     document.querySelectorAll('.chat-bubble').forEach(x => x.classList.remove('show-actions'));
     b.classList.toggle('show-actions');
   });
+
   return b;
 }
 
@@ -2688,6 +2918,11 @@ async function doUpload(){
     }
 
     toast("🎵 Upload berhasil!");
+    
+    // Update upload count & cek role
+db.ref('users/' + U.name + '/uploadCount').transaction(v => (v || 0) + 1);
+setTimeout(() => checkAndUpgradeRole(), 1000);
+
     // Reset
     document.getElementById('up-title').value='';
     document.getElementById('up-artist').value='';
@@ -3091,6 +3326,445 @@ document.addEventListener('click',e=>{
   if(sp.classList.contains('show')&&!sp.contains(e.target)&&!e.target.closest('.chat-extra-btn')){hideStickerPanel()}
   if(!e.target.closest('.chat-bubble')){document.querySelectorAll('.chat-bubble').forEach(x=>x.classList.remove('show-actions'))}
 });
+
+// ============================================================
+// VIEW IMAGE (dengan error handling)
+// ============================================================
+
+function viewImg(url) {
+  // CEK: apakah URL ada?
+  if (!url) {
+    toast("Tidak ada gambar untuk ditampilkan!", true);
+    return;
+  }
+
+  // CEK: apakah elemen viewer ada?
+  const viewer = document.getElementById('img-viewer');
+  const img = document.getElementById('iv-img');
+  
+  if (!viewer || !img) {
+    console.error("Elemen viewer tidak ditemukan!");
+    toast("Gagal membuka gambar!", true);
+    return;
+  }
+
+  // SET gambar dan tampilkan viewer
+  img.src = url;
+  viewer.style.display = 'flex';
+  
+  // TAMBAH: biar user bisa tutup pake klik di luar gambar
+  viewer.onclick = function(e) {
+    if (e.target === viewer) {
+      viewer.style.display = 'none';
+    }
+  };
+}
+
+// ============================================================
+// DOWNLOAD GAMBAR (dengan fallback)
+// ============================================================
+
+function downloadImage() {
+  const img = document.getElementById('iv-img');
+  
+  // CEK: apakah ada gambar?
+  if (!img || !img.src || img.src === '' || img.src === window.location.href) {
+    toast("Tidak ada gambar untuk disimpan!", true);
+    return;
+  }
+
+  try {
+    // CARA 1: pake fetch (lebih stabil buat gambar dari luar)
+    fetch(img.src)
+      .then(response => response.blob())
+      .then(blob => {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'regal_image_' + Date.now() + '.jpg';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        toast("✅ Gambar berhasil disimpan!");
+      })
+      .catch(() => {
+        // FALLBACK: kalo fetch gagal, pake cara langsung
+        fallbackDownloadImage(img.src);
+      });
+  } catch (e) {
+    // FALLBACK: kalo error, pake cara tradisional
+    fallbackDownloadImage(img.src);
+  }
+}
+
+function fallbackDownloadImage(src) {
+  try {
+    const link = document.createElement('a');
+    link.href = src;
+    link.download = 'regal_image_' + Date.now() + '.jpg';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast("✅ Gambar berhasil disimpan!");
+  } catch (e) {
+    toast("Gagal menyimpan gambar! Coba buka di browser lain.", true);
+    console.error("Download error:", e);
+  }
+}
+
+// ============================================================
+// TUTUP VIEWER PAKE TOMBOL ESC
+// ============================================================
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    const viewer = document.getElementById('img-viewer');
+    if (viewer && viewer.style.display === 'flex') {
+      viewer.style.display = 'none';
+    }
+  }
+});
+
+// ============================================================
+// COPY TEKS KE CLIPBOARD
+// ============================================================
+
+function copyMsg(text) {
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => {
+      toast("📋 Teks disalin!");
+    }).catch(() => {
+      fallbackCopy(text);
+    });
+  } else {
+    fallbackCopy(text);
+  }
+}
+
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  document.execCommand('copy');
+  document.body.removeChild(ta);
+  toast("📋 Teks disalin!");
+}
+
+// ============================================================
+// KIRIM LAGU KE CHAT (DETEKSI OTOMATIS)
+// ============================================================
+
+function sendCurrentSong() {
+  // Cek login & lagu
+  if (!U) { toast("Login dulu!", true); return; }
+  if (!currentSongId) { toast("Gak ada lagu yang diputar!", true); return; }
+  
+  const s = songs.find(x => x.id === currentSongId);
+  if (!s) { toast("Lagu tidak ditemukan!", true); return; }
+
+  // Deteksi target berdasarkan halaman yang aktif
+  let target = null;
+  let targetId = null;
+
+  // Cek apakah di halaman DM
+  if (document.getElementById('chat-room').classList.contains('active') && currentDMUser) {
+    target = 'dm';
+    targetId = currentDMUser;
+  }
+  // Cek apakah di halaman Grup
+  else if (document.getElementById('group-room').classList.contains('active') && currentGroupId) {
+    target = 'grp';
+    targetId = currentGroupId;
+  }
+  // Cek apakah di halaman Live Chat
+  else if (document.getElementById('live-chat').classList.contains('active')) {
+    target = 'live';
+    targetId = 'live';
+  } else {
+    toast("Buka chat/grup/live dulu!", true);
+    return;
+  }
+
+  // Siapkan pesan
+  const msg = {
+    from: U.name,
+    type: 'song',
+    songId: currentSongId,
+    title: s.title,
+    artist: s.artist,
+    cover: s.cover || DC,
+    text: '🎵 ' + s.title + ' - ' + s.artist,
+    ts: firebase.database.ServerValue.TIMESTAMP
+  };
+
+  // Kirim ke target yang terdeteksi
+  if (target === 'dm') {
+    const key = getDMKey(U.name, targetId);
+    db.ref('dms/' + key).push(msg);
+    db.ref('dmNotify/' + targetId + '/' + U.name).set({unread: true, ts: firebase.database.ServerValue.TIMESTAMP});
+    toast("🎵 Lagu dikirim ke chat!");
+  } else if (target === 'grp') {
+    db.ref('groupMsgs/' + targetId).push({...msg, user: U.name, role: U.role});
+    toast("🎵 Lagu dikirim ke grup!");
+  } else if (target === 'live') {
+    db.ref('liveChat').push({user: U.name, role: U.role, ...msg});
+    toast("🎵 Lagu dikirim ke Live Chat!");
+  }
+}
+
+// ============================================================
+// EMOJI PANEL (untuk input chat)
+// ============================================================
+
+const EMOJIS = ['😀','😂','🥹','😍','🤩','😎','😭','😡','🥺','🤔','👍','❤️','🔥','💯','🎵','🎶','🎉','🎊','👑','💎','⭐','🌟','🚀','💫','🌈','🎸','🎤','🎧','🍎','🍕','🐶','🐱','🦁','🐻','🌸','🌺','🌊','⚡','🌙','☀️','😁','😅','🥰','😘','😗','😙','😚','☺️','🙂','🤗','🤭','🤫','🤔','😐','😑','😶','🙄','😏','😣','😥','😮','🤐','😯','😪','😫','😴','😌','😛','😜','😝','🤤','😒','😓','😔','😕','🙃','🤑','😲','☹️','🙁','😖','😞','😟','😤','😢','😨','😰','😬','😳','🤯','😩','😧','😱','🥵','🥶'];
+
+function toggleEmojiPanel() {
+  const panel = document.getElementById('emoji-panel');
+  if (panel.style.display === 'block') {
+    panel.style.display = 'none';
+    return;
+  }
+  
+  // Isi grid emoji
+  const grid = document.getElementById('emoji-grid');
+  grid.innerHTML = '';
+  EMOJIS.forEach(emoji => {
+    const span = document.createElement('span');
+    span.textContent = emoji;
+    span.className = 'emoji-item';
+    span.onclick = function() { insertEmoji(emoji); };
+    grid.appendChild(span);
+  });
+  
+  panel.style.display = 'block';
+}
+
+function insertEmoji(emoji) {
+  // Cari input yang aktif
+  const activeInput = document.activeElement;
+  const inputIds = ['cr-in', 'gr-in', 'live-in', 'ai-in'];
+  
+  if (activeInput && inputIds.includes(activeInput.id)) {
+    const start = activeInput.selectionStart;
+    const end = activeInput.selectionEnd;
+    const text = activeInput.value;
+    activeInput.value = text.substring(0, start) + emoji + text.substring(end);
+    activeInput.selectionStart = activeInput.selectionEnd = start + emoji.length;
+    activeInput.focus();
+  } else {
+    // Fallback: cari input yang visible
+    for (let id of inputIds) {
+      const el = document.getElementById(id);
+      if (el && el.offsetParent !== null) {
+        const start = el.selectionStart || 0;
+        const text = el.value;
+        el.value = text.substring(0, start) + emoji + text.substring(start);
+        el.selectionStart = el.selectionEnd = start + emoji.length;
+        el.focus();
+        break;
+      }
+    }
+  }
+  
+  // Sembunyikan panel setelah pilih emoji
+  document.getElementById('emoji-panel').style.display = 'none';
+}
+
+// Tutup panel kalo klik di luar
+document.addEventListener('click', function(e) {
+  const panel = document.getElementById('emoji-panel');
+  if (panel.style.display === 'block' && !panel.contains(e.target) && !e.target.closest('.chat-extra-btn')) {
+    panel.style.display = 'none';
+  }
+});
+
+// ============================================================
+// ROLE PROGRESS & ANIMASI
+// ============================================================
+
+function updateRoleProgress() {
+  if (!U) return;
+  db.ref('users/' + U.name).once('value', snap => {
+    const data = snap.val();
+    if (!data) return;
+    const role = data.role || 'viewer';
+    const uploads = data.uploadCount || 0;
+    const streak = data.loginStreak || 0;
+    const invites = data.invites || 0;
+    const lastActive = data.lastActive || data.lastLogin || 0;
+    const daysInactive = Math.floor((Date.now() - lastActive) / (1000 * 60 * 60 * 24));
+    
+    const badgeMap = { 'viewer': '👤', 'creator': '⭐', 'elite': '💎', 'admin': '🛡️', 'owner': '👑' };
+    document.getElementById('rp-badge-preview').innerText = badgeMap[role] || '👤';
+    document.getElementById('rp-current-role').innerText = role.toUpperCase();
+    document.getElementById('rp-upload-count').innerText = uploads;
+    document.getElementById('rp-streak-count').innerText = streak;
+    document.getElementById('rp-invite-count').innerText = invites;
+    document.getElementById('rp-inactive-days').innerText = daysInactive;
+    
+    let progress = 0, nextRole = 'Creator', nextCondition = 'Upload 5 lagu atau Invite 3 temen';
+    if (role === 'elite') { progress = 100; nextRole = '✅ Elite (Max!)'; nextCondition = 'Pertahankan streak!'; }
+    else if (role === 'creator') {
+      const eliteProgress = Math.min((streak / 30) * 100, (uploads / 20) * 100);
+      progress = 50 + (eliteProgress / 2);
+      nextRole = 'Elite';
+      nextCondition = 'Login 30 hari atau Upload 20 lagu';
+    } else {
+      const creatorProgress = Math.min((uploads / 5) * 100, (invites / 3) * 100);
+      progress = creatorProgress / 2;
+      nextRole = 'Creator';
+      nextCondition = 'Upload 5 lagu atau Invite 3 temen';
+    }
+    document.getElementById('rp-progress-bar').style.width = Math.min(progress, 100) + '%';
+    document.getElementById('rp-progress-text').innerText = Math.min(Math.round(progress), 100) + '%';
+    document.getElementById('rp-next-name').innerText = nextRole;
+    document.getElementById('rp-next-condition').innerText = nextCondition;
+    
+    const isCreator = ['creator','elite','admin','owner'].includes(role);
+    const isElite = ['elite','admin','owner'].includes(role);
+    const cBadge = document.getElementById('rp-creator-badge');
+    cBadge.innerText = isCreator ? '✅ AKTIF' : '🔒 Terkunci';
+    cBadge.style.background = isCreator ? 'var(--green)' : '#333';
+    cBadge.style.color = isCreator ? '#000' : 'var(--gray)';
+    const eBadge = document.getElementById('rp-elite-badge');
+    eBadge.innerText = isElite ? '✅ AKTIF' : '🔒 Terkunci';
+    eBadge.style.background = isElite ? 'var(--green)' : '#333';
+    eBadge.style.color = isElite ? '#000' : 'var(--gray)';
+  });
+}
+
+function fireConfetti() {
+  if (typeof confetti !== 'undefined') {
+    confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+    setTimeout(() => { confetti({ particleCount: 100, spread: 100, origin: { y: 0.5, x: 0.3 } }); }, 200);
+    setTimeout(() => { confetti({ particleCount: 100, spread: 100, origin: { y: 0.5, x: 0.7 } }); }, 400);
+  }
+}
+
+function showRoleUpgradeAnimation(role) {
+  const emojiMap = { 'creator': '⭐', 'elite': '💎' };
+  const el = document.createElement('div');
+  el.className = 'role-upgrade-flash';
+  el.innerHTML = `<div class="ring"></div><div class="badge-big">${emojiMap[role] || '🎉'}</div>`;
+  document.body.appendChild(el);
+  setTimeout(() => { el.remove(); }, 2500);
+  fireConfetti();
+}
+
+function checkAndUpgradeRole() {
+  if (!U) return;
+  if (isDev(U.name) || hasAdmin(U.name)) return;
+  const userRef = db.ref('users/' + U.name);
+  userRef.once('value', snap => {
+    const data = snap.val();
+    if (!data) return;
+    const currentRole = data.role || 'viewer';
+    const uploads = data.uploadCount || 0, streak = data.loginStreak || 0, invites = data.invites || 0;
+    let newRole = currentRole, upgraded = false;
+    if (currentRole === 'viewer' && (uploads >= 5 || invites >= 3)) { newRole = 'creator'; upgraded = true; }
+    else if (currentRole === 'creator' && (streak >= 30 || uploads >= 20)) { newRole = 'elite'; upgraded = true; }
+    if (currentRole !== 'viewer') {
+      const lastActive = data.lastActive || data.lastLogin || 0;
+      const daysInactive = Math.floor((Date.now() - lastActive) / (1000 * 60 * 60 * 24));
+      if (daysInactive >= 3) {
+        if (currentRole === 'elite') { newRole = 'creator'; upgraded = false; toast("⚠️ Turun ke Creator karena 3 hari gak aktif!"); }
+        else if (currentRole === 'creator') { newRole = 'viewer'; upgraded = false; toast("⚠️ Turun ke Viewer karena 3 hari gak aktif!"); }
+      }
+    }
+    if (newRole !== currentRole) {
+      userRef.update({ role: newRole, lastActive: Date.now() });
+      if (upgraded) { toast("🎉 Selamat! Lo naik jadi " + newRole.toUpperCase() + "!"); showRoleUpgradeAnimation(newRole); setTimeout(() => updateRoleProgress(), 1000); }
+    }
+  });
+}
+
+function updateLoginStreak() {
+  if (!U) return;
+  const today = new Date().toISOString().split('T')[0];
+  const userRef = db.ref('users/' + U.name);
+  userRef.once('value', snap => {
+    const data = snap.val();
+    if (!data) return;
+    const lastLogin = data.lastLogin || '';
+    let streak = data.loginStreak || 0;
+    if (lastLogin === today) return;
+    const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = yesterday.toISOString().split('T')[0];
+    streak = (lastLogin === yesterdayStr) ? streak + 1 : 1;
+    userRef.update({ lastLogin: today, loginStreak: streak, lastActive: Date.now() });
+    setTimeout(() => checkAndUpgradeRole(), 500);
+  });
+}
+
+function generateInviteLink() {
+  if (!U) return;
+  db.ref('users/' + U.name + '/inviteCode').once('value', snap => {
+    let code = snap.val();
+    if (!code) {
+      code = U.name.substring(0,4) + '_' + Date.now().toString(36).substring(0,4);
+      db.ref('users/' + U.name + '/inviteCode').set(code);
+    }
+    const link = window.location.origin + window.location.pathname + '?ref=' + code;
+    showModal("🔗 Link Undangan",
+      `<p style="font-size:.8rem;color:var(--gray);margin-bottom:10px">Share link ini ke temen-temen lo!</p>
+      <div style="background:rgba(255,255,255,.05);padding:12px;border-radius:8px;font-size:.75rem;word-break:break-all;margin-bottom:10px">${esc(link)}</div>
+      <p style="font-size:.7rem;color:var(--gray)">Kalo temen lo daftar pake link ini, lo dapet 1 poin undangan.<br><b style="color:var(--accent)">3 poin = Role CREATOR!</b></p>`,
+      () => { copyMsg(link); closeModal(); }
+    );
+    document.getElementById('m-ok').innerText = 'Salin Link';
+  });
+}
+
+function checkInviteReferral() {
+  const params = new URLSearchParams(window.location.search);
+  const refCode = params.get('ref');
+  if (!refCode || !U) return;
+  db.ref('users').orderByChild('inviteCode').equalTo(refCode).once('value', snap => {
+    let inviter = null;
+    snap.forEach(child => { inviter = child.key; });
+    if (!inviter) { toast("Kode undangan tidak valid!", true); return; }
+    if (inviter === U.name) { toast("Gak bisa pake link sendiri!", true); return; }
+    db.ref('users/' + inviter + '/invites').transaction(v => (v || 0) + 1);
+    db.ref('users/' + U.name + '/invitedBy').set(inviter);
+    toast("🎉 Berhasil! " + inviter + " dapat 1 poin undangan!");
+    setTimeout(() => checkAndUpgradeRole(), 1000);
+  });
+  window.history.replaceState({}, '', window.location.pathname);
+}
+
+// ============================================================
+// SHARE KE SOSMED
+// ============================================================
+
+function shareSong(songId) {
+  const s = songs.find(x => x.id === songId);
+  if (!s) { toast("Lagu tidak ditemukan!", true); return; }
+  const shareData = { title: s.title + ' - ' + s.artist, text: '🎵 Dengerin ' + s.title + ' - ' + s.artist + ' di Regal Music!', url: window.location.href };
+  if (navigator.share) { navigator.share(shareData).catch(() => {}); }
+  else { copyMsg(window.location.href); toast("Link disalin! Share ke temen lo."); }
+}
+
+// ============================================================
+// UPDATE HIGHLIGHT LAGU AKTIF
+// ============================================================
+
+function updateActiveSongHighlight() {
+  // Hapus class aktif dari semua elemen lagu
+  document.querySelectorAll('.track-row, .spotify-card').forEach(el => {
+    el.classList.remove('active-song');
+  });
+
+  // Tambahin class aktif ke elemen yang sedang diputar
+  if (currentSongId) {
+    document.querySelectorAll(`.track-row[data-song-id="${currentSongId}"], .spotify-card[data-song-id="${currentSongId}"]`).forEach(el => {
+      el.classList.add('active-song');
+    });
+  }
+}
 
 // ============================================================
 // START
