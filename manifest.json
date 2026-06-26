@@ -1,0 +1,12 @@
+{
+  "name": "Regal Music",
+  "short_name": "Regal",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#050a0f",
+  "theme_color": "#d4af37",
+  "lang": "id",
+  "orientation": "any",
+  "categories": ["entertainment", "music"],
+  "description": "Regal Music - Gratis tanpa iklan!"
+}
