@@ -1,0 +1,76 @@
+{
+  "name": "Regal Music",
+  "short_name": "Regal",
+  "id": "Regal",
+  "start_url": "https://regal-music-jade.vercel.app/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": [
+    "window-controls-overlay",
+    "standalone"
+  ],
+  "background_color": "#050a0f",
+  "theme_color": "#d4af37",
+  "lang": "id",
+  "orientation": "portrait",
+  "categories": [
+    "entertainment",
+    "music"
+  ],
+  "description": "Regal Music - Dengarkan musik gratis tanpa iklan!",
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "Beranda",
+      "short_name": "Beranda",
+      "description": "Buka halaman utama Regal",
+      "url": "/",
+      "icons": [
+        {
+          "src": "/logo.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Cari Lagu",
+      "short_name": "Cari",
+      "description": "Cari lagu favorit lo",
+      "url": "/?search"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot-1.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/screenshot-2.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "256x256",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
