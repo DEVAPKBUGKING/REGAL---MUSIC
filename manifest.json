@@ -1,6 +1,7 @@
 {
   "name": "Regal Music",
   "short_name": "Regal",
+  "id": "Regal",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#050a0f",
