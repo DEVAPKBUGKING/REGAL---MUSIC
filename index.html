@@ -1615,7 +1615,7 @@ if (Notification.permission === 'default') {
     U.role=d.role||'viewer';U.phone=d.phone;U.bio=d.bio||'Regal User';U.pfp=d.pfp||'';
     localStorage.setItem('uv18',JSON.stringify(U));
     document.getElementById('n-ad').style.display=hasAdmin(U.name)?'flex':'none';
-    document.getElementById('n-up').style.display=canUpload(U.name)?'flex':'none';
+    document.getElementById('n-up').style.display = canUpload(U.name) ? 'flex' : 'none';
     document.getElementById('n-ai').style.display=canUseAI()?'flex':'none';
     var gc=document.getElementById('create-grp-btn');
     if(gc)gc.style.display=canCreateGroup(U.name)?'flex':'none';
@@ -1917,13 +1917,60 @@ function clearSH(){searchHistory=[];localStorage.setItem('sh_'+U.name,'[]');rend
 // ============================================================
 // PLAYER (SIDE) + NOW PLAYING + LYRICS
 // ============================================================
-function playSong(id){
+async function playSong(id) {
   const s = songs.find(x => x.id === id);
   if (!s) { toast("Lagu tidak tersedia", true); return; }
+  
+  // ===== CEK CACHE DULU =====
+  try {
+    const cache = await caches.open('regal-audio');
+    const cachedResponse = await cache.match(s.url);
+    
+    if (cachedResponse) {
+      // ✅ KALO UDAH ADA DI CACHE, PAKE LANGSUMG (GAK PAKE KUOTA!)
+      console.log('✅ Lagu dari cache:', s.title);
+      const blob = await cachedResponse.blob();
+      const url = URL.createObjectURL(blob);
+      
+      aud.src = url;
+      await aud.play().catch(() => {});
+      
+      currentSongId = id;
+      document.getElementById('p-ti').innerText = s.title;
+      const pi = document.getElementById('p-img');
+      pi.src = s.cover || DC;
+      pi.onerror = function(){ this.src = DC; };
+      pi.onclick = openNowPlaying;
+      pi.style.cursor = 'pointer';
+      document.getElementById('side-player').style.display = 'flex';
+      document.getElementById('p-ic').className = 'fas fa-pause sp-btn';
+      updateFavBtn(); updatePlBtn();
+      updateNowPlayingUI();
+      updateLyricsPage();
+      
+      const lang = detectLang(s.title, s.artist);
+      db.ref('playHistory/' + U.name).push({ songId: id, lang, ts: firebase.database.ServerValue.TIMESTAMP });
+      db.ref('songs/' + id + '/plays').transaction(v => (v || 0) + 1);
+      
+      let localHistory = JSON.parse(localStorage.getItem('regal_history_' + U.name) || '[]');
+      localHistory.push({ id: id, ts: Date.now() });
+      if (localHistory.length > 100) localHistory = localHistory.slice(-100);
+      localStorage.setItem('regal_history_' + U.name, JSON.stringify(localHistory));
+      
+      setTimeout(() => { updateActiveSongHighlight(); }, 200);
+      return; // ✅ LANGSUNG KELUAR, GAK DOWNLOAD LAGI
+    }
+  } catch(e) {
+    console.log('⚠️ Cache error (lanjut download normal):', e);
+  }
+  // ===== SAMPE SINI =====
+  
+  // ===== KALO BELUM ADA DI CACHE, DOWNLOAD DARI SERVER =====
+  console.log('⬇️ Download lagu dari server:', s.title);
   currentSongId = id;
   aud.src = s.url;
-  aud.play().catch(() => {});
-
+  await aud.play().catch(() => {});
+  
   document.getElementById('p-ti').innerText = s.title;
   const pi = document.getElementById('p-img');
   pi.src = s.cover || DC;
@@ -1939,17 +1986,26 @@ function playSong(id){
   const lang = detectLang(s.title, s.artist);
   db.ref('playHistory/' + U.name).push({ songId: id, lang, ts: firebase.database.ServerValue.TIMESTAMP });
   
-  // ✅ Simpan riwayat ke localStorage untuk rekomendasi instan
-let localHistory = JSON.parse(localStorage.getItem('regal_history_' + U.name) || '[]');
-localHistory.push({ id: id, ts: Date.now() });
-if (localHistory.length > 100) localHistory = localHistory.slice(-100);
-localStorage.setItem('regal_history_' + U.name, JSON.stringify(localHistory));
+  let localHistory = JSON.parse(localStorage.getItem('regal_history_' + U.name) || '[]');
+  localHistory.push({ id: id, ts: Date.now() });
+  if (localHistory.length > 100) localHistory = localHistory.slice(-100);
+  localStorage.setItem('regal_history_' + U.name, JSON.stringify(localHistory));
 
   db.ref('songs/' + id + '/plays').transaction(v => (v || 0) + 1);
   
-  setTimeout(() => {
-    updateActiveSongHighlight();
-  }, 200);
+  setTimeout(() => { updateActiveSongHighlight(); }, 200);
+  
+  // ===== SIMPAN KE CACHE (BIAR NEXT TIME GAK PAKE KUOTA) =====
+  try {
+    const cache = await caches.open('regal-audio');
+    const existing = await cache.match(s.url);
+    if (!existing) {
+      await cache.add(s.url);
+      console.log('✅ Lagu disimpan ke cache:', s.title);
+    }
+  } catch(e) {
+    console.log('⚠️ Gagal simpan cache:', e);
+  }
 }
 
 // ----- NOW PLAYING -----
