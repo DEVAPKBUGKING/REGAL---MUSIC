@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Regal Mix Studio (5 Lagu)</title>
+  <style>
+    body { margin:0; background:#050a0f; color:#fff; font-family:'Plus Jakarta Sans',sans-serif; padding:20px; min-height:100vh; }
+    .container { max-width:600px; margin:0 auto; }
+    h1 { color:#d4af37; font-size:1.8rem; text-align:center; }
+    .tag { display:inline-block; background:#d4af37; color:#000; font-size:.6rem; font-weight:800; padding:2px 12px; border-radius:20px; margin-bottom:6px; }
+    .card { background:rgba(15,25,35,0.9); border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:16px 20px; margin-bottom:16px; }
+    .track-row { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-bottom:12px; }
+    .track-row select { flex:2; min-width:120px; padding:10px 12px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:#fff; font-size:.85rem; }
+    .track-row input[type="range"] { flex:1; min-width:80px; accent-color:#d4af37; }
+    .track-row label { font-size:.7rem; color:#b3b3b3; min-width:40px; }
+    .btn-gold { background:#d4af37; color:#000; border:none; border-radius:30px; padding:14px 24px; font-weight:800; width:100%; cursor:pointer; font-size:.9rem; transition:.2s; }
+    .btn-gold:active { transform:scale(.97); opacity:.8; }
+    .btn-danger { background:#ff4444; color:#fff; border:none; border-radius:30px; padding:14px 24px; font-weight:800; width:100%; cursor:pointer; font-size:.9rem; }
+    .preview-box { background:rgba(0,0,0,.5); border-radius:12px; padding:16px; text-align:center; margin-top:12px; min-height:50px; display:flex; align-items:center; justify-content:center; }
+    .hidden { display:none; }
+    .btn-back { background:transparent; border:1px solid #333; color:#b3b3b3; border-radius:30px; padding:12px; width:100%; cursor:pointer; margin-top:20px; }
+    .badge-dev { background:#ff6600; color:#fff; font-size:.6rem; padding:2px 10px; border-radius:20px; margin-left:10px; }
+    .vol-value { font-size:.7rem; color:#d4af37; min-width:30px; text-align:center; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>🎚️ Mix Studio <span class="badge-dev">DEV</span></h1>
+  <p style="text-align:center;color:#b3b3b3;font-size:.8rem">Campur hingga 5 lagu sekaligus</p>
+
+  <!-- 5 Track Lagu -->
+  <div id="tracks-container">
+    <!-- Track 1 -->
+    <div class="card">
+      <div class="tag">LAGU 1</div>
+      <div class="track-row">
+        <select class="song-select" data-track="0">
+          <option value="">— Pilih lagu —</option>
+        </select>
+        <label>Volume</label>
+        <input type="range" class="vol-slider" data-track="0" min="0" max="1" step="0.01" value="1">
+        <span class="vol-value" id="vol-label-0">1.00</span>
+      </div>
+    </div>
+    <!-- Track 2 -->
+    <div class="card">
+      <div class="tag">LAGU 2</div>
+      <div class="track-row">
+        <select class="song-select" data-track="1">
+          <option value="">— Pilih lagu —</option>
+        </select>
+        <label>Volume</label>
+        <input type="range" class="vol-slider" data-track="1" min="0" max="1" step="0.01" value="1">
+        <span class="vol-value" id="vol-label-1">1.00</span>
+      </div>
+    </div>
+    <!-- Track 3 -->
+    <div class="card">
+      <div class="tag">LAGU 3</div>
+      <div class="track-row">
+        <select class="song-select" data-track="2">
+          <option value="">— Pilih lagu —</option>
+        </select>
+        <label>Volume</label>
+        <input type="range" class="vol-slider" data-track="2" min="0" max="1" step="0.01" value="1">
+        <span class="vol-value" id="vol-label-2">1.00</span>
+      </div>
+    </div>
+    <!-- Track 4 -->
+    <div class="card">
+      <div class="tag">LAGU 4</div>
+      <div class="track-row">
+        <select class="song-select" data-track="3">
+          <option value="">— Pilih lagu —</option>
+        </select>
+        <label>Volume</label>
+        <input type="range" class="vol-slider" data-track="3" min="0" max="1" step="0.01" value="1">
+        <span class="vol-value" id="vol-label-3">1.00</span>
+      </div>
+    </div>
+    <!-- Track 5 -->
+    <div class="card">
+      <div class="tag">LAGU 5</div>
+      <div class="track-row">
+        <select class="song-select" data-track="4">
+          <option value="">— Pilih lagu —</option>
+        </select>
+        <label>Volume</label>
+        <input type="range" class="vol-slider" data-track="4" min="0" max="1" step="0.01" value="1">
+        <span class="vol-value" id="vol-label-4">1.00</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Kontrol -->
+  <div class="card">
+    <button class="btn-gold" id="preview-btn">▶️ Preview Mix</button>
+    <button class="btn-danger" id="stop-btn">⏹️ Stop</button>
+    <div class="preview-box" id="status-box">
+      <span style="color:#b3b3b3">Pilih lagu & tekan Preview</span>
+    </div>
+    <button class="btn-gold" id="export-btn" style="margin-top:12px">💾 Download Mix (WAV)</button>
+  </div>
+
+  <button class="btn-back" onclick="window.location.href='index.html'">← Kembali ke Regal</button>
+</div>
+
+<script>
+// ============================================================
+// AMBIL DATA LAGU DARI REGAL
+// ============================================================
+let songs = [];
+
+function loadSongs() {
+  // Coba dari localStorage (Regal)
+  const stored = localStorage.getItem('regal_songs_cache');
+  if (stored) {
+    try { songs = JSON.parse(stored); populateAllSelects(); return; } catch(e) {}
+  }
+
+  // Fetch dari Firebase
+  const fbConfig = {
+    apiKey: "AIzaSyBTb_DwvrKW35f15NvzNC5VTTbubZJD5JQ",
+    databaseURL: "https://developer-9640f-default-rtdb.asia-southeast1.firebasedatabase.app"
+  };
+  fetch(fbConfig.databaseURL + '/songs.json')
+    .then(res => res.json())
+    .then(data => {
+      if (data) {
+        songs = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+        localStorage.setItem('regal_songs_cache', JSON.stringify(songs));
+        populateAllSelects();
+      }
+    })
+    .catch(() => {
+      document.getElementById('status-box').innerHTML = '<span style="color:#ff4444">❌ Gagal ambil data lagu. Buka Regal dulu.</span>';
+    });
+}
+
+function populateAllSelects() {
+  document.querySelectorAll('.song-select').forEach(sel => {
+    const currentVal = sel.value;
+    sel.innerHTML = '<option value="">— Pilih lagu —</option>';
+    songs.forEach(song => {
+      const opt = document.createElement('option');
+      opt.value = song.id;
+      opt.textContent = song.title + ' - ' + song.artist;
+      sel.appendChild(opt);
+    });
+    if (currentVal) sel.value = currentVal;
+  });
+}
+
+// ============================================================
+// AUDIO MIX (5 TRACK)
+// ============================================================
+let audioCtx = null;
+let isPlaying = false;
+
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+async function playMix() {
+  const ctx = getAudioCtx();
+  if (isPlaying) { stopMix(); await new Promise(r => setTimeout(r, 300)); }
+
+  const selects = document.querySelectorAll('.song-select');
+  const sliders = document.querySelectorAll('.vol-slider');
+
+  // Kumpulkan track yang dipilih
+  const tracks = [];
+  selects.forEach((sel, i) => {
+    const songId = sel.value;
+    if (songId) {
+      const song = songs.find(s => s.id === songId);
+      if (song) {
+        tracks.push({
+          song: song,
+          volume: parseFloat(sliders[i].value) || 1
+        });
+      }
+    }
+  });
+
+  if (tracks.length === 0) {
+    document.getElementById('status-box').innerHTML = '<span style="color:#ff6600">⚠️ Pilih minimal 1 lagu</span>';
+    return;
+  }
+
+  const statusBox = document.getElementById('status-box');
+  statusBox.innerHTML = '<span style="color:#d4af37">⏳ Memuat lagu...</span>';
+
+  try {
+    if (ctx.state === 'suspended') await ctx.resume();
+
+    // Decode semua buffer
+    const buffers = [];
+    const labels = [];
+    for (let t of tracks) {
+      const resp = await fetch(t.song.url);
+      const arr = await resp.arrayBuffer();
+      const buf = await ctx.decodeAudioData(arr);
+      buffers.push(buf);
+      labels.push(t.song.title);
+    }
+
+    // Mix: gabung semua buffer
+    const maxLength = Math.max(...buffers.map(b => b.length));
+    const sampleRate = buffers[0].sampleRate;
+    const channels = Math.min(...buffers.map(b => b.numberOfChannels));
+    const mixedBuffer = ctx.createBuffer(channels, maxLength, sampleRate);
+
+    for (let ch = 0; ch < channels; ch++) {
+      const output = mixedBuffer.getChannelData(ch);
+      buffers.forEach((buf, idx) => {
+        const vol = tracks[idx].volume;
+        const input = buf.getChannelData(Math.min(ch, buf.numberOfChannels - 1));
+        for (let j = 0; j < buf.length; j++) {
+          if (j < output.length) output[j] += input[j] * vol;
+        }
+      });
+    }
+
+    // Play
+    const source = ctx.createBufferSource();
+    source.buffer = mixedBuffer;
+    const gain = ctx.createGain();
+    gain.gain.value = 1;
+    source.connect(gain);
+    gain.connect(ctx.destination);
+    source.start();
+    isPlaying = true;
+    window._mixSource = source;
+
+    statusBox.innerHTML = `<span style="color:#1db954">▶️ Memutar mix: ${labels.join(' + ')}</span>`;
+
+    source.onended = () => {
+      isPlaying = false;
+      statusBox.innerHTML = '<span style="color:#b3b3b3">⏹️ Selesai</span>';
+    };
+  } catch (err) {
+    statusBox.innerHTML = `<span style="color:#ff4444">❌ Error: ${err.message}</span>`;
+    console.error(err);
+  }
+}
+
+function stopMix() {
+  if (window._mixSource) {
+    try { window._mixSource.stop(); } catch(e) {}
+    window._mixSource = null;
+    isPlaying = false;
+  }
+  document.getElementById('status-box').innerHTML = '<span style="color:#b3b3b3">⏹️ Dihentikan</span>';
+}
+
+// ============================================================
+// EXPORT MIX (WAV)
+// ============================================================
+async function exportMix() {
+  const ctx = getAudioCtx();
+  const selects = document.querySelectorAll('.song-select');
+  const sliders = document.querySelectorAll('.vol-slider');
+
+  const tracks = [];
+  selects.forEach((sel, i) => {
+    const songId = sel.value;
+    if (songId) {
+      const song = songs.find(s => s.id === songId);
+      if (song) tracks.push({ song, volume: parseFloat(sliders[i].value) || 1 });
+    }
+  });
+
+  if (tracks.length === 0) {
+    toast('Pilih minimal 1 lagu!', true);
+    return;
+  }
+
+  const statusBox = document.getElementById('status-box');
+  statusBox.innerHTML = '<span style="color:#d4af37">⏳ Memproses export...</span>';
+
+  try {
+    const buffers = [];
+    for (let t of tracks) {
+      const resp = await fetch(t.song.url);
+      const arr = await resp.arrayBuffer();
+      buffers.push(await ctx.decodeAudioData(arr));
+    }
+
+    const maxLength = Math.max(...buffers.map(b => b.length));
+    const sampleRate = buffers[0].sampleRate;
+    const channels = Math.min(...buffers.map(b => b.numberOfChannels));
+    const mixedBuffer = ctx.createBuffer(channels, maxLength, sampleRate);
+
+    for (let ch = 0; ch < channels; ch++) {
+      const output = mixedBuffer.getChannelData(ch);
+      buffers.forEach((buf, idx) => {
+        const vol = tracks[idx].volume;
+        const input = buf.getChannelData(Math.min(ch, buf.numberOfChannels - 1));
+        for (let j = 0; j < buf.length; j++) {
+          if (j < output.length) output[j] += input[j] * vol;
+        }
+      });
+    }
+
+    // Convert ke WAV
+    const wav = audioBufferToWav(mixedBuffer);
+    const blob = new Blob([wav], { type: 'audio/wav' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `regal_mix_${Date.now()}.wav`;
+    a.click();
+    URL.revokeObjectURL(url);
+
+    statusBox.innerHTML = '<span style="color:#1db954">✅ Mix berhasil di-download!</span>';
+  } catch (err) {
+    statusBox.innerHTML = `<span style="color:#ff4444">❌ Export error: ${err.message}</span>`;
+    console.error(err);
+  }
+}
+
+// ============================================================
+// UTILITY: WAV GENERATOR
+// ============================================================
+function audioBufferToWav(buffer) {
+  const numChannels = buffer.numberOfChannels;
+  const sampleRate = buffer.sampleRate;
+  const format = 1;
+  const bitDepth = 16;
+  const bytesPerSample = bitDepth / 8;
+  const blockAlign = numChannels * bytesPerSample;
+  const dataSize = buffer.length * blockAlign;
+  const headerSize = 44;
+  const totalSize = headerSize + dataSize;
+
+  const wav = new ArrayBuffer(totalSize);
+  const view = new DataView(wav);
+
+  writeString(view, 0, 'RIFF');
+  view.setUint32(4, totalSize - 8, true);
+  writeString(view, 8, 'WAVE');
+  writeString(view, 12, 'fmt ');
+  view.setUint32(16, 16, true);
+  view.setUint16(20, format, true);
+  view.setUint16(22, numChannels, true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate * blockAlign, true);
+  view.setUint16(32, blockAlign, true);
+  view.setUint16(34, bitDepth, true);
+  writeString(view, 36, 'data');
+  view.setUint32(40, dataSize, true);
+
+  const offset = 44;
+  const data = new Float32Array(buffer.length * numChannels);
+  for (let ch = 0; ch < numChannels; ch++) {
+    const channelData = buffer.getChannelData(ch);
+    for (let i = 0; i < buffer.length; i++) {
+      data[i * numChannels + ch] = channelData[i];
+    }
+  }
+  const int16Data = new Int16Array(wav, offset, data.length);
+  for (let i = 0; i < data.length; i++) {
+    const s = Math.max(-1, Math.min(1, data[i]));
+    int16Data[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+  }
+  return wav;
+}
+
+function writeString(view, offset, string) {
+  for (let i = 0; i < string.length; i++) {
+    view.setUint8(offset + i, string.charCodeAt(i));
+  }
+}
+
+function toast(msg, warn) {
+  const t = document.createElement('div');
+  t.style.cssText = `position:fixed;top:40px;left:50%;transform:translateX(-50%);background:${warn?'#ff4444':'#1db954'};color:#000;padding:12px 24px;border-radius:30px;font-weight:800;z-index:99999;font-size:.8rem`;
+  t.innerText = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2500);
+}
+
+// Update label volume
+document.querySelectorAll('.vol-slider').forEach(slider => {
+  slider.addEventListener('input', function() {
+    const idx = this.dataset.track;
+    document.getElementById('vol-label-' + idx).textContent = parseFloat(this.value).toFixed(2);
+  });
+});
+
+// ============================================================
+// EVENT LISTENERS
+// ============================================================
+document.getElementById('preview-btn').addEventListener('click', playMix);
+document.getElementById('stop-btn').addEventListener('click', stopMix);
+document.getElementById('export-btn').addEventListener('click', exportMix);
+
+// ============================================================
+// LOAD
+// ============================================================
+loadSongs();
+</script>
+</body>
+</html>
