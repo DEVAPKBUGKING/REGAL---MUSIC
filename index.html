@@ -1557,6 +1557,12 @@ function init(){
   // 🔒 Sembunyikan navbar & side player sejak awal
   document.getElementById('bot-nav').style.display = 'none';
   document.getElementById('side-player').style.display = 'none';
+// ===== REGISTER SERVICE WORKER =====
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js')
+    .then(reg => console.log('✅ SW terdaftar!', reg))
+    .catch(err => console.log('❌ SW gagal:', err));
+}
 
   startDeviceBanListener();
   const saved=localStorage.getItem('uv18');
