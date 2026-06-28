@@ -1462,10 +1462,27 @@ function uploadFile(file, path, pBar, pFill) {
 // ============================================================
 // DEVICE BAN
 // ============================================================
-function startDeviceBanListener(){
-  db.ref('bannedDevices/'+DEVICE_ID).on('value',s=>{
-    if(s.val()===true){setDeviceBanned(true);showBanScreen("Perangkat ini telah di-banned.");}
-    else{if(isDeviceBanned()){setDeviceBanned(false);hideBanScreen()}}
+function startDeviceBanListener() {
+  db.ref('bannedDevices/' + DEVICE_ID).on('value', async (s) => {
+    // KALO KING, GAK KENA BAN
+    if (U && U.name === 'King') {
+      if (isDeviceBanned()) {
+        setDeviceBanned(false);
+        await db.ref('bannedDevices/' + DEVICE_ID).remove().catch(() => {});
+        hideBanScreen();
+      }
+      return;
+    }
+    
+    if (s.val() === true) {
+      setDeviceBanned(true);
+      showBanScreen("Perangkat ini telah di-banned.");
+    } else {
+      if (isDeviceBanned()) {
+        setDeviceBanned(false);
+        hideBanScreen();
+      }
+    }
   });
 }
 function startUserBanListener(){
@@ -1487,9 +1504,20 @@ function showBanScreen(msg){
   document.getElementById('side-player').style.display='none';
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
 }
-function hideBanScreen(){
-  const bo=document.getElementById('ban-overlay');
-  if(bo.style.display==='flex'){bo.style.display='none';if(U){document.getElementById('bot-nav').style.display='flex';nav('home');toast("✅ Anda telah di-unban!")}}
+function hideBanScreen() {
+  const bo = document.getElementById('ban-overlay');
+  if (bo.style.display === 'flex') {
+    bo.style.display = 'none';
+    if (U) {
+      document.getElementById('bot-nav').style.display = 'flex';
+      nav('home');
+      toast("✅ Anda telah di-unban!");
+    }
+    // Reset localStorage
+    setDeviceBanned(false);
+    // Hapus dari Firebase
+    db.ref('bannedDevices/' + DEVICE_ID).remove().catch(() => {});
+  }
 }
 
 // ============================================================
@@ -3177,20 +3205,42 @@ function rAdminBan(){
     b.appendChild(r);
   }
 }
-function toggleBan(un,ban){
-  showModal((ban?'BAN':'UNBAN')+" User",`<p>${ban?'Ban':'Unban'} <b style="color:var(--elite)">${esc(un)}</b>?</p>`,()=>{
-    if(ban){
-      db.ref('users/'+un+'/banned').set(true);
-      db.ref('users/'+un+'/deviceId').once('value',ds=>{const devId=ds.val();if(devId){db.ref('bannedDevices/'+devId).set(true);db.ref('users/'+un+'/bannedDevice').set(devId)}});
-      db.ref('users/'+un+'/forceLogout').set(Date.now());
-      toast(un+" di-ban!");
-    } else {
-      db.ref('users/'+un+'/banned').remove();
-      db.ref('users/'+un+'/bannedDevice').once('value',ds=>{const devId=ds.val();if(devId){db.ref('bannedDevices/'+devId).remove();db.ref('users/'+un+'/bannedDevice').remove()}});
-      db.ref('users/'+un+'/forceLogout').remove();
-      toast("✅ "+un+" di-unban!");
+function toggleBan(un, ban) {
+  const action = ban ? 'BAN' : 'UNBAN';
+  showModal(action + " User", `<p>${ban ? 'Ban' : 'Unban'} <b style="color:var(--elite)">${esc(un)}</b>?</p>`, async () => {
+    try {
+      if (ban) {
+        // BAN
+        await db.ref('users/' + un + '/banned').set(true);
+        const snap = await db.ref('users/' + un + '/deviceId').once('value');
+        const devId = snap.val();
+        if (devId) {
+          await db.ref('bannedDevices/' + devId).set(true);
+          await db.ref('users/' + un + '/bannedDevice').set(devId);
+        }
+        await db.ref('users/' + un + '/forceLogout').set(Date.now());
+        toast(un + " di-ban!");
+      } else {
+        // UNBAN
+        await db.ref('users/' + un + '/banned').remove();
+        const snap = await db.ref('users/' + un + '/bannedDevice').once('value');
+        const devId = snap.val();
+        if (devId) {
+          await db.ref('bannedDevices/' + devId).remove();
+          await db.ref('users/' + un + '/bannedDevice').remove();
+        }
+        await db.ref('users/' + un + '/forceLogout').remove();
+        toast("✅ " + un + " di-unban!");
+        
+        // Refresh halaman admin
+        setTimeout(() => {
+          location.reload();
+        }, 1000);
+      }
+      closeModal();
+    } catch (e) {
+      toast("Error: " + e.message, true);
     }
-    closeModal();
   });
 }
 function rAdminSongs(){
