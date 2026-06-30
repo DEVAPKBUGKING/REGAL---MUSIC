@@ -31,7 +31,10 @@
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></script>
 
+<script src="https://apis.google.com/js/api.js?onload=gapiLoaded"></script>
+<script src="https://accounts.google.com/gsi/client?onload=gisLoaded"></script>
 <style>
+
 :root{--accent:#d4af37;--bg:#050a0f;--card:rgba(15,25,35,0.9);--text:#fff;--gray:#b3b3b3;--elite:#00e5ff;--red:#ff4444;--green:#1db954;--border:rgba(255,255,255,0.1)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;outline:none;margin:0;padding:0}
 body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);overflow:hidden;height:100vh}
@@ -1359,6 +1362,28 @@ function getRoleBadge(role,name){if(isDev(name))return' 👑';if(role==='admin')
 function scrollBottom(el){if(el)setTimeout(()=>{el.scrollTop=el.scrollHeight},100)}
 
 // ============================================================
+// GOOGLE API LOAD
+// ============================================================
+
+function gapiLoaded() {
+  gapi.load('client', initializeGapiClient);
+}
+
+async function initializeGapiClient() {
+  await gapi.client.init({
+    apiKey: '', // Kosongin dulu
+    discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
+  });
+}
+
+function gisLoaded() {
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: CLIENT_ID,
+    scope: 'https://www.googleapis.com/auth/drive.file',
+    callback: '', // diisi nanti
+  });
+}
+// ============================================================
 // FILE UPLOAD
 // ============================================================
 function handleAudioFile(i){
@@ -1396,65 +1421,116 @@ function handleQrisFile(i){
   document.getElementById('qris-file-wrap').classList.add('active');
   const r=new FileReader();r.onload=e=>{const p=document.getElementById('qris-upload-preview');p.src=e.target.result;p.style.display='block'};r.readAsDataURL(f);
 }
+// ============================================================
+// UPLOAD KE GOOGLE DRIVE (PAKE OAUTH 2.0)
+// ============================================================
+
+const CLIENT_ID = '335344881471-6rjj0aa963esd7eciuc0du9o67vb4kr4.apps.googleusercontent.com'; // Ganti dengan Client ID dari Google Cloud!
+const API_KEY = ''; // Kosongin dulu (gak pake API key, pake OAuth)
+const SCOPES = 'https://www.googleapis.com/auth/drive.file';
+const DISCOVERY_DOCS = ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'];
+
+let tokenClient = null;
+let gapiInited = false;
+let gisInited = false;
+
+// ===== INISIALISASI GAPI =====
+function gapiLoaded() {
+  gapi.load('client', initializeGapiClient);
+}
+
+async function initializeGapiClient() {
+  await gapi.client.init({
+    apiKey: API_KEY,
+    discoveryDocs: DISCOVERY_DOCS,
+  });
+  gapiInited = true;
+}
+
+// ===== INISIALISASI GIS (OAuth) =====
+function gisLoaded() {
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: CLIENT_ID,
+    scope: SCOPES,
+    callback: '', // diisi nanti
+  });
+  gisInited = true;
+}
+
+// ===== UPLOAD FILE KE GOOGLE DRIVE =====
 function uploadFile(file, path, pBar, pFill) {
-  return new Promise(async (res, rej) => {
-    if (!file) { rej(new Error("No file")); return; }
+  return new Promise((resolve, reject) => {
+    if (!file) { reject(new Error("No file")); return; }
 
-    if (pBar) pBar.style.display = 'block';
-    if (pFill) pFill.style.width = '0%';
-
-    const formData = new FormData();
-    formData.append('chat_id', TELEGRAM_CHAT_ID);
-
-    // Tentukan endpoint berdasarkan tipe file
-    let endpoint;
-    if (file.type.startsWith('audio/')) {
-      formData.append('audio', file);
-      endpoint = 'sendAudio';
-    } else if (file.type.startsWith('image/')) {
-      formData.append('photo', file);
-      endpoint = 'sendPhoto';
-    } else {
-      // fallback (misal dokumen)
-      formData.append('document', file);
-      endpoint = 'sendDocument';
+    // Pastikan GAPI & GIS udah siap
+    if (!gapiInited || !gisInited) {
+      reject(new Error("Google API belum siap. Refresh halaman."));
+      return;
     }
 
-    try {
-      const response = await fetch(
-        `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/${endpoint}`,
-        { method: 'POST', body: formData }
-      );
-      const result = await response.json();
-      if (!result.ok) throw new Error(result.description);
-
-      // Ambil file_id sesuai endpoint
-      let fileId;
-      if (endpoint === 'sendAudio') {
-        fileId = result.result.audio.file_id;
-      } else if (endpoint === 'sendPhoto') {
-        // Ambil ukuran foto terbesar
-        const photos = result.result.photo;
-        fileId = photos[photos.length - 1].file_id;
-      } else {
-        fileId = result.result.document.file_id;
+    // Panggil OAuth login
+    tokenClient.callback = async (resp) => {
+      if (resp.error !== undefined) {
+        reject(new Error(resp.error));
+        return;
       }
 
-      // Dapatkan URL permanen
-      const filePathRes = await fetch(
-        `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getFile?file_id=${fileId}`
-      );
-      const filePathData = await filePathRes.json();
-      if (!filePathData.ok) throw new Error(filePathData.description);
-      const filePath = filePathData.result.file_path;
-      const url = `https://api.telegram.org/file/bot${TELEGRAM_BOT_TOKEN}/${filePath}`;
-
-      if (pBar) pBar.style.display = 'none';
+      // Update progress bar
+      if (pBar) pBar.style.display = 'block';
       if (pFill) pFill.style.width = '0%';
-      res(url);
-    } catch (e) {
-      if (pBar) pBar.style.display = 'none';
-      rej(e);
+
+      const metadata = {
+        name: file.name,
+        parents: ['root'], // Simpen di root drive (bisa diganti folder ID)
+      };
+
+      const form = new FormData();
+      form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+      form.append('file', file);
+
+      try {
+        const response = await fetch(
+          'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,webContentLink',
+          {
+            method: 'POST',
+            headers: new Headers({ 'Authorization': 'Bearer ' + gapi.client.getToken().access_token }),
+            body: form,
+          }
+        );
+        if (!response.ok) throw new Error('Upload gagal: ' + response.statusText);
+        const data = await response.json();
+        console.log('✅ Upload berhasil:', data);
+
+        // Dapetin link share publik
+        const fileId = data.id;
+        // Ubah permission jadi public
+        await gapi.client.drive.permissions.create({
+          fileId: fileId,
+          resource: {
+            role: 'reader',
+            type: 'anyone',
+          },
+        });
+
+        // Dapetin link download langsung
+        const publicUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+        console.log('🔗 Link publik:', publicUrl);
+
+        if (pBar) pBar.style.display = 'none';
+        if (pFill) pFill.style.width = '0%';
+
+        resolve(publicUrl);
+      } catch (err) {
+        if (pBar) pBar.style.display = 'none';
+        reject(err);
+      }
+    };
+
+    // Minta akses OAuth (kalo belum login)
+    if (gapi.client.getToken() === null) {
+      tokenClient.requestAccessToken({ prompt: 'consent' });
+    } else {
+      tokenClient.callback({});
     }
   });
 }
@@ -1615,6 +1691,9 @@ function startApp(){
   checkMaintenance();
   startUserBanListener();
   setOnlineStatus(true);
+  // ===== LOAD GOOGLE API =====
+  gapiLoaded();
+  gisLoaded();
   
   // Update login streak & role
 updateLoginStreak();
@@ -1636,6 +1715,27 @@ if (Notification.permission === 'default') {
     }
   });
 }
+
+  // ===== LOAD GOOGLE API (DIAMANKAN) =====
+  try {
+    if (typeof gapi !== 'undefined') {
+      gapiLoaded();
+    } else {
+      console.warn('⚠️ GAPI gak di-load, skip');
+    }
+  } catch(e) {
+    console.warn('⚠️ GAPI error:', e);
+  }
+
+  try {
+    if (typeof google !== 'undefined') {
+      gisLoaded();
+    } else {
+      console.warn('⚠️ GIS gak di-load, skip');
+    }
+  } catch(e) {
+    console.warn('⚠️ GIS error:', e);
+  }
 
 
   favs=JSON.parse(localStorage.getItem('regal_favs_'+U.name)||'[]');
